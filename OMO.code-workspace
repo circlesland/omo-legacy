@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "/Users/philippbartels/github/textileio/js-threads-client"
+		},
+		{
+			"path": "/Users/philippbartels/github/textileio/js-foldersync"
+		},
+		{
+			"path": "/Users/philippbartels/github/textileio/go-threads"
+		},
+		{
+			"path": "/Users/philippbartels/github/textileio/js-ipfs-lite"
+		},
+		{
+			"path": "/Users/philippbartels/github/phibar/ipfs-maker"
+		}
+	],
+	"settings": {}
+}

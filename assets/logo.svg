@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1585px" height="1915px" viewBox="0 0 1585 1915" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 60.1 (88133) - https://sketch.com -->
+    <title>Group 3</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard" transform="translate(-406.000000, -337.000000)">
+            <g id="Group-3" transform="translate(406.000000, 337.000000)">
+                <g id="Group-2">
+                    <ellipse id="Oval" fill="#C8D1E0" cx="793" cy="808.852252" rx="298" ry="295.852252"></ellipse>
+                    <path d="M792.5,-1.13686838e-13 C1230.18566,-1.13686838e-13 1585,354.814336 1585,792.5 C1585,1011.35747 1496.28455,1209.49434 1352.85334,1352.9109 L1141.69441,1140.41877 C1230.26428,1051.2433 1285,928.334253 1285,792.622859 C1285,520.236747 1064.50024,299.424175 792.5,299.424175 C520.499761,299.424175 300,520.236747 300,792.622859 C300,928.37111 354.765454,1051.31006 443.377756,1140.49142 L232.219107,1352.98334 C88.7453269,1209.56106 0,1011.39432 0,792.5 C0,354.814336 354.814336,-1.13686838e-13 792.5,-1.13686838e-13 Z" id="Combined-Shape" fill="#4AC984"></path>
+                </g>
+                <g id="Group" transform="translate(221.000000, 1237.000000)" fill="#C8D1E0">
+                    <rect id="Rectangle" transform="translate(697.000000, 339.500000) rotate(45.000000) translate(-697.000000, -339.500000) " x="547" y="11" width="300" height="657"></rect>
+                    <rect id="Rectangle" transform="translate(265.539105, 264.960895) rotate(45.000000) translate(-265.539105, -264.960895) " x="115.539105" y="40.4608948" width="300" height="449"></rect>
+                    <rect id="Rectangle" transform="translate(445.000000, 338.500000) rotate(-45.000000) translate(-445.000000, -338.500000) " x="295" y="10" width="300" height="657"></rect>
+                    <rect id="Rectangle" transform="translate(876.168002, 266.668002) rotate(-45.000000) translate(-876.168002, -266.668002) " x="726.168002" y="41.1680015" width="300" height="451"></rect>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
