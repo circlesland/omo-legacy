@@ -7,7 +7,6 @@ const HtmlWebPackPlugin = require("html-webpack-plugin");
 const config = {
   entry: {
     quantum: resolve("./src/index.ts"),
-    kanban: resolve("./src/quants/kanban.js"),
     test: resolve("./src/quants/test.js"),
     state: resolve("./src/quants/state.js"),
     omotheme: resolve("./src/quants/omotheme.js"),
