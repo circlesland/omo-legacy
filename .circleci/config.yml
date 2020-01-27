@@ -42,4 +42,14 @@ jobs:
           name: Deploy
           command:
             scp -r omo-quantum/dist $drinkbuddy@$drinkbuddies.org:~/quantom.drinkbuddies.org/
-
+       
+workflows:
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
