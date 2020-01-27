@@ -3,7 +3,7 @@ omo.quant(
     static get styles() {
       return [
         omo.normalize,
-        omo.css ``
+        omo.css``
       ];
     }
     constructor() {
@@ -13,13 +13,18 @@ omo.quant(
     }
 
     render() {
-      return omo.html `
+      return omo.html`
       <p>TODO</p>
       `;
     }
 
     static get model() {
       return {
+        relation: {
+          type: "relation",
+          quant: this,
+          display: "string"
+        },
         string: {
           type: "string"
         },

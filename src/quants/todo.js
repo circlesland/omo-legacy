@@ -3,7 +3,7 @@ omo.quant(
     static get styles() {
       return [
         omo.normalize,
-        omo.css `
+        omo.css`
         h1{
           color:blue;
         }`
@@ -16,7 +16,7 @@ omo.quant(
     }
 
     render() {
-      return omo.html `
+      return omo.html`
       <input type="checkbox" ?checked="${this.done}" disabled>
       <p>Task: ${this.task}</p>
       <p>von ${this.person}</p>
@@ -25,8 +25,11 @@ omo.quant(
 
     static get model() {
       return {
-        done: {
-          type: "boolean"
+        state: {
+          type: "relation",
+          quant: omo.quanta.State,
+          display: "state",
+          kanban: true
         },
         task: {
           type: "string",
@@ -35,7 +38,7 @@ omo.quant(
         person: {
           type: "relation",
           quant: omo.quanta.Person,
-          display: "name",
+          display: "name"
         },
         milestone: {
           type: "relation",

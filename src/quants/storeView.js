@@ -36,7 +36,7 @@ omo.quant(
     }
 
     render() {
-      return omo.html `
+      return omo.html`
       <div class="bg-gray-100 left border p-10">
         <h1 class="text-l">STORE</h1>
         ${Object.keys(omo.quanta).map(quant => {
