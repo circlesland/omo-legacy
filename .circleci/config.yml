@@ -41,7 +41,7 @@ jobs:
       - run:
           name: Deploy
           command:
-            scp -r omo-quantum/dist $SSH_USER@$SSH_HOST:~/quantom.drinkbuddies.org/
+            scp -r ~/omo-quantum/dist $SSH_USER@$SSH_HOST:$DEPLOY_PATH
        
 workflows:
   version: 2
