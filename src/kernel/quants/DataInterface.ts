@@ -151,6 +151,9 @@ export default class DataInterface extends Quant {
       if (item.type == "tel") {
         item.type = "string";
       }
+      if (item.type == "formular") {
+        item.type = "string";
+      }
 
       if (item.required) {
         delete item.required;

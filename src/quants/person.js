@@ -11,6 +11,7 @@ omo.quant(
       this.name = "";
       this.lastName = "";
       this.age = 0;
+      this.displayName = "${this.name} ${this.lastName}";
     }
 
     render() {
@@ -34,6 +35,9 @@ omo.quant(
         },
         email: {
           type: "email"
+        },
+        displayName: {
+          type: "formular"
         }
       };
     }

@@ -9,6 +9,28 @@ omo.quant(
         :host{
           overflow:scroll;
         }
+        .formular{
+            position:relative;
+        }
+        .formular *{
+            transition: .4s opacity;
+        }
+        .formular p{
+            position:absolute;
+            top:0;
+            left:0;
+            bottom:0;
+            right:0;
+        }
+        .formular input{
+            opacity:0;
+        }
+         .formular:hover input{
+            opacity:1;
+        }
+        .formular:hover p{
+            opacity:0;
+        }
         `
       ];
     }
@@ -114,6 +136,14 @@ omo.quant(
           return this.renderInput(properties[name].type, name, entry[name], entry.ID, properties[name].disabled, properties[name].required, pattern, properties[name].onError);
         case "relation":
           return this.renderRelation(name, entry[name], entry.ID, properties[name].options, properties[name].display);
+        case "formular":
+            let formular = entry[name] ?entry[name].replace(/this/g,"entry"):'';
+            return omo.html`
+                <div class="formular">
+                    <p>${eval('`'+formular+'`')}</p>
+                    ${this.renderInput(properties[name].type, name, entry[name], entry.ID, properties[name].disabled, properties[name].required, pattern, properties[name].onError)}
+                </div>
+            `;
         default:
           return this.renderInput("text", name, entry[name], entry.ID, properties[name].disabled, properties[name].required, pattern, properties[name].onError);
       }
