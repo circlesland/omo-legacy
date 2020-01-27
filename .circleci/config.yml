@@ -33,8 +33,6 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-      - artifacts: # defining the artifacts to be passed to each future step.
-          - ~/repo/dist/**
       - store_artifacts:
           path: ~/repo/dist
   
@@ -46,7 +44,7 @@ jobs:
       - run:
           name: Deploy
           command:
-            scp -r ~/repo/dist $SSH_USER@$SSH_HOST:$DEPLOY_PATH
+            scp -r ~/repo $SSH_USER@$SSH_HOST:$DEPLOY_PATH
        
 workflows:
   version: 2
