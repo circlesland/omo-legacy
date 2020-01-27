@@ -44,6 +44,7 @@ jobs:
             scp -r omo-quantum/dist $drinkbuddy@$drinkbuddies.org:~/quantom.drinkbuddies.org/
        
 workflows:
+  version: 2
   build-and-deploy:
     jobs:
       - build
