@@ -38,8 +38,9 @@ jobs:
   
   deploy:
     working_directory: ~/repo
-    machine:
-      enabled: true
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:13.7.0
     steps:
       - run:
           name: Deploy
