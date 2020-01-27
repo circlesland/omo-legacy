@@ -33,6 +33,8 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
+      - store_artifacts:
+          path: /repo/dist
   
   deploy:
     working_directory: ~/repo
