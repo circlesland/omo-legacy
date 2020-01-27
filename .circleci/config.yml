@@ -35,13 +35,15 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
   
   deploy:
+    working_directory: ~/repo
     machine:
       enabled: true
     steps:
       - run:
           name: Deploy
           command:
-            scp -r ~/omo-quantum/dist $SSH_USER@$SSH_HOST:$DEPLOY_PATH
+            ls &&
+            scp -r ~/repo/dist $SSH_USER@$SSH_HOST:$DEPLOY_PATH
        
 workflows:
   version: 2
