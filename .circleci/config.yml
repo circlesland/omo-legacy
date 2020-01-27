@@ -39,11 +39,11 @@ jobs:
     machine:
       enabled: true
     steps:
-      - run: ls
+      - run: ls ~/repo
       - run:
           name: Deploy
           command:
-            scp -r ~/repo/dist/ $SSH_USER@$SSH_HOST:$DEPLOY_PATH
+            scp -r ~/repo $SSH_USER@$SSH_HOST:$DEPLOY_PATH
        
 workflows:
   version: 2
