@@ -27,7 +27,7 @@ jobs:
             - v1-dependencies-
 
       - run: npm install
-      - build: npm run dev
+      - run: npm run dev
 
       - save_cache:
           paths:
@@ -41,5 +41,5 @@ jobs:
       - run:
           name: Deploy
           command:
-            - scp -r omo-quantum/dist $drinkbuddy@$drinkbuddies.org:~/quantom.drinkbuddies.org/
+            scp -r omo-quantum/dist $drinkbuddy@$drinkbuddies.org:~/quantom.drinkbuddies.org/
 
