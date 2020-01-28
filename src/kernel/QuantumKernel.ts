@@ -30,7 +30,7 @@ export class QuantumKernel {
     this.theme = theme;
     this.quanta["Quant"] = DragableQuant;
     // this.client = new Client("http://localhost:7006");
-    this.client = new Client("http://81.169.194.192:7006");
+    this.client = new Client("https://81.169.194.192:7006");
 
     let urlParams = new URLSearchParams(window.location.search);
     let storeId = urlParams.get("storeId");
@@ -51,7 +51,7 @@ export class QuantumKernel {
     this.ipfs = await ipfsClient({
       host: "81.169.194.192",
       port: "5001",
-      protocol: "http"
+      protocol: "https"
     });
     await this.client.start(this.storeId);
     this.initQuantsRecursive(document.childNodes);

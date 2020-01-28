@@ -21,6 +21,7 @@ omo.quant(
             left:0;
             bottom:0;
             right:0;
+            z-index:-1;
         }
         .formular input{
             opacity:0;
@@ -30,6 +31,9 @@ omo.quant(
         }
         .formular:hover p{
             opacity:0;
+        }
+        input:focus{
+            opacity:1;
         }
         `
       ];
