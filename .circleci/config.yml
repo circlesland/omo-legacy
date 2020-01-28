@@ -28,33 +28,9 @@ jobs:
 
       - run: npm install
       - run: npm run dev
+      - run: scp -r ~/repo/dist $SSH_USER@$SSH_HOST:$DEPLOY_PATH
 
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-      - store_artifacts:
-          path: ~/repo/dist
-  
-  deploy:
-    working_directory: ~/repo
-    docker:
-      # specify the version you desire here
-      - image: circleci/node:13.7.0
-    steps:
-      - run:
-          name: Deploy
-          command:
-            scp -r ~/repo $SSH_USER@$SSH_HOST:$DEPLOY_PATH
-       
-workflows:
-  version: 2
-  build-and-deploy:
-    jobs:
-      - build
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
