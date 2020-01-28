@@ -38,5 +38,5 @@ jobs:
       - deploy:
           name: Deploy Over SSH
           command: |
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST rm -r $DEPLOY_PATH/* && exit
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST exit
             scp -r ~/repo/dist/* $SSH_USER@$SSH_HOST:$DEPLOY_PATH
