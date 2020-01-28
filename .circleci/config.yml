@@ -28,6 +28,10 @@ jobs:
 
       - run: npm install
       - run: npm run dev
+      
+      - add_ssh_keys:
+          fingerprints:
+            - "fe:ef:a0:3c:f9:0f:4f:c5:e3:42:61:9c:c0:2e:e0:52"
       - run: scp -r ~/repo/dist $SSH_USER@$SSH_HOST:$DEPLOY_PATH
 
       - save_cache:
