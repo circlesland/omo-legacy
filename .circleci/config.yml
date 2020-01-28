@@ -27,15 +27,16 @@ jobs:
             - v1-dependencies-
 
       - run: npm install
-      - run: npm run dev
 
       - save_cache:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
           
+      - run: npm run dev
+          
       - deploy:
           name: Deploy Over SSH
           command: |
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST exit
-            scp -r ~/repo/dist $SSH_USER@$SSH_HOST:$DEPLOY_PATH
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST rm -r $DEPLOY_PATH/* && exit
+            scp -r ~/repo/dist/* $SSH_USER@$SSH_HOST:$DEPLOY_PATH
