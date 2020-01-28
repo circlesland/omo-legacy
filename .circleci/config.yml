@@ -36,4 +36,6 @@ jobs:
           
       - deploy:
           name: Deploy Over SSH
-          command: scp -r ~/repo/dist $SSH_USER@$SSH_HOST:$DEPLOY_PATH
+          command: |
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST exit
+            scp -r ~/repo/dist $SSH_USER@$SSH_HOST:$DEPLOY_PATH
