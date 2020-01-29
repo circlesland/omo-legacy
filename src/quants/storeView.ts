@@ -7,7 +7,7 @@ omo.quant(
         omo.css /*css*/ `
         :host{
           display:grid !important;
-          grid-template-areas: 
+          grid-template-areas:
             "left main right"
             "left footer right";
             grid-template-rows: 1fr auto;
@@ -82,7 +82,7 @@ omo.quant(
       super.initAsync();
     }
 
-    quantClicked(event:any) {
+    quantClicked(event: any) {
       this.active = event.target.text;
     }
   }

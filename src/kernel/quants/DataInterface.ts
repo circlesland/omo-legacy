@@ -51,7 +51,7 @@ export default class DataInterface extends Quant {
 
   async updateModel(result: any) {
     // TODO remove next line when textile fixed pubsub for listen changes on threads
-    if (result.entity.ID != this.entityId) { return; }
+    // if (result.entity.ID !== this.entityId) { return; }
     result = await window.omo.client.modelFindByID(window.omo.storeId, this.modelName, this.entityId);
     // TODO END
     Object.keys(result.entity).forEach(key => {

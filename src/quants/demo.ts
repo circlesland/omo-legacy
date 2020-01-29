@@ -23,6 +23,14 @@ omo.quant(
 
     static get model(): any {
       return {
+        string: {
+          type: "string"
+        },
+        stringpattern: {
+          onError: "Bitte eine gültige email eingeben",
+          pattern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$",
+          type: "string"
+        },
         disabled: {
           disabled: true,
           type: "string"
@@ -39,14 +47,7 @@ omo.quant(
           required: true,
           type: "string"
         },
-        string: {
-          type: "string"
-        },
-        stringpattern: {
-          onError: "Bitte eine gültige email eingeben",
-          pattern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$",
-          type: "string"
-        },
+
         boolean: {
           type: "boolean"
         },
