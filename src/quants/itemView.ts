@@ -34,6 +34,9 @@ omo.quant(
       this.quant = quant;
       console.log(entity);
     }
+    static get properties() {
+      return super.properties;
+    }
 
     public render(): void {
       console.log(this.quant._model);
@@ -48,7 +51,7 @@ omo.quant(
             <strong>${key}</strong>
             <p>${this.quant[key]}</p>
           </li>`
-      )}
+          )}
         </ul>
         ${JSON.stringify(this.quant.model)}
       `

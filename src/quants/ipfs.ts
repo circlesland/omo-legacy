@@ -26,7 +26,7 @@ omo.quant(
       `;
     }
 
-    static get properties(): any {
+    static get model(): any {
       return {
         agentVersion: {
           type: "string"
@@ -38,6 +38,10 @@ omo.quant(
           type: "string"
         }
       };
+    }
+
+    static get properties() {
+      return super.properties;
     }
 
     public async initAsync(): Promise<void> {

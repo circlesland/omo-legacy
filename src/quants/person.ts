@@ -25,6 +25,9 @@ omo.quant(
       <p>Alter: ${this.age}</p>
       `;
     }
+    static get properties() {
+      return super.properties;
+    }
 
     static get model() {
       return {

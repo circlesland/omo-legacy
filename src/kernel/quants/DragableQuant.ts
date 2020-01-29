@@ -7,4 +7,7 @@ export default class DragableQuant extends DataInterface {
     static get properties() {
         return super.properties;
     }
+    static get model() {
+        return super.model;
+    }
 }
