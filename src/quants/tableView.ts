@@ -70,7 +70,8 @@ omo.quant(
       this.quant = new this.quantConstructor();
 
       const entities = (await omo.client.modelFind(omo.storeId, this.quantConstructor._modelName, {})).entitiesList;
-      const properties = this.quantConstructor.schemaProperties;
+      const properties = {};
+      Object.keys(this.quantConstructor.schemaProperties).forEach(key=>properties[key] =this.quantConstructor._model[key])
       console.log(properties);
       await Promise.all(Object.keys(properties).map(async (key) => {
         const prop = properties[key];
@@ -125,6 +126,7 @@ omo.quant(
 
     public renderColumn(properties:any, name:string, entry:any):any {
       const pattern = properties[name].pattern ? properties[name].pattern : ".*";
+      console.log("properties[name].type",properties[name].type)
       switch (properties[name].type) {
         case "boolean":
           return omo.html `
@@ -231,14 +233,14 @@ omo.quant(
     public async openItemView(e:any):Promise<void>{
       const newQuant = new omo.quanta.ItemView();
       newQuant.show(this.quantConstructor, e.target.dataset["id"]);
-      await newQuant.initAsync();
+      await newQuant.init();
       this.parentNode.replaceChild(newQuant,this);
     }
 
      public async showView(e:any):Promise<void>{
       const newQuant = new this.quantConstructor();
       newQuant.ID = e.target.dataset["id"];
-      await newQuant.initAsync();
+      await newQuant.init();
       this.parentNode.replaceChild(newQuant,this);
       
     }

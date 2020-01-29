@@ -69,6 +69,9 @@ export default class DataInterface extends Quant {
   }
 
   async saveModel() {
+    if (!this.initialized) {
+      return;
+    }
     if (this._model === undefined) {
       return;
     }

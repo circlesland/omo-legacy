@@ -4,9 +4,11 @@ export default class Quant extends LitElement {
   _root: ShadowRoot | undefined;
   name: string;
   autosave: any;
+  initialized: boolean;
 
   constructor() {
     super();
+    this.initialized = false;
     this.name = "";
     this.autosave = true;
   }
@@ -38,7 +40,7 @@ export default class Quant extends LitElement {
   }
 
   init() {
-    this.initAsync();
+    this.initAsync().then(() => this.initialized = true);
   }
 
   static get model() {
