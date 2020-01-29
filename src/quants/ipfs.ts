@@ -5,17 +5,14 @@ omo.quant(
     public peerId: string;
 
     static get styles(): any[] {
-      return [
-        omo.normalize,
-        omo.css``
-      ];
+      return [omo.normalize, omo.css``];
     }
 
     constructor() {
       super();
-      this.status = "connecting to IPFS";
-      this.agentVersion = "";
-      this.peerId = "";
+      this.status = 'connecting to IPFS';
+      this.agentVersion = '';
+      this.peerId = '';
     }
 
     public render(): any {
@@ -29,28 +26,28 @@ omo.quant(
     static get model(): any {
       return {
         agentVersion: {
-          type: "string"
+          type: 'string'
         },
         peerId: {
-          type: "string"
+          type: 'string'
         },
         status: {
-          type: "string"
+          type: 'string'
         }
       };
     }
 
-    static get properties() {
+    static get properties(): any {
       return super.properties;
     }
 
     public async initAsync(): Promise<void> {
-      console.log("init async ipfs");
+      console.log('init async ipfs');
       await super.initAsync();
       const result = await omo.ipfs.id();
       this.agentVersion = result.agentVersion;
       this.peerId = result.id;
-      this.status = "Connected ;)"
+      this.status = 'Connected ;)';
     }
   }
 );

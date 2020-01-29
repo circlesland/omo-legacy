@@ -4,14 +4,11 @@ omo.quant(
     public required: string;
     public disabled: string;
     public static get styles(): any[] {
-      return [
-        omo.normalize,
-        omo.css``
-      ];
+      return [omo.normalize, omo.css``];
     }
     constructor() {
       super();
-      this.required = "";
+      this.required = '';
       this.disabled = "I'm disabled";
     }
 
@@ -24,75 +21,75 @@ omo.quant(
     static get model(): any {
       return {
         string: {
-          type: "string"
+          type: 'string'
         },
         stringpattern: {
-          onError: "Bitte eine gültige email eingeben",
-          pattern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$",
-          type: "string"
+          onError: 'Bitte eine gültige email eingeben',
+          pattern: '[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,}$',
+          type: 'string'
         },
         disabled: {
           disabled: true,
-          type: "string"
+          type: 'string'
         },
         formular: {
-          type: "formular"
+          type: 'formular'
         },
         relation: {
-          display: "string",
+          display: 'string',
           quant: this,
-          type: "relation"
+          type: 'relation'
         },
         required: {
           required: true,
-          type: "string"
+          type: 'string'
         },
 
         boolean: {
-          type: "boolean"
+          type: 'boolean'
         },
         number: {
-          type: "number"
+          type: 'number'
         },
         email: {
-          type: "email",
-          pattern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$",
-          onError: "Bitte eine gültige email eingeben"
+          type: 'email',
+          pattern: '[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2,}$',
+          onError: 'Bitte eine gültige email eingeben'
         },
         password: {
-          type: "password"
+          type: 'password'
         },
         hardPassword: {
-          type: "password",
-          pattern: ".{6,}",
-          onError: "Mindestens 6 Zeichen"
+          type: 'password',
+          pattern: '.{6,}',
+          onError: 'Mindestens 6 Zeichen'
         },
         file: {
-          type: "file"
+          type: 'file'
         },
         color: {
-          type: "color"
+          type: 'color'
         },
         date: {
-          type: "date"
+          type: 'date'
         },
         datetimelocal: {
-          type: "datetime-local"
+          type: 'datetime-local'
         },
         month: {
-          type: "month"
+          type: 'month'
         },
         week: {
-          type: "week"
+          type: 'week'
         },
         url: {
-          type: "url"
+          type: 'url'
         },
         search: {
-          type: "search"
+          type: 'search'
         },
         tel: {
-          type: "tel"
+          type: 'tel'
         }
       };
     }

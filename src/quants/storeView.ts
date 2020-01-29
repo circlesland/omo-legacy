@@ -1,10 +1,10 @@
 omo.quant(
   class StoreView extends omo.quanta.Quant {
-    active: string;
-    static get styles() {
+    public active: string;
+    public static get styles(): any {
       return [
         omo.theme,
-        omo.css /*css*/ `
+        omo.css/*css*/ `
         :host{
           display:grid !important;
           grid-template-areas:
@@ -36,29 +36,32 @@ omo.quant(
       ];
     }
 
-    static get model() {
+    static get model(): any {
       return {
         active: {
-          type: "string"
+          type: 'string'
         }
-      }
+      };
     }
 
-    static get properties() {
+    static get properties(): any {
       return super.properties;
     }
 
     constructor() {
       super();
-      this.active = "Demo";
+      this.active = 'Demo';
     }
 
-    render() {
+    public render(): void {
       return omo.html`
       <div class="bg-gray-100 left border p-10">
         <h1 class="text-l">STORE</h1>
         ${Object.keys(omo.quanta).map(quant => {
-        return omo.html`<a class="py-1 text-gray-600 ${this.active == quant ? 'text-green-400' : ''}"
+          return omo.html`
+        <a class="py-1 text-gray-600 ${
+          this.active === quant ? 'text-green-400' : ''
+        }"
           @click="${this.quantClicked}">${quant}</a>`;
         })}
       </div>
@@ -78,11 +81,11 @@ omo.quant(
       `;
     }
 
-    async initAsync() {
+    public async initAsync(): Promise<void> {
       super.initAsync();
     }
 
-    quantClicked(event: any) {
+    public quantClicked(event: any): void {
       this.active = event.target.text;
     }
   }

@@ -5,15 +5,12 @@ omo.quant(
     public age: number;
 
     static get styles(): any[] {
-      return [
-        omo.normalize,
-        omo.css``
-      ];
+      return [omo.normalize, omo.css``];
     }
     constructor() {
       super();
-      this.name = "";
-      this.lastName = "";
+      this.name = '';
+      this.lastName = '';
       this.age = 0;
     }
 
@@ -29,10 +26,10 @@ omo.quant(
     static get model(): any {
       return {
         name: {
-          type: "string"
+          type: 'string'
         },
         enddate: {
-          type: "date"
+          type: 'date'
         }
       };
     }

@@ -1,6 +1,6 @@
 omo.quant(
   class Simple extends omo.quanta.Quant {
-    static get styles() {
+    static get styles(): any {
       return [
         omo.normalize,
         omo.css`
@@ -10,21 +10,21 @@ omo.quant(
       ];
     }
 
-    render() {
+    public render(): void {
       return omo.html`
-      <h1>${this.name}</h1>
+        <h1>${this.name}</h1>
       `;
     }
 
-    static get model() {
+    static get model(): any {
       return {
         name: {
-          type: "string"
+          type: 'string'
         }
       };
     }
 
-    static get properties() {
+    static get properties(): any {
       return super.properties;
     }
   }

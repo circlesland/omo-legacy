@@ -3,7 +3,7 @@ omo.quant(
     public quantname: string | undefined;
     public quant: any;
 
-    static get styles() {
+    static get styles(): any {
       return [
         omo.theme,
         omo.css/*css*/ `
@@ -15,8 +15,8 @@ omo.quant(
 
     static get model(): any {
       return {
-        quantname: { type: 'string' },
-        quant: { type: 'object' }
+        quant: { type: 'object' },
+        quantname: { type: 'string' }
       };
     }
 
@@ -24,17 +24,17 @@ omo.quant(
       super();
     }
 
-    public async show(constructor: any, entity: any) {
+    public async show(constructor: any, entity: any): Promise<void> {
       console.log(constructor);
       this.quantname = constructor.name;
-      let quant = new constructor();
+      const quant = new constructor();
       quant.ID = entity;
       await quant.initAsync();
       console.log(quant.model);
       this.quant = quant;
       console.log(entity);
     }
-    static get properties() {
+    static get properties(): any {
       return super.properties;
     }
 

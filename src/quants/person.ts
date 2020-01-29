@@ -1,14 +1,12 @@
+// tslint:disable: object-literal-sort-keys
 omo.quant(
   class Person extends omo.quanta.Quant {
     public name: string | undefined;
     public lastName: string | undefined;
     public age: number | undefined;
     public displayName: string | undefined;
-    static get styles() {
-      return [
-        omo.normalize,
-        omo.css``
-      ];
+    static get styles(): any {
+      return [omo.normalize, omo.css``];
     }
     constructor() {
       super();
@@ -18,33 +16,33 @@ omo.quant(
       // this.displayName = "${this.name} ${this.lastName}";
     }
 
-    render() {
+    public render(): void {
       return omo.html`
       <p>Name: ${this.name}</p>
       <p>Nachname: ${this.lastName}</p>
       <p>Alter: ${this.age}</p>
       `;
     }
-    static get properties() {
+    static get properties(): any {
       return super.properties;
     }
 
-    static get model() {
+    static get model(): any {
       return {
         name: {
-          type: "string"
+          type: 'string'
         },
         lastName: {
-          type: "string"
+          type: 'string'
         },
         age: {
-          type: "number"
+          type: 'number'
         },
         email: {
-          type: "email"
+          type: 'email'
         },
         displayName: {
-          type: "formular"
+          type: 'formular'
         }
       };
     }

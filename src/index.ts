@@ -1,4 +1,4 @@
-import { QuantumKernel } from "./kernel/QuantumKernel";
+import { QuantumKernel } from './kernel/QuantumKernel';
 
 declare global {
   interface Window {

@@ -15,7 +15,7 @@ omo.quant(
     constructor() {
       super();
       this.done = false;
-      this.task = "";
+      this.task = '';
     }
 
     public render(): any {
@@ -26,32 +26,32 @@ omo.quant(
       `;
     }
 
-    static get model() {
+    static get model(): any {
       return {
         state: {
-          type: "relation",
+          type: 'relation',
           quant: omo.quanta.State,
-          display: "state",
+          display: 'state',
           kanban: true
         },
         task: {
-          type: "string",
+          type: 'string',
           required: true
         },
         person: {
-          type: "relation",
+          type: 'relation',
           quant: omo.quanta.Person,
-          display: "name"
+          display: 'name'
         },
         milestone: {
-          type: "relation",
+          type: 'relation',
           quant: omo.quanta.Milestone,
-          display: "name"
+          display: 'name'
         }
       };
     }
 
-    static get properties() {
+    static get properties(): any {
       return super.properties;
     }
   }
