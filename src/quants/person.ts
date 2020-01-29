@@ -1,5 +1,3 @@
-import { throws } from "assert";
-
 omo.quant(
   class Person extends omo.quanta.Quant {
     public name: string | undefined;
