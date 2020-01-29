@@ -51,6 +51,8 @@ omo.quant(
 
     public render():any {
       return omo.html `
+        <button class="border text-red-400 border-red-400 rounded-full px-2" @click="${this.showView}">Show</button>
+
         ${this.table}
       `;
     }
@@ -102,7 +104,6 @@ omo.quant(
             <th class="bg-gray-100 text-left text-gray-600 text-xs px-4 py-2 border-b uppercase">${header}</th>
           `
         )}
-        
       `;
     }
 
@@ -220,9 +221,26 @@ omo.quant(
       return id !== undefined ? omo.html `
         <div class="py-1 px-2">
           <button class="border text-red-400 border-red-400 rounded-full px-2" @click="${this.delete}" data-id="${id}">delete</button>
+          <button class="border text-red-400 border-red-400 rounded-full px-2" @click="${this.openItemView}" data-id="${id}">ItemView</button>
+          <button class="border text-red-400 border-red-400 rounded-full px-2" @click="${this.showView}" data-id="${id}">Show</button>
           <!-- <button class="border text-green-400 border-green-400 rounded-full px-2" @click="${this.duplicate}" data-id="${id}">duplicate</button> -->
         </div>` :
         omo.html `<span></span>`
+    }
+
+    public async openItemView(e:any):Promise<void>{
+      const newQuant = new omo.quanta.ItemView();
+      newQuant.show(this.quantConstructor, e.target.dataset["id"]);
+      await newQuant.initAsync();
+      this.parentNode.replaceChild(newQuant,this);
+    }
+
+     public async showView(e:any):Promise<void>{
+      const newQuant = new this.quantConstructor();
+      newQuant.ID = e.target.dataset["id"];
+      await newQuant.initAsync();
+      this.parentNode.replaceChild(newQuant,this);
+      
     }
 
     public async delete(event:any):Promise<void> {

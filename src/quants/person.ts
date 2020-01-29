@@ -1,9 +1,11 @@
+import { throws } from "assert";
+
 omo.quant(
   class Person extends omo.quanta.Quant {
-    public name: string;
-    public lastName: string;
-    public age: number;
-    public displayName: string;
+    public name: string | undefined;
+    public lastName: string | undefined;
+    public age: number | undefined;
+    public displayName: string | undefined;
     static get styles() {
       return [
         omo.normalize,
@@ -12,10 +14,10 @@ omo.quant(
     }
     constructor() {
       super();
-      this.name = "";
-      this.lastName = "";
-      this.age = 0;
-      this.displayName = "${this.name} ${this.lastName}";
+      // this.name = "";
+      // this.lastName = "";
+      // this.age = 0;
+      // this.displayName = "${this.name} ${this.lastName}";
     }
 
     render() {
@@ -44,10 +46,6 @@ omo.quant(
           type: "formular"
         }
       };
-    }
-
-    static get properties() {
-      return super.properties;
     }
   }
 );
