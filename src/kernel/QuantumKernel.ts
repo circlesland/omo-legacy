@@ -66,7 +66,6 @@ export class QuantumKernel {
       ? quant.name.toParamCase()
       : `omo${quant.name}`.toParamCase();
     this.quanta[quant.name] = quant;
-    console.log('YEAH', quant.properties);
     window.customElements.define(quantName, quant);
   }
 

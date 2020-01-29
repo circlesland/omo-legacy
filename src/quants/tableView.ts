@@ -80,7 +80,6 @@ omo.quant(
       Object.keys(this.quantConstructor.schemaProperties).forEach(
         key => (properties[key] = this.quantConstructor._model[key])
       );
-      console.log(properties);
       await Promise.all(
         Object.keys(properties).map(async key => {
           const prop = properties[key];
@@ -144,7 +143,6 @@ omo.quant(
       const pattern = properties[name].pattern
         ? properties[name].pattern
         : '.*';
-      console.log('properties[name].type', properties[name].type);
       switch (properties[name].type) {
         case 'boolean':
           return omo.html`
@@ -161,7 +159,6 @@ omo.quant(
         case 'url':
         case 'week':
         case 'datetime-local':
-          console.log(properties[name]);
           return this.renderInput(
             properties[name].type,
             name,
@@ -224,8 +221,6 @@ omo.quant(
       options: any[],
       display: any
     ): any {
-      console.log('RENDER RELATION', value);
-      console.log(options);
       return omo.html`
       <select data-name="${name}" data-id="${id}" @change="${(e: any) => {
         this.selectChanged(e);

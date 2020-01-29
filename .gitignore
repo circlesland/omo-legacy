@@ -38,5 +38,6 @@ node_modules/
 
 #Build Pipeline
 build
+dist
 test
 *.log

@@ -15,8 +15,6 @@ export default class Quant extends LitElement {
 
   // extracted model for LIT Element
   static get properties(): any {
-    console.log('LIT PROPERTIES', this.model);
-
     const props = JSON.parse(JSON.stringify(this.model));
 
     Object.keys(props).map((key: any) => {

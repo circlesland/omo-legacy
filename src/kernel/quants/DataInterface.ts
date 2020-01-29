@@ -45,7 +45,6 @@ export default class DataInterface extends Quant {
     this._model = DataInterface.recursiveModel(this);
     this.schemaProperties = await this.createSchemaProperties(this._model);
     const jsonSchema = this.createJsonSchema(this.schemaProperties);
-    console.log(jsonSchema);
     this._modelName = await DataInterface.getModelName(jsonSchema);
     await DataInterface.registerSchemaIfNoRegistered(
       jsonSchema,
@@ -85,7 +84,6 @@ export default class DataInterface extends Quant {
       const item = schemaProperties[key];
 
       if (item.type === 'property') {
-        console.log('property');
         delete schemaProperties[key];
         return;
       }
@@ -209,7 +207,6 @@ export default class DataInterface extends Quant {
           entity[key] = this[key];
         }
       });
-      console.log('defaultent', entity);
       entity = (
         await window.omo.client.modelCreate(
           window.omo.storeId,
