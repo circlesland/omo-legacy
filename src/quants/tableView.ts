@@ -1,7 +1,10 @@
 omo.quant(
   class TableView extends omo.quanta.Quant {
+    public quantConstructor: any;
+    public quant: any;
+    public table: any;
 
-    static get styles() {
+    static get styles():any[] {
       return [
         omo.theme,
         omo.dragStyle,
@@ -40,36 +43,38 @@ omo.quant(
     }
 
     constructor() {
+
       super();
-      this.active = "";
+      this.active = "test";
+
     }
 
-    render() {
+    public render():any {
       return omo.html `
         ${this.table}
       `;
     }
 
-    set active(value) {
-      let quant = omo.quanta[value];
-      if (quant == undefined) return;
+    set active(value:string) {
+      const quant = omo.quanta[value];
+      if (quant === undefined) { return; }
       this.quantConstructor = quant;
 
       this.updateTable()
     }
 
-    async updateTable() {
+    public async updateTable(): Promise<void> {
       await this.quantConstructor.Init();
       this.quant = new this.quantConstructor();
 
-      let entities = (await omo.client.modelFind(omo.storeId, this.quantConstructor._modelName, {})).entitiesList;
-      let properties = this.quantConstructor._model;
+      const entities = (await omo.client.modelFind(omo.storeId, this.quantConstructor._modelName, {})).entitiesList;
+      const properties = this.quantConstructor.schemaProperties;
       console.log(properties);
       await Promise.all(Object.keys(properties).map(async (key) => {
-        let prop = properties[key];
-        if (prop.type == "relation") {
+        const prop = properties[key];
+        if (prop.type === "relation") {
           await prop.quant.Init();
-          prop.options = (await window.omo.client.modelFind(window.omo.storeId, prop.quant._modelName, {})).entitiesList;
+          prop.options = (await omo.client.modelFind(omo.storeId, prop.quant._modelName, {})).entitiesList;
         }
         properties[key] = prop;
       }))
@@ -89,11 +94,11 @@ omo.quant(
       `;
     }
 
-    renderHeader(properties) {
-      return window.omo.html `
+    public renderHeader(properties:any):any {
+      return omo.html `
         <th class="bg-gray-100 text-left text-gray-600 text-xs px-4 py-2 border-b uppercase">actions</th>
         ${Object.keys(properties).map(
-          (header) => header == "ID" ? '' : window.omo.html`
+          (header) => header === "ID" ? '' : omo.html`
             <th class="bg-gray-100 text-left text-gray-600 text-xs px-4 py-2 border-b uppercase">${header}</th>
           `
         )}
@@ -101,14 +106,14 @@ omo.quant(
       `;
     }
 
-    renderRow(entry, properties) {
-      return window.omo.html `
+    public renderRow(entry:any, properties:any):any {
+      return omo.html `
           <tr>
             <td class="border-b px-4 py-1">
               ${this.renderActions(entry.ID)}
             </td>
             ${Object.keys(properties).map((name) => 
-              name == "ID" ? omo.html`` : omo.html`
+              name === "ID" ? omo.html`` : omo.html`
               <td class="text-gray-600 border-b px-4 py-2">
                 ${this.renderColumn(properties, name, entry)}
               </td>`
@@ -117,12 +122,11 @@ omo.quant(
       `;
     }
 
-    renderColumn(properties, name, entry) {
-      let pattern = properties[name].pattern ? properties[name].pattern : ".*";
-      console.log(pattern);
+    public renderColumn(properties:any, name:string, entry:any):any {
+      const pattern = properties[name].pattern ? properties[name].pattern : ".*";
       switch (properties[name].type) {
         case "boolean":
-          return window.omo.html `
+          return omo.html `
           <input name="${name}" type="checkbox" ?checked="${entry[name]}" data-id="${entry.ID}" @change="${this.changed}" @focus="${this.updatePreview}">`;
         case "date":
         case "number":
@@ -141,7 +145,7 @@ omo.quant(
         case "relation":
           return this.renderRelation(name, entry[name], entry.ID, properties[name].options, properties[name].display);
         case "formular":
-            let formular = entry[name] ?entry[name].replace(/this/g,"entry"):'';
+            const formular = entry[name] ?entry[name].replace(/this/g,"entry"):'';
             return omo.html`
                 <div class="formular">
                     <p>${eval('`'+formular+'`')}</p>
@@ -153,88 +157,90 @@ omo.quant(
       }
     }
 
-    renderRelation(name, value, id, options, display) {
+    public renderRelation(name:string, value:any, id:string, options:any[], display:any) :any{
       console.log("RENDER RELATION", value)
       console.log(options);
       return omo.html `
-      <select data-name="${name}" data-id="${id}" @change="${(e) => { this.selectChanged(e);}}">
+      <select data-name="${name}" data-id="${id}" @change="${(e:any) => { this.selectChanged(e);}}">
         <option value="">Bitte ${name} auswählen</option>
         ${
           options.map(option=>omo.html`
-            <option value="${option.ID}" ?selected="${value && value.id==option.ID}">${option[display] ? option[display] :  option.ID}</option>
+            <option value="${option.ID}" ?selected="${value && value.id===option.ID}">${option[display] ? option[display] :  option.ID}</option>
           `)
         }
       </select>
       `
     }
 
-    async selectChanged(event) {
-      let target = event.target;
-      let index = target.selectedIndex;
-      let foreignId = target.options[index].value;
-      let itemId = target.dataset.id;
-      let name = target.dataset.name;
+    public async selectChanged(event:any):Promise<void> {
+      const target = event.target;
+      const index = target.selectedIndex;
+      const foreignId = target.options[index].value;
+      const itemId = target.dataset.id;
+      const name = target.dataset.name;
 
-      let entity = (await omo.client.modelFindByID(omo.storeId, this.quantConstructor._modelName, itemId)).entity;
-      if (foreignId == "")
+      const entity = (await omo.client.modelFindByID(omo.storeId, this.quantConstructor._modelName, itemId)).entity;
+      if (foreignId === "") {
         delete entity[name];
-      else
+      }
+      else {
         entity[name] = {
           id: foreignId
         };
+      }
       await omo.client.modelSave(omo.storeId, this.quantConstructor._modelName, [entity]);
       console.log("Model Saved", entity);
     }
 
-    renderAdd() {
-      return window.omo.html `<tr><td class="px-4 py-2"><button class="border text-green-400 border-green-400 rounded-full px-2" @click="${this.createNew}">add row</button></td></tr>`;
+    public renderAdd():any {
+      return omo.html `<tr><td class="px-4 py-2"><button class="border text-green-400 border-green-400 rounded-full px-2" @click="${this.createNew}">add row</button></td></tr>`;
     }
 
-    async createNew() {
-      var instance = new this.quantConstructor();
+    public async createNew():Promise<any> {
+      const instance = new this.quantConstructor();
       await instance.initAsync();
       await this.updateTable();
       this.focusId(instance.entityId);
     }
 
-    async duplicate(event) {
-      var entity = (await omo.client.modelFindByID(omo.storeId, this.quantConstructor._modelName, event.target.dataset["id"])).entity;
+    public async duplicate(event:any):Promise<void> {
+      const entity = (await omo.client.modelFindByID(omo.storeId, this.quantConstructor._modelName, event.target.dataset["id"])).entity;
       entity.ID = null;
-      var newEntity = (await omo.client.modelCreate(omo.storeId, this.quantConstructor._modelName, [entity])).entitiesList[0];
+      const newEntity = (await omo.client.modelCreate(omo.storeId, this.quantConstructor._modelName, [entity])).entitiesList[0];
       await this.updateTable();
       this.focusId(newEntity.ID);
     }
 
-    focusId(entityId) {
-      var input = this._root.querySelector(`input[data-id='${entityId}']:not([disabled])`);
+   public focusId(entityId:string) :void{
+      const input = this._root.querySelector(`input[data-id='${entityId}']:not([disabled])`);
       input.focus();
     }
 
-    renderActions(id) {
-      return id != undefined ? window.omo.html `
+    public renderActions(id:string) :any{
+      return id !== undefined ? omo.html `
         <div class="py-1 px-2">
           <button class="border text-red-400 border-red-400 rounded-full px-2" @click="${this.delete}" data-id="${id}">delete</button>
           <!-- <button class="border text-green-400 border-green-400 rounded-full px-2" @click="${this.duplicate}" data-id="${id}">duplicate</button> -->
         </div>` :
-        window.omo.html `<span></span>`
+        omo.html `<span></span>`
     }
 
-    async delete(event) {
+    public async delete(event:any):Promise<void> {
       console.log(event.target)
       await omo.client.modelDelete(omo.storeId, this.quantConstructor._modelName, [event.target.dataset["id"]]);
       await this.updateTable();
     }
 
-    renderInput(type, name, value, id, disabled = false, required = false, pattern = "", error = "") {
-      if (value == undefined) value = null;
-      return window.omo.html `
+    public renderInput(type:any, name:any, value:any, id:any, disabled = false, required = false, pattern = "", error = ""):any {
+      if (value === undefined) { value = null; }
+      return omo.html `
         <input name="${name}" type="${type}" placeholder="${name}" pattern="${pattern}" .value="${value}" ?disabled="${disabled}" ?required="${required}" data-id="${id}"  @change="${this.changed}" @focus="${this.updatePreview}" data-error="${error}">
       `
     }
 
-    async changed(event) {
+    public async changed(event:any):Promise<void> {
 
-      let target = event.target;
+      const target = event.target;
       target.setCustomValidity("");
       if (!target.checkValidity()) {
         target.setCustomValidity(target.dataset.error);
@@ -243,47 +249,34 @@ omo.quant(
       }
 
 
-      let name = target.name;
+      const name = target.name;
       let value = target.value;
-      if (target.type == "checkbox") value = target.checked;
-      if (target.type == "number") value = Number(value);
+      if (target.type === "checkbox") { value = target.checked; }
+      if (target.type === "number") { value = Number(value); }
 
-      let entity = (await omo.client.modelFindByID(omo.storeId, this.quantConstructor._modelName, target.dataset["id"])).entity;
+      const entity = (await omo.client.modelFindByID(omo.storeId, this.quantConstructor._modelName, target.dataset["id"])).entity;
       entity[name] = value;
       await omo.client.modelSave(omo.storeId, this.quantConstructor._modelName, [entity]);
       console.log("Model Saved", entity);
     }
 
-    // updatePreview(event){
-    //   let entityId = event.target.dataset["id"];
-    //   let div = this._root.getElementById("preview");
-    //   div.innerText="";
-
-    //   let quant = new this.quantConstructor();
-    //   quant.entityId = entityId;
-    //   quant.initAsync();
-    //   div.append(quant);
-    // }
-
-
-    static get model() {
+    static get model():any {
       return {
         active: {
           type: "string"
         },
         table: {
-          type: "object"
+          type: "property"
         }
       };
     }
 
-    static get properties() {
+    static get properties():any {
       return super.properties;
     }
-    async initAsync() {
+    
+    public  async initAsync():Promise<void> {
       super.initAsync();
     }
-
-
   }
 );

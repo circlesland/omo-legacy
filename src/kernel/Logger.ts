@@ -3,7 +3,7 @@
  * Components can use this Logger then bringing the logs to the front. of course this logger can be extended to show more detailed information.
  */
 export default class Logger {
-    logs: [any]
+    private logs: any[]
     /**
      * Creates the logger
      */
@@ -18,8 +18,8 @@ export default class Logger {
      * @param  {The logtype of object} type
      * @param  {The arguments that was logged} args
      */
-    log(type:string, args:any) {
-        if (args) args.logtype = type;
+    public log(type: string, args: any): string {
+        if (args) { args.logtype = type };
         this.logs.push(args);
         return type;
     }
@@ -30,10 +30,10 @@ export default class Logger {
      * @param  {} type the logtype
      * @param  {} log the replacing function
      */
-    proxy(context:any, method:any, type:string, log:any) {
-        var THIS = this;
-        return function () {
-            if (type == "CLEAR") {
+    public proxy(context: any, method: any, type: string, log: any): any {
+        const THIS = this;
+        return () => {
+            if (type === "CLEAR") {
                 THIS.logs = [0];
                 method.apply(context, Array.prototype.slice.apply(arguments))
             }
@@ -43,11 +43,11 @@ export default class Logger {
         }
     }
 
-    overwriteConsoleFunctions() {
+    private overwriteConsoleFunctions(): void {
         console.clear = this.proxy(console, console.clear, "CLEAR", null);
     }
 
-    overwriteConsoleOutput() {
+    private overwriteConsoleOutput(): void {
         console.log = this.proxy(console, console.log, "LOG", this.log.bind(this));
         console.error = this.proxy(console, console.error, "ERROR", this.log.bind(this));
         console.warn = this.proxy(console, console.warn, "WARNING", this.log.bind(this))

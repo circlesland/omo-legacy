@@ -4,6 +4,7 @@ export default class DataInterface extends Quant {
   static _modelName: any;
   static _model: any;
   ID: any;
+  static viewModel: any;
 
   async initAsync() {
     await super.initAsync();
@@ -14,8 +15,9 @@ export default class DataInterface extends Quant {
 
   static async Init() {
     this._model = DataInterface.recursiveModel(this);
-    let schemaProperties = await this.createSchemaProperties(this._model);
-    let jsonSchema = this.createJsonSchema(schemaProperties);
+    this.schemaProperties = await this.createSchemaProperties(this._model);
+    let jsonSchema = this.createJsonSchema(this.schemaProperties);
+    console.log(jsonSchema);
     this._modelName = await DataInterface.getModelName(jsonSchema);
     await DataInterface.registerSchemaIfNoRegistered(jsonSchema, this._modelName);
   }
@@ -24,14 +26,17 @@ export default class DataInterface extends Quant {
     return this.constructor._modelName;
   }
   get _model() {
-    return this.constructor._model;
+    return this.constructor.schemaProperties;
   }
 
   async createEntityIfNotExist() {
     if (this.entityId == undefined || this.entityId == "" || !window.omo.client.modelHas(window.omo.storeId, this.modelName, [this.entityId])) {
       let entity: any = {};
       Object.keys(this._model).forEach(key => {
-        entity[key] = this[key];
+
+        if (this._model[key].type != "property") {
+          entity[key] = this[key];
+        }
       })
       console.log("defaultent", entity)
       entity = (await window.omo.client.modelCreate(window.omo.storeId, this.modelName, [entity])).entitiesList[0];
@@ -46,28 +51,39 @@ export default class DataInterface extends Quant {
 
   async updateModel(result: any) {
     // TODO remove next line when textile fixed pubsub for listen changes on threads
-    if (result.entity.ID != this.entityId) return;
+    if (result.entity.ID != this.entityId) { return; }
     result = await window.omo.client.modelFindByID(window.omo.storeId, this.modelName, this.entityId);
     // TODO END
     Object.keys(result.entity).forEach(key => {
-      if (this[key] != result.entity[key])
+      if (this[key] != result.entity[key]) {
         this[key] = result.entity[key];
+      }
     })
 
   }
 
-  updated(changedProperties: any) {
-    if (this.autosave)
+  updated(/*changedProperties: any*/) {
+    if (this.autosave) {
       this.saveModel();
+    }
   }
 
   async saveModel() {
-    if (this._model == undefined) return;
+    if (this._model === undefined) {
+      return;
+    }
+
     let model = {};
     Object.keys(this._model).forEach(key => {
       model[key] = this[key];
     });
-    window.omo.client.modelSave(window.omo.storeId, this.constructor._modelName, [model]);
+
+    if (Object.values(model).some(val => val !== undefined)) {
+      window.omo.client.modelSave(window.omo.storeId, this.constructor._modelName, [model]);
+
+    }
+
+
   }
 
 
@@ -79,8 +95,9 @@ export default class DataInterface extends Quant {
         jsonSchema
       );
     } catch (err) {
-      if (err.message != "already registered model")
+      if (err.message != "already registered model") {
         throw err;
+      }
     }
   }
 
@@ -111,6 +128,11 @@ export default class DataInterface extends Quant {
     Object.keys(schemaProperties).map(function (key: any) {
       let item = schemaProperties[key];
 
+      if (item.type == "property") {
+        console.log("property");
+        delete schemaProperties[key];
+        return;
+      }
 
       //Handle Relations
       if (item.type == "relation") {

@@ -1,6 +1,9 @@
+// tslint:disable: object-literal-sort-keys
 omo.quant(
   class Todo extends omo.quanta.Quant {
-    static get styles() {
+    public done: boolean;
+    public task: string;
+    static get styles(): any {
       return [
         omo.normalize,
         omo.css`
@@ -15,7 +18,7 @@ omo.quant(
       this.task = "";
     }
 
-    render() {
+    public render(): any {
       return omo.html`
       <input type="checkbox" ?checked="${this.done}" disabled>
       <p>Task: ${this.task}</p>
