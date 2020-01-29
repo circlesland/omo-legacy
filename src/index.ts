@@ -4,6 +4,9 @@ declare global {
   interface Window {
     omo: QuantumKernel;
   }
+  interface SymbolConstructor {
+    readonly observable: symbol;
+  }
   var omo: QuantumKernel;
 }
 
