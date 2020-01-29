@@ -1,5 +1,7 @@
 omo.quant(
   class State extends omo.quanta.Quant {
+    done: boolean;
+    task: string;
     static get styles() {
       return [
         omo.normalize,

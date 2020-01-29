@@ -1,6 +1,9 @@
+// tslint:disable: object-literal-sort-keys
 omo.quant(
   class Demo extends omo.quanta.Quant {
-    static get styles() {
+    public required: string;
+    public disabled: string;
+    public static get styles(): any[] {
       return [
         omo.normalize,
         omo.css``
@@ -12,37 +15,37 @@ omo.quant(
       this.disabled = "I'm disabled";
     }
 
-    render() {
+    public render(): any {
       return omo.html`
       <p>TODO</p>
       `;
     }
 
-    static get model() {
+    static get model(): any {
       return {
-        relation: {
-          type: "relation",
-          quant: this,
-          display: "string"
-        },
-        string: {
+        disabled: {
+          disabled: true,
           type: "string"
         },
         formular: {
           type: "formular"
         },
-        stringpattern: {
-          type: "string",
-          pattern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$",
-          onError: "Bitte eine gültige email eingeben"
-        },
-        disabled: {
-          type: "string",
-          disabled: true
+        relation: {
+          display: "string",
+          quant: this,
+          type: "relation"
         },
         required: {
-          type: "string",
-          required: true
+          required: true,
+          type: "string"
+        },
+        string: {
+          type: "string"
+        },
+        stringpattern: {
+          onError: "Bitte eine gültige email eingeben",
+          pattern: "[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$",
+          type: "string"
         },
         boolean: {
           type: "boolean"
@@ -90,13 +93,10 @@ omo.quant(
         tel: {
           type: "tel"
         }
-
-
-
       };
     }
 
-    static get properties() {
+    public static get properties(): any {
       return super.properties;
     }
   }

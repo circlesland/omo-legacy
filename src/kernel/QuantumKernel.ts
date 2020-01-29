@@ -28,7 +28,10 @@ export class QuantumKernel {
     this.normalize = normalize;
     this.dragStyle = dragStyle;
     this.theme = theme;
+
     this.quanta["Quant"] = DragableQuant;
+    window.customElements.define("omo-quant", DragableQuant);
+
     // this.client = new Client("http://localhost:7006");
     this.client = new Client("http://81.169.194.192:7006");
 

@@ -1,5 +1,6 @@
 omo.quant(
   class StoreView extends omo.quanta.Quant {
+    active: string;
     static get styles() {
       return [
         omo.theme,
@@ -35,6 +36,23 @@ omo.quant(
       ];
     }
 
+    static get model() {
+      return {
+        active: {
+          type: "string"
+        }
+      }
+    }
+
+    static get properties() {
+      return super.properties;
+    }
+
+    constructor() {
+      super();
+      this.active = "Demo";
+    }
+
     render() {
       return omo.html`
       <div class="bg-gray-100 left border p-10">
@@ -60,28 +78,11 @@ omo.quant(
       `;
     }
 
-    constructor() {
-      super();
-      this.active = "Demo";
-    }
-
     async initAsync() {
       super.initAsync();
     }
 
-    static get model() {
-      return {
-        active: {
-          type: "string"
-        }
-      }
-    }
-
-    static get properties() {
-      return super.properties;
-    }
-
-    quantClicked(event) {
+    quantClicked(event:any) {
       this.active = event.target.text;
     }
   }

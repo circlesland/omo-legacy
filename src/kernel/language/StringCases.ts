@@ -1,5 +1,7 @@
+// tslint:disable: no-parameter-reassignment
+
 export default class StringCases {
-  static init() {
+  public static init(): void {
     String.prototype.toCamelCase = StringCases.toCamelCase;
     String.prototype.toSnakeCase = StringCases.toSnakeCase;
     String.prototype.toPascalCase = StringCases.toPascalCase;
@@ -10,55 +12,55 @@ export default class StringCases {
     String.prototype.toHeaderCase = StringCases.toHeaderCase;
     String.prototype.toParamCase = StringCases.toParamCase;
   }
-  static toCamelCase(value: any) {
+  public static toCamelCase(value: any): string {
     if (!value) {
       value = this;
     }
     return require("js-convert-case").toCamelCase(value);
   }
-  static toSnakeCase(value: any) {
+  public static toSnakeCase(value: any): string {
     if (!value) {
       value = this;
     }
     return require("js-convert-case").toSnakeCase(value);
   }
-  static toPascalCase(value: any) {
+  public static toPascalCase(value: any): string {
     if (!value) {
       value = this;
     }
     return require("js-convert-case").toPascalCase(value);
   }
-  static toDotCase(value: any) {
+  public static toDotCase(value: any): string {
     if (!value) {
       value = this;
     }
     return require("js-convert-case").toDotCase(value);
   }
-  static toPathCase(value: any) {
+  public static toPathCase(value: any): string {
     if (!value) {
       value = this;
     }
     return require("js-convert-case").toPathCase(value);
   }
-  static toTextCase(value: any) {
+  public static toTextCase(value: any): string {
     if (!value) {
       value = this;
     }
     return require("js-convert-case").toTextCase(value);
   }
-  static toSentenceCase(value: any) {
+  public static toSentenceCase(value: any): string {
     if (!value) {
       value = this;
     }
     return require("js-convert-case").toSentenceCase(value);
   }
-  static toHeaderCase(value: any) {
+  public static toHeaderCase(value: any): string {
     if (!value) {
       value = this;
     }
     return require("js-convert-case").toHeaderCase(value);
   }
-  static toParamCase(value: any) {
+  public static toParamCase(value: any): string {
     if (!value) {
       value = this;
     }

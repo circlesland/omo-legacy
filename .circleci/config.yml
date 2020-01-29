@@ -1,21 +1,10 @@
-# JavaScript Node CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-javascript/ for more details
-#
+# https://circleci.com/docs/2.0/language-javascript/
 version: 2
 jobs:
-  build:
+  'node-10':
     docker:
-      # specify the version you desire here
-      - image: circleci/node:13.7.0
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/mongo:3.4.4
-
-    working_directory: ~/repo
-
+      - image: circleci/node:10
+    working_directory: ~/omo-quantum
     steps:
       - checkout
 
@@ -32,11 +21,38 @@ jobs:
           paths:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
-          
-      - run: npm run dev
-          
-      - deploy:
-          name: Deploy Over SSH
-          command: |
-            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST exit
-            scp -r ~/repo/dist/* $SSH_USER@$SSH_HOST:$DEPLOY_PATH
+      - run: npm test
+      - run: npm run cov:send
+      - run: npm run cov:check
+
+      # - deploy:
+      #     name: Deploy Over SSH
+      #     command: |
+      #       ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST exit
+      #       scp -r ~/repo/dist/* $SSH_USER@$SSH_HOST:$DEPLOY_PATH
+
+  'node-latest':
+    docker:
+      - image: circleci/node:latest
+    working_directory: ~/omo-quantum
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "package.json" }}
+            - v1-dependencies-
+      - run: npm install
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+      - run: npm test
+      - run: npm run cov:send
+      - run: npm run cov:check
+
+workflows:
+  version: 2
+  build:
+    jobs:
+      - 'node-10'
+      - 'node-latest'

@@ -73,12 +73,23 @@ export default class Quant extends LitElement {
 
   // extracted model for LIT Element
   static get properties() {
-    console.log("PROPS", this.model);
+    console.log("LIT PROPERTIES", this.model);
+
+    let props = JSON.parse(JSON.stringify(this.model));
+
+    Object.keys(props).map(function (key: any) {
+      let item = props[key];
+
+      if (item.type == "property")
+        item.type = "object";
+      props[key] = item;
+    });
+
     // Make it conform for lit
-    return this.model;
+    return props;
   }
 
-  async initAsync() {}
+  async initAsync() { }
 }
 
 declare global {
@@ -91,5 +102,6 @@ declare global {
     _model: any;
     _modelName: any;
     Init: any;
+    schemaProperties: any;
   }
 }

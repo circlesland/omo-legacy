@@ -1,56 +1,21 @@
-const {
-  resolve
-} = require("path");
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
-const HtmlWebPackPlugin = require("html-webpack-plugin");
-
-const config = {
-  entry: {
-    quantum: resolve("./src/index.ts"),
-    test: resolve("./src/quants/test.js"),
-    state: resolve("./src/quants/state.js"),
-    omotheme: resolve("./src/quants/omotheme.js"),
-    ipfs: resolve("./src/quants/ipfs.js"),
-    demo: resolve("./src/quants/demo.js"),
-    milestone: resolve("./src/quants/milestone.js"),
-    ipfstwo: resolve("./src/quants/ipfs2.js"),
-    simple: resolve("./src/quants/simple.js"),
-    tableView: resolve("./src/quants/tableView.js"),
-    storeView: resolve("./src/quants/storeView.js"),
-    person: resolve("./src/quants/person.js"),
-    todo: resolve("./src/quants/todo.js")
-  },
-  module: {
-    rules: [{
-      test: /\.tsx?$/,
-      loader: ["awesome-typescript-loader?module=esnext&target=esnext"],
-      exclude: [/node_modules/]
+module.exports = {
+    entry: './build/module/index.js',
+    output: {
+        path: __dirname + '/dist',
+        publicPath: '/',
+        filename: 'omoearth.js'
     },
-    {
-      test: /\.js$/
+    devServer: {
+        contentBase: './dist'
     },
-    {
-      test: /\.html$/,
-      use: [{
-        loader: "html-loader",
-        options: {
-          minimize: false
-        }
-      }]
-    }
-    ]
-  },
-  resolve: {
-    mainFields: ['esnext', 'browser', 'module', 'main'],
-    extensions: [".js", ".ts", ".tsx"]
-  },
-  plugins: [
-    new HtmlWebPackPlugin({
-      template: "./src/index.html",
-      filename: "./index.html",
-      chunks: [""]
-    })
-  ]
+    plugins: [
+        new CleanWebpackPlugin(),
+        new CopyPlugin([
+            { from: 'build/module/quants/*.js', to: 'quants/', flatten: true },
+            { from: 'src/index.html' },
+        ])
+    ],
 };
-
-module.exports = config;

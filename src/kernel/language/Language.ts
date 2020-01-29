@@ -1,7 +1,7 @@
 import StringCases from "./StringCases";
 
 export default class Language {
-  static init() {
+  public static init(): void {
     StringCases.init();
   }
 }

@@ -1,6 +1,10 @@
 omo.quant(
-  class Person extends omo.quanta.Quant {
-    static get styles() {
+  class Milestone extends omo.quanta.Quant {
+    public name: string;
+    public lastName: string;
+    public age: number;
+
+    static get styles(): any[] {
       return [
         omo.normalize,
         omo.css``
@@ -11,10 +15,9 @@ omo.quant(
       this.name = "";
       this.lastName = "";
       this.age = 0;
-      this.displayName = "${this.name} ${this.lastName}";
     }
 
-    render() {
+    public render(): void {
       return omo.html`
       <p>Name: ${this.name}</p>
       <p>Nachname: ${this.lastName}</p>
@@ -22,27 +25,19 @@ omo.quant(
       `;
     }
 
-    static get model() {
+    // tslint:disable: object-literal-sort-keys
+    static get model(): any {
       return {
         name: {
           type: "string"
         },
-        lastName: {
-          type: "string"
-        },
-        age: {
-          type: "number"
-        },
-        email: {
-          type: "email"
-        },
-        displayName: {
-          type: "formular"
+        enddate: {
+          type: "date"
         }
       };
     }
 
-    static get properties() {
+    static get properties(): any {
       return super.properties;
     }
   }

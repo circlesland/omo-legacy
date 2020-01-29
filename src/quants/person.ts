@@ -1,5 +1,9 @@
 omo.quant(
-  class Milestone extends omo.quanta.Quant {
+  class Person extends omo.quanta.Quant {
+    public name: string;
+    public lastName: string;
+    public age: number;
+    public displayName: string;
     static get styles() {
       return [
         omo.normalize,
@@ -11,6 +15,7 @@ omo.quant(
       this.name = "";
       this.lastName = "";
       this.age = 0;
+      this.displayName = "${this.name} ${this.lastName}";
     }
 
     render() {
@@ -26,8 +31,17 @@ omo.quant(
         name: {
           type: "string"
         },
-        enddate: {
-          type: "date"
+        lastName: {
+          type: "string"
+        },
+        age: {
+          type: "number"
+        },
+        email: {
+          type: "email"
+        },
+        displayName: {
+          type: "formular"
         }
       };
     }
