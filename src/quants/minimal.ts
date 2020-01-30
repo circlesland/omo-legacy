@@ -1,1 +1,3 @@
-omo.quant(class Minimal extends omo.quanta.Quant {});
+// omo.quant(class Minimal extends omo.quantum.get("omo", "quantum", "quant") {
+
+// });
