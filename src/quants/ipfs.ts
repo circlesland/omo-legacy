@@ -1,53 +1,53 @@
-omo.quant(
-  class Ipfs extends omo.quanta.Quant {
-    public status: string;
-    public agentVersion: string;
-    public peerId: string;
+// omo.quant(
+//   class Ipfs extends omo.quantum.get("omo", "quantum", "quant") {
+//     public status: string;
+//     public agentVersion: string;
+//     public peerId: string;
 
-    static get styles(): any[] {
-      return [omo.normalize, omo.css``];
-    }
+//     static get styles(): any[] {
+//       return [omo.normalize, omo.css``];
+//     }
 
-    constructor() {
-      super();
-      this.status = 'connecting to IPFS';
-      this.agentVersion = '';
-      this.peerId = '';
-    }
+//     constructor() {
+//       super();
+//       this.status = 'connecting to IPFS';
+//       this.agentVersion = '';
+//       this.peerId = '';
+//     }
 
-    public render(): any {
-      return omo.html`
-      <h1>${this.status}</h1>
-      <h2>ID: ${this.peerId}</h2>
-      <h2>Agent version: ${this.agentVersion}</h2>
-      `;
-    }
+//     public render(): any {
+//       return omo.html`
+//       <h1>${this.status}</h1>
+//       <h2>ID: ${this.peerId}</h2>
+//       <h2>Agent version: ${this.agentVersion}</h2>
+//       `;
+//     }
 
-    static get model(): any {
-      return {
-        agentVersion: {
-          type: 'string'
-        },
-        peerId: {
-          type: 'string'
-        },
-        status: {
-          type: 'string'
-        }
-      };
-    }
+//     static get model(): any {
+//       return {
+//         agentVersion: {
+//           type: 'string'
+//         },
+//         peerId: {
+//           type: 'string'
+//         },
+//         status: {
+//           type: 'string'
+//         }
+//       };
+//     }
 
-    static get properties(): any {
-      return super.properties;
-    }
+//     static get properties(): any {
+//       return super.properties;
+//     }
 
-    public async initAsync(): Promise<void> {
-      console.log('init async ipfs');
-      await super.initAsync();
-      const result = await omo.ipfs.id();
-      this.agentVersion = result.agentVersion;
-      this.peerId = result.id;
-      this.status = 'Connected ;)';
-    }
-  }
-);
+//     public async initAsync(): Promise<void> {
+//       console.log('init async ipfs');
+//       await super.initAsync();
+//       const result = await omo.ipfs.id();
+//       this.agentVersion = result.agentVersion;
+//       this.peerId = result.id;
+//       this.status = 'Connected ;)';
+//     }
+//   }
+// );

@@ -1,31 +1,29 @@
-omo.quant(
-  class Simple extends omo.quanta.Quant {
+class Simple extends omo.quantum.get("omo", "quantum", "quant", 0, 1, 0) {
     static get styles(): any {
-      return [
-        omo.normalize,
-        omo.css`
+        return [
+            omo.normalize,
+            omo.css`
         h1{
           color:blue;
         }`
-      ];
+        ];
     }
 
     public render(): void {
-      return omo.html`
+        return omo.html`
         <h1>${this.name}</h1>
       `;
     }
 
     static get model(): any {
-      return {
-        name: {
-          type: 'string'
-        }
-      };
+        return {
+            name: {
+                type: 'string'
+            }
+        };
     }
 
     static get properties(): any {
-      return super.properties;
+        return super.properties;
     }
-  }
-);
+}

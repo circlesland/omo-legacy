@@ -63,6 +63,7 @@ export default class Quant extends LitElement {
 
   constructor() {
     super();
+
     this.initialized = false;
     this.autosave = true;
     this.init();

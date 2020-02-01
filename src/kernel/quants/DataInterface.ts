@@ -245,10 +245,19 @@ export default class DataInterface extends Quant {
     });
   }
 
-  public updated(/*changedProperties: any*/): void {
-    if (this.autosave) {
-      this.saveModel();
-    }
+  public updated(changedProperties: any): void {
+
+    changedProperties.forEach((_oldValue, propName) => {
+      switch (propName) {
+        case "ID":
+          this.updateModel({ entity: { ID: this.entityId } });
+          break;
+        default:
+          if (this.autosave) {
+            this.saveModel();
+          }
+      }
+    });
   }
 
   public async saveModel(): Promise<void> {
