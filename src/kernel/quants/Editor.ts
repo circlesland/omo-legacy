@@ -42,7 +42,7 @@ export default class Editor extends DragableQuant {
                     this.editor.setTheme(`ace/theme/${this.theme}`);
                 } break;
                 case "mode": if (this.mode !== undefined) {
-                    this.editor.setTheme(`ace/mode/${this.mode}`);
+                    this.editor.session.setMode(`ace/mode/${this.mode}`);
                 } break;
                 case "code": if (this.code) {
                     this.editor.setValue(this.code);
