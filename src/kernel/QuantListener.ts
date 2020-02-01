@@ -12,6 +12,29 @@ export default class QuantListener {
     this.subscribeNodeAdded();
   }
 
+  public getMeta(src: string): any {
+    const splitted = src.split('-');
+
+    const author = splitted[0];
+    const project = splitted[1];
+    const name = splitted[2];
+
+    if (splitted.length !== 4) {
+      console.error("In alpha only quants with full identifier are accepted. Please use name like: author-project-name-version. Your name was: ", src);
+      return { author, project, name, major: 0, minor: 0, patch: 1 }
+    }
+
+    const version = splitted[3].split('.');
+    if (version.length !== 3) {
+      console.error("In alpha only version with full identifier are accepted. Please use version like: major.minor.patch Your version was: ", splitted[3]);
+      return undefined;
+    }
+    const major = Number.parseInt(version[0], 10);
+    const minor = Number.parseInt(version[1], 10);
+    const patch = Number.parseInt(version[2], 10);
+    return { author, project, name, major, minor, patch }
+  }
+
   private async loadQuant(scriptElement: HTMLScriptElement): Promise<void> {
     const quantname = scriptElement.getAttribute("src");
     if (quantname == null || this.loadedQuanta.includes(quantname)) { return; };
@@ -28,27 +51,6 @@ export default class QuantListener {
 
     this.head.append(script);
     scriptElement.setAttribute("loaded", "true");
-  }
-
-  public getMeta(src: string): any {
-    const splitted = src.split('-');
-    if (splitted.length !== 4) {
-      console.error("In alpha only quants with full identifier are accepted. Please use name like: author-project-name-version. Your name was: ", src);
-      return undefined;
-    }
-    const author = splitted[0];
-    const project = splitted[1];
-    const name = splitted[2];
-
-    const version = splitted[3].split('.');
-    if (version.length !== 3) {
-      console.error("In alpha only version with full identifier are accepted. Please use version like: major.minor.patch Your version was: ", splitted[3]);
-      return undefined;
-    }
-    const major = Number.parseInt(version[0], 10);
-    const minor = Number.parseInt(version[1], 10);
-    const patch = Number.parseInt(version[2], 10);
-    return { author, project, name, major, minor, patch }
   }
   private async loadQuantFromStore(author: string, project: string, name: string, major: number, minor: number, patch: number): Promise<any> {
     return await omo.quantum.loadFromThread(author, project, name, major, minor, patch);

@@ -11,7 +11,7 @@ class Simple extends omo.quantum.get("omo", "quantum", "quant", 0, 1, 0) {
 
     public render(): void {
         return omo.html`
-        <h1>${this.name}</h1>
+        <!-- <h1>${this}</h1> -->
       `;
     }
 

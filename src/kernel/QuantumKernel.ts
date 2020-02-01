@@ -2,10 +2,10 @@ import { Client } from '@textile/threads-client';
 // import Logger from "./Logger";
 import { css, html } from 'lit-element';
 import Language from './language/Language';
-import { QuantStore } from './QuantStore';
 import { dragStyle } from './quants/DragStyle';
 import { normalize } from './quants/Normalize';
 import { theme } from './quants/Theme';
+import { QuantStore } from './QuantStore';
 
 export class QuantumKernel {
   // logger: Logger;

@@ -3,6 +3,14 @@ import QuantListener from "./QuantListener";
 import CodeEditor from "./quants/CodeEditor";
 import DragableQuant from "./quants/DragableQuant";
 import Editor from "./quants/Editor";
+import Designer from "../quants/earth/Designer";
+import QuantaList from "../quants/earth/QuantaList";
+import ContextSwitch from "../quants/earth/ContextSwitch";
+import ViewsChooser from "../quants/earth/ViewsChooser";
+import Data from "../quants/earth/Data";
+import Actions from "../quants/earth/Actions";
+import Versions from "../quants/earth/Versions";
+import SplitView from "../quants/earth/SplitView";
 
 export class QuantStore {
     public get QuantStoreId(): string { return "af8fd66c-3cbd-49b9-abbc-2811dc870388" }
@@ -117,6 +125,14 @@ export class QuantStore {
         this.storeQuant("omo", "quantum", "quant", DragableQuant, 0, 1, 0);
         this.storeQuant("omo", "quantum", "editor", Editor, 0, 1, 0);
         this.storeQuant("omo", "quantum", "codeEditor", CodeEditor, 0, 1, 42);
+        this.storeQuant("omo", "earth", "splitView", SplitView, 0, 0, 1);
+        this.storeQuant("omo", "earth", "data", Data, 0, 0, 1);
+        this.storeQuant("omo", "earth", "actions", Actions, 0, 0, 1);
+        this.storeQuant("omo", "earth", "versions", Versions, 0, 0, 1);
+        this.storeQuant("omo", "earth", "contextSwitch", ContextSwitch, 0, 0, 1);
+        this.storeQuant("omo", "earth", "viewsChooser", ViewsChooser, 0, 0, 1);
+        this.storeQuant("omo", "earth", "quantaList", QuantaList, 0, 0, 1);
+        this.storeQuant("omo", "earth", "designer", Designer, 0, 0, 1);
         // this.CreateOrUpdateQuant("omo", "quantum", "simple", "QmYWVoFsaCwVo2KVHTbskRn7KBs9PxvF68Zv1tPiocBdEm");
         this.listener = new QuantListener();
         console.log(this.listener);
@@ -168,7 +184,8 @@ export class QuantStore {
         const version = this.getVersion(author, project, name, major, minor, patch);
         this.quanta[author][project][name][version] = constructor;
         const quantName = this.getQuantName(author, project, name, major, minor, patch);
-        window.customElements.define(quantName, constructor);
+        // TODO remove hack
+        window.customElements.define(quantName.replace("-0.0.1", ""), constructor);
     }
 
     public getQuantName(author: string, project: string, name: string, major: number, minor: number, patch: number): string {
