@@ -67,7 +67,7 @@ export default class QuantaList extends DragableQuant {
     super.initAsync();
   }
   public selectQuant(event: Event): void {
-    this.selectedQuant = event['path'][0].innerText;
+    this.selectedQuant = event.srcElement['innerText'];
   }
 
   public updated(changedProperties: any): void {
@@ -75,13 +75,6 @@ export default class QuantaList extends DragableQuant {
   }
 
   static get styles() {
-    return [
-      omo.theme,
-      omo.css`
-        :host {
-            position:relative;
-        }
-        `
-    ];
+    return [omo.theme];
   }
 }
