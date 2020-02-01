@@ -30,6 +30,7 @@ export default class Quant extends LitElement {
     return props;
   }
 
+
   // getModelRecursive(constructor: Function, properties: {}) {
   //   if (constructor.model) {
   //     Object.entries(constructor.model).forEach(prop => {
@@ -57,6 +58,7 @@ export default class Quant extends LitElement {
     }
     return properties;
   }
+
   public autosave: any;
   public initialized: boolean;
   public root: ShadowRoot | undefined;
@@ -68,6 +70,12 @@ export default class Quant extends LitElement {
     this.autosave = true;
     this.init();
     this.initAsync().then(() => (this.initialized = true));
+  }
+
+  public updated(changedProperties: any): void {
+    changedProperties.forEach((_oldValue, propName) => {
+      this.dispatchEvent(new CustomEvent(propName));
+    });
   }
 
   public render(): any {

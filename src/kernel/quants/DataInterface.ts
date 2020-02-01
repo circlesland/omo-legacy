@@ -246,7 +246,7 @@ export default class DataInterface extends Quant {
   }
 
   public updated(changedProperties: any): void {
-
+    super.updated(changedProperties);
     changedProperties.forEach((_oldValue, propName) => {
       switch (propName) {
         case "ID":

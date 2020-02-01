@@ -2,7 +2,7 @@
 //  * The QuantListener is one of the core features it listen to the DOM an then apply the magic of resolving depencies
 //  */
 export default class QuantListener {
-  private loadedQuanta: string[];
+  public loadedQuanta: string[];
   private head: HTMLHeadElement;
 
   constructor() {

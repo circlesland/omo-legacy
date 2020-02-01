@@ -67,14 +67,14 @@ export default class SplitView extends DragableQuant {
     public updated(changedProperties: any): void {
         super.updated(changedProperties);
         changedProperties.forEach((_oldValue, propName) => {
-            // switch (propName) {
-            //     case "columns": if (this.columns === undefined || this.columns === 0) {
-            //         this.columns = 1;
-            //     } break;
-            //     case "rows": if (this.rows === undefined || this.rows === 0) {
-            //         this.rows = 1;
-            //     } break;
-            // }
+            switch (propName) {
+                case "columns": if (this.columns === undefined || this.columns.length <= 0) {
+                    this.columns = this.array(1);
+                } break;
+                case "rows": if (this.rows === undefined || this.rows.length <= 0) {
+                    this.rows = this.array(1);
+                } break;
+            }
         });
     }
     private updateColumns(event: Event): void {

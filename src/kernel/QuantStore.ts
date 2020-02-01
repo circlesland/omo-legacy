@@ -15,6 +15,7 @@ import SplitView from "../quants/earth/SplitView";
 export class QuantStore {
     public get QuantStoreId(): string { return "af8fd66c-3cbd-49b9-abbc-2811dc870388" }
 
+    public loadedQuanta: any[];
     get all(): any {
         throw new Error("Method not implemented.");
     }
@@ -135,7 +136,7 @@ export class QuantStore {
         this.storeQuant("omo", "earth", "designer", Designer, 0, 0, 1);
         // this.CreateOrUpdateQuant("omo", "quantum", "simple", "QmYWVoFsaCwVo2KVHTbskRn7KBs9PxvF68Zv1tPiocBdEm");
         this.listener = new QuantListener();
-        console.log(this.listener);
+        this.loadedQuanta = this.listener.loadedQuanta;
     }
     public async saveQuant(author: string, project: string, name: string, major: number, minor: number, patch: number, code: string): Promise<void> {
         const quant = this.getQuantName(author, project, name, major, minor, patch);

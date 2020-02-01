@@ -1,6 +1,8 @@
 import DragableQuant from "../../kernel/quants/DragableQuant";
 
 export default class Designer extends DragableQuant {
+    private quantaList: any;
+    private contextSwitch: any;
     constructor() {
         super();
     }
@@ -15,7 +17,18 @@ export default class Designer extends DragableQuant {
         <omo-earth-splitView></omo-earth-splitView>
         `;
     }
-    public static get styles() {
+    public firstUpdated(changedProperties: any): void {
+        super.firstUpdated(changedProperties);
+        this.quantaList = this.root.querySelector("omo-earth-quantalist");
+        this.contextSwitch = this.root.querySelector("omo-earth-contextswitch");
+        this.quantaList.addEventListener("selectedQuant", () => this.setSelectedQuant(this.quantaList.selectedQuant), false);
+    }
+
+    setSelectedQuant(selectedQuant: any) {
+        this.contextSwitch.selectedQuant = selectedQuant;
+    }
+
+    public static get styles(): any {
         return [omo.css/*css*/`
     :host{
         height:100%;
