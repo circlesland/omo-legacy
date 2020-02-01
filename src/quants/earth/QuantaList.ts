@@ -33,9 +33,9 @@ export default class QuantaList extends DragableQuant {
     public render(): void {
         return omo.html`
         ${this.quanta.map((quant: any) => {
-            const quantName = omo.quantum.getQuantName(quant.author, quant.project, quant.name, quant.major, quant.minor,
-                quant.patch);
-            return omo.html`<a @click="${this.selectQuant}">${quantName}</a>`
+        const quantName = omo.quantum.getQuantName(quant.author, quant.project, quant.name, quant.major, quant.minor,
+        quant.patch);
+        return omo.html`<a @click="${this.selectQuant}">${quantName}</a>`
         })}`
     }
 
@@ -43,7 +43,8 @@ export default class QuantaList extends DragableQuant {
         super.initAsync();
     }
     public selectQuant(event: Event): void {
-        this.selectedQuant = event["path"][0].innerText;
+        // this.selectedQuant = event["path"][0].innerText;
+        this.selectedQuant = event.srcElement["innerText"];
     }
 
     public updated(changedProperties: any): void {
