@@ -16,57 +16,57 @@ export default class StringCases {
     if (!value) {
       value = this;
     }
-    return require("js-convert-case").toCamelCase(value);
+    return require('js-convert-case').toCamelCase(value);
   }
   public static toSnakeCase(value: any): string {
     if (!value) {
       value = this;
     }
-    return require("js-convert-case").toSnakeCase(value);
+    return require('js-convert-case').toSnakeCase(value);
   }
   public static toPascalCase(value: any): string {
     if (!value) {
       value = this;
     }
-    return require("js-convert-case").toPascalCase(value);
+    return require('js-convert-case').toPascalCase(value);
   }
   public static toDotCase(value: any): string {
     if (!value) {
       value = this;
     }
-    return require("js-convert-case").toDotCase(value);
+    return require('js-convert-case').toDotCase(value);
   }
   public static toPathCase(value: any): string {
     if (!value) {
       value = this;
     }
-    return require("js-convert-case").toPathCase(value);
+    return require('js-convert-case').toPathCase(value);
   }
   public static toTextCase(value: any): string {
     if (!value) {
       value = this;
     }
-    return require("js-convert-case").toTextCase(value);
+    return require('js-convert-case').toTextCase(value);
   }
   public static toSentenceCase(value: any): string {
     if (!value) {
       value = this;
     }
-    return require("js-convert-case").toSentenceCase(value);
+    return require('js-convert-case').toSentenceCase(value);
   }
   public static toHeaderCase(value: any): string {
     if (!value) {
       value = this;
     }
-    return require("js-convert-case").toHeaderCase(value);
+    return require('js-convert-case').toHeaderCase(value);
   }
   public static toParamCase(value: any): string {
     if (!value) {
       value = this;
     }
-    return require("js-convert-case")
+    return require('js-convert-case')
       .toSnakeCase(value)
-      .replace(/_/g, "-");
+      .replace(/_/g, '-');
   }
 }
 

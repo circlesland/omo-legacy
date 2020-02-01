@@ -6,9 +6,11 @@
     "moduleResolution": "node",
     "module": "commonjs",
     "declaration": true,
+    // "sourceMap": true,
     "inlineSourceMap": false,
+    "noImplicitUseStrict": true,
     "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
-    "strict": true /* Enable all strict type-checking options. */,
+    // "strict": true /* Enable all strict type-checking options. */,
     /* Strict Type-Checking Options */
     // "noImplicitAny": true /* Raise error on expressions and declarations with an implied 'any' type. */,
     // "strictNullChecks": true /* Enable strict null checks. */,
@@ -43,7 +45,8 @@
     "suppressImplicitAnyIndexErrors": true
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "test.ts"
   ],
   "exclude": [
     "node_modules/**"

@@ -1,4 +1,4 @@
-import { css } from "lit-element";
+import { css } from 'lit-element';
 
 export const dragStyle = css`
   :host(.omo-drag) {
@@ -12,7 +12,7 @@ export const dragStyle = css`
     position: relative;
     display: block;
     transition: all 0.4s;
-    width:100%;
+    width: 100%;
   }
 
   :host slot {
@@ -21,7 +21,7 @@ export const dragStyle = css`
   }
 
   :host(.over) slot::before {
-    content: " ";
+    content: ' ';
     position: absolute;
     top: 0;
     left: 10px;
@@ -35,7 +35,7 @@ export const dragStyle = css`
 
   :host(.over)::after {
     position: absolute;
-    content: " ";
+    content: ' ';
     top: 0;
     left: 0;
     width: 100%;
@@ -47,7 +47,7 @@ export const dragStyle = css`
   }
 
   :host::before {
-    content: " ";
+    content: ' ';
     position: absolute;
     right: 0;
     top: 0;

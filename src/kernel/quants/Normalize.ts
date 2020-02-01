@@ -1,4 +1,4 @@
-import { css } from "lit-element";
+import { css } from 'lit-element';
 
 export const normalize = css`
   :host(.omo-drag) {
@@ -20,7 +20,7 @@ export const normalize = css`
   }
 
   :host(.over) slot::before {
-    content: " ";
+    content: ' ';
     position: absolute;
     top: 0;
     left: 10px;
@@ -34,7 +34,7 @@ export const normalize = css`
 
   :host(.over)::after {
     position: absolute;
-    content: " ";
+    content: ' ';
     top: 0;
     left: 0;
     width: 100%;
@@ -46,7 +46,7 @@ export const normalize = css`
   }
 
   :host::before {
-    content: " ";
+    content: ' ';
     position: absolute;
     right: 0;
     top: 0;
@@ -265,9 +265,9 @@ export const normalize = css`
  */
 
   button,
-  [type="button"],
-  [type="reset"],
-  [type="submit"] {
+  [type='button'],
+  [type='reset'],
+  [type='submit'] {
     -webkit-appearance: button;
   }
 
@@ -276,9 +276,9 @@ export const normalize = css`
  */
 
   button::-moz-focus-inner,
-  [type="button"]::-moz-focus-inner,
-  [type="reset"]::-moz-focus-inner,
-  [type="submit"]::-moz-focus-inner {
+  [type='button']::-moz-focus-inner,
+  [type='reset']::-moz-focus-inner,
+  [type='submit']::-moz-focus-inner {
     border-style: none;
     padding: 0;
   }
@@ -288,9 +288,9 @@ export const normalize = css`
  */
 
   button:-moz-focusring,
-  [type="button"]:-moz-focusring,
-  [type="reset"]:-moz-focusring,
-  [type="submit"]:-moz-focusring {
+  [type='button']:-moz-focusring,
+  [type='reset']:-moz-focusring,
+  [type='submit']:-moz-focusring {
     outline: 1px dotted ButtonText;
   }
 
@@ -339,8 +339,8 @@ export const normalize = css`
  * 2. Remove the padding in IE 10.
  */
 
-  [type="checkbox"],
-  [type="radio"] {
+  [type='checkbox'],
+  [type='radio'] {
     box-sizing: border-box; /* 1 */
     padding: 0; /* 2 */
   }
@@ -349,8 +349,8 @@ export const normalize = css`
  * Correct the cursor style of increment and decrement buttons in Chrome.
  */
 
-  [type="number"]::-webkit-inner-spin-button,
-  [type="number"]::-webkit-outer-spin-button {
+  [type='number']::-webkit-inner-spin-button,
+  [type='number']::-webkit-outer-spin-button {
     height: auto;
   }
 
@@ -359,7 +359,7 @@ export const normalize = css`
  * 2. Correct the outline style in Safari.
  */
 
-  [type="search"] {
+  [type='search'] {
     -webkit-appearance: textfield; /* 1 */
     outline-offset: -2px; /* 2 */
   }
@@ -368,7 +368,7 @@ export const normalize = css`
  * Remove the inner padding in Chrome and Safari on macOS.
  */
 
-  [type="search"]::-webkit-search-decoration {
+  [type='search']::-webkit-search-decoration {
     -webkit-appearance: none;
   }
 

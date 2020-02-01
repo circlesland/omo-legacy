@@ -1,51 +1,35 @@
-import { LitElement } from "lit-element";
+import { LitElement } from 'lit-element';
 
 export default class Quant extends LitElement {
-  _root: ShadowRoot | undefined;
-  name: string;
-  autosave: any;
-  initialized: boolean;
-
-  constructor() {
-    super();
-    this.initialized = false;
-    this.name = "";
-    this.autosave = true;
+  get hasSlot(): boolean {
+    return this.renderRoot.querySelector('slot') !== undefined;
   }
 
-  render() {
-    return window.omo.html`<p>Please implement render function<p>`;
+  get slots(): any {
+    return this.renderRoot.querySelectorAll('slot');
   }
 
-  get hasSlot() {
-    return this.renderRoot.querySelector("slot") != undefined;
-  }
-
-  get slots() {
-    return this.renderRoot.querySelectorAll("slot");
-  }
-
-  append(node: Node) {
-    if (this.hasSlot) super.append(node);
-    else if (this.parentElement)
-      this.parentElement.insertBefore(node, this.nextSibling);
-    else document.append(node);
-  }
-
-  createRenderRoot() {
-    this._root = this.attachShadow({
-      mode: "open"
-    });
-    return this._root;
-  }
-
-  init() {
-    this.initAsync().then(() => this.initialized = true);
-  }
-
-  static get model() {
+  static get model(): any {
     return {};
   }
+
+  // extracted model for LIT Element
+  static get properties(): any {
+    const props = JSON.parse(JSON.stringify(this.model));
+
+    Object.keys(props).map((key: any) => {
+      const item = props[key];
+
+      if (item.type === 'property') {
+        item.type = 'object';
+      }
+      props[key] = item;
+    });
+
+    // Make it conform for lit
+    return props;
+  }
+
 
   // getModelRecursive(constructor: Function, properties: {}) {
   //   if (constructor.model) {
@@ -60,38 +44,68 @@ export default class Quant extends LitElement {
   //   return properties;
   // }
 
-  static recursiveModel(constructor: Function): any {
+  public static recursiveModel(constructor: any): any {
     let properties = {};
-    if (constructor.recursiveModel != undefined) {
-      let parentConstructor = Object.getPrototypeOf(constructor);
+    if (constructor.recursiveModel !== undefined) {
+      const parentConstructor = Object.getPrototypeOf(constructor);
       properties = constructor.recursiveModel(parentConstructor);
 
       Object.entries(constructor.model).forEach(prop => {
-        if (!properties[prop[0]]) properties[prop[0]] = prop[1];
+        if (!properties[prop[0]]) {
+          properties[prop[0]] = prop[1];
+        }
       });
     }
     return properties;
   }
 
-  // extracted model for LIT Element
-  static get properties() {
-    console.log("LIT PROPERTIES", this.model);
+  public autosave: any;
+  public initialized: boolean;
+  public root: ShadowRoot | undefined;
 
-    let props = JSON.parse(JSON.stringify(this.model));
+  constructor() {
+    super();
 
-    Object.keys(props).map(function (key: any) {
-      let item = props[key];
-
-      if (item.type == "property")
-        item.type = "object";
-      props[key] = item;
-    });
-
-    // Make it conform for lit
-    return props;
+    this.initialized = false;
+    this.autosave = true;
+    this.init();
+    this.initAsync().then(() => (this.initialized = true));
   }
 
-  async initAsync() { }
+  public updated(changedProperties: any): void {
+    changedProperties.forEach((_oldValue, propName) => {
+      this.dispatchEvent(new CustomEvent(propName));
+    });
+  }
+
+  public render(): any {
+    return window.omo.html`<p>Please implement render function<p>`;
+  }
+
+  public append(node: Node): void {
+    if (this.hasSlot) {
+      super.append(node);
+    } else if (this.parentElement) {
+      this.parentElement.insertBefore(node, this.nextSibling);
+    } else {
+      document.append(node);
+    }
+  }
+
+  public createRenderRoot(): any {
+    this.root = this.attachShadow({
+      mode: 'open'
+    });
+    return this.root;
+  }
+
+  public init(): void {
+    // this.initAsync().then(() => this.initialized = true);
+  }
+
+  public async initAsync(): Promise<void> {
+    /**/
+  }
 }
 
 declare global {

@@ -1,13 +1,18 @@
+// import DataInterface from './DataInterface';
 import DataInterface from './DataInterface';
 
 export default class DragableQuant extends DataInterface {
-    async initAsync() {
-        await super.initAsync();
-    }
-    static get properties() {
-        return super.properties;
-    }
-    static get model() {
-        return super.model;
-    }
+  public async initAsync(): Promise<void> {
+
+    await super.initAsync();
+  }
+  static get properties(): any {
+    return super.properties;
+  }
+  static get model(): any {
+    return super.model;
+  }
+  public updated(changedProperties: any): void {
+    super.updated(changedProperties);
+  }
 }

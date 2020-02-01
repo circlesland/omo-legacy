@@ -24,12 +24,16 @@ jobs:
       - run: npm test
       - run: npm run cov:send
       - run: npm run cov:check
+      
+      #hack
+      - run: npm run build:module
+      - run: npm run dist
 
-      # - deploy:
-      #     name: Deploy Over SSH
-      #     command: |
-      #       ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST exit
-      #       scp -r ~/repo/dist/* $SSH_USER@$SSH_HOST:$DEPLOY_PATH
+      - deploy:
+          name: Deploy Over SSH
+          command: |
+            ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST exit
+            scp -r ~/omo-quantum/dist/* $SSH_USER@$SSH_HOST:$DEPLOY_PATH
 
   'node-latest':
     docker:

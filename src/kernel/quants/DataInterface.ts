@@ -1,96 +1,61 @@
-import Quant from "./Quant";
+import Quant from './Quant';
 
 export default class DataInterface extends Quant {
-  static _modelName: any;
-  static _model: any;
-  ID: any;
-  static viewModel: any;
-
-  async initAsync() {
-    await super.initAsync();
-    await this.constructor.Init()
-    await this.createEntityIfNotExist()
-    this.startListenForDataChanges();
-  }
-
-  static async Init() {
-    this._model = DataInterface.recursiveModel(this);
-    this.schemaProperties = await this.createSchemaProperties(this._model);
-    let jsonSchema = this.createJsonSchema(this.schemaProperties);
-    console.log(jsonSchema);
-    this._modelName = await DataInterface.getModelName(jsonSchema);
-    await DataInterface.registerSchemaIfNoRegistered(jsonSchema, this._modelName);
-  }
-
-  get modelName() {
+  get modelName(): string {
     return this.constructor._modelName;
   }
-  get _model() {
+  get _model(): any {
     return this.constructor.schemaProperties;
   }
 
-  async createEntityIfNotExist() {
-    if (this.entityId == undefined || this.entityId == "" || !window.omo.client.modelHas(window.omo.storeId, this.modelName, [this.entityId])) {
-      let entity: any = {};
-      Object.keys(this._model).forEach(key => {
-
-        if (this._model[key].type != "property") {
-          entity[key] = this[key];
-        }
-      })
-      console.log("defaultent", entity)
-      entity = (await window.omo.client.modelCreate(window.omo.storeId, this.modelName, [entity])).entitiesList[0];
-      this.entityId = entity.ID;
-    }
-    this.updateModel({ entity: { ID: this.entityId } });
+  get entityId(): string {
+    return this.ID;
+  }
+  set entityId(value) {
+    this.ID = value;
   }
 
-  startListenForDataChanges() {
-    window.omo.client.listen(window.omo.storeId, this.modelName, this.entityId, this.updateModel.bind(this))
-  }
-
-  async updateModel(result: any) {
-    // TODO remove next line when textile fixed pubsub for listen changes on threads
-    // if (result.entity.ID !== this.entityId) { return; }
-    result = await window.omo.client.modelFindByID(window.omo.storeId, this.modelName, this.entityId);
-    // TODO END
-    Object.keys(result.entity).forEach(key => {
-      if (this[key] != result.entity[key]) {
-        this[key] = result.entity[key];
+  static get model(): any {
+    return {
+      ID: {
+        required: true,
+        type: 'string'
       }
-    })
-
+    };
   }
 
-  updated(/*changedProperties: any*/) {
-    if (this.autosave) {
-      this.saveModel();
-    }
-  }
+  static get jsonProperties(): any {
+    const properties = DataInterface.recursiveModel(this);
 
-  async saveModel() {
-    if (!this.initialized) {
-      return;
-    }
-    if (this._model === undefined) {
-      return;
-    }
-
-    let model = {};
-    Object.keys(this._model).forEach(key => {
-      model[key] = this[key];
+    Object.keys(properties).map((key: any) => {
+      const item = properties[key];
+      properties[key] = item;
     });
 
-    if (Object.values(model).some(val => val !== undefined)) {
-      window.omo.client.modelSave(window.omo.storeId, this.constructor._modelName, [model]);
-
-    }
-
-
+    return properties;
   }
 
+  // tslint:disable-next-line: variable-name
+  public static _modelName: any;
+  // tslint:disable-next-line: variable-name
+  public static _model: any;
+  public static viewModel: any;
 
-  static async registerSchemaIfNoRegistered(jsonSchema: any, modelName: string) {
+  public static async Init(): Promise<void> {
+    this._model = DataInterface.recursiveModel(this);
+    this.schemaProperties = await this.createSchemaProperties(this._model);
+    const jsonSchema = this.createJsonSchema(this.schemaProperties);
+    this._modelName = await DataInterface.getModelName(jsonSchema);
+    await DataInterface.registerSchemaIfNoRegistered(
+      jsonSchema,
+      this._modelName
+    );
+  }
+
+  public static async registerSchemaIfNoRegistered(
+    jsonSchema: any,
+    modelName: string
+  ): Promise<void> {
     try {
       await window.omo.client.registerSchema(
         window.omo.storeId,
@@ -98,86 +63,72 @@ export default class DataInterface extends Quant {
         jsonSchema
       );
     } catch (err) {
-      if (err.message != "already registered model") {
+      if (err.message !== 'already registered model') {
         throw err;
       }
     }
   }
 
-  static async getModelName(jsonSchema: any) {
+  public static async getModelName(jsonSchema: any): Promise<string> {
     // Modelname is the content hash of the model of quant
-    let hashJsonSchemaResult = await window.omo.ipfs.add(JSON.stringify(jsonSchema), { onlyHash: true });
+    const hashJsonSchemaResult = await window.omo.ipfs.add(
+      JSON.stringify(jsonSchema),
+      { onlyHash: true }
+    );
     return hashJsonSchemaResult[0].hash;
   }
 
-  get entityId() {
-    return this.ID;
-  }
-  set entityId(value) {
-    this.ID = value;
-  }
+  public static createSchemaProperties(model: any): any {
+    const schemaProperties = JSON.parse(JSON.stringify(model));
+    Object.keys(schemaProperties).map((key: any) => {
+      const item = schemaProperties[key];
 
-  static get model() {
-    return {
-      ID: {
-        type: "string",
-        required: true
-      }
-    };
-  }
-
-  static createSchemaProperties(model: any) {
-    let schemaProperties = JSON.parse(JSON.stringify(model));
-    Object.keys(schemaProperties).map(function (key: any) {
-      let item = schemaProperties[key];
-
-      if (item.type == "property") {
-        console.log("property");
+      if (item.type === 'property') {
         delete schemaProperties[key];
         return;
       }
 
-      //Handle Relations
-      if (item.type == "relation") {
-        item.type = "object";
-        item.$ref = "#/definitions/relation";
+      // Handle Relations
+      if (item.type === 'relation') {
+        item.type = 'object';
+        item.$ref = '#/definitions/relation';
       }
 
-      if (item.type == "date") {
-        item.type = "string";
+      if (item.type === 'date') {
+        item.type = 'string';
       }
-      if (item.type == "email") {
-        item.type = "string";
+      if (item.type === 'email') {
+        item.type = 'string';
       }
-      if (item.type == "password") {
-        item.type = "string";
+      if (item.type === 'password') {
+        item.type = 'string';
       }
-      if (item.type == "file") {
-        item.type = "string";
+      if (item.type === 'file') {
+        item.type = 'string';
       }
-      if (item.type == "color") {
-        item.type = "string";
+      if (item.type === 'color') {
+        item.type = 'string';
       }
-      if (item.type == "datetime-local") {
-        item.type = "string";
+      if (item.type === 'datetime-local') {
+        item.type = 'string';
       }
-      if (item.type == "month") {
-        item.type = "string";
+      if (item.type === 'month') {
+        item.type = 'string';
       }
-      if (item.type == "url") {
-        item.type = "string";
+      if (item.type === 'url') {
+        item.type = 'string';
       }
-      if (item.type == "week") {
-        item.type = "string";
+      if (item.type === 'week') {
+        item.type = 'string';
       }
-      if (item.type == "search") {
-        item.type = "string";
+      if (item.type === 'search') {
+        item.type = 'string';
       }
-      if (item.type == "tel") {
-        item.type = "string";
+      if (item.type === 'tel') {
+        item.type = 'string';
       }
-      if (item.type == "formular") {
-        item.type = "string";
+      if (item.type === 'formular') {
+        item.type = 'string';
       }
 
       if (item.required) {
@@ -198,72 +149,136 @@ export default class DataInterface extends Quant {
 
       schemaProperties[key] = item;
     });
-    //TODO Generate a valid JSONSchema out of quant model
+    // TODO Generate a valid JSONSchema out of quant model
     return schemaProperties;
   }
 
-  static createJsonSchema(schemaProperties: any) {
-    let schema = {
-      $schema: "http://json-schema.org/draft-04/schema#",
+  public static createJsonSchema(schemaProperties: any): any {
+    const schema = {
       $ref: `#/definitions/${this.name}`,
+      $schema: 'http://json-schema.org/draft-04/schema#',
       definitions: {}
     };
     schema.definitions[this.name] = {
-      required: Object.keys(this._model).filter(key => this._model[key].required),
-      properties: schemaProperties,
       additionalProperties: false,
-      type: "object"
+      properties: schemaProperties,
+      required: Object.keys(this._model).filter(
+        key => this._model[key].required
+      ),
+      type: 'object'
     };
 
     // If any property is relation add relation definition
-    if (Object.values(schemaProperties).some((item: any) => item.$ref == "#/definitions/relation")) {
-      schema.definitions["relation"] = {
-        required: ["id"],
-        properties: { id: { type: "string" } },
+    if (
+      Object.values(schemaProperties).some(
+        (item: any) => item.$ref === '#/definitions/relation'
+      )
+    ) {
+      schema.definitions['relation'] = {
         additionalProperties: false,
-        type: "object"
-      }
+        properties: { id: { type: 'string' } },
+        required: ['id'],
+        type: 'object'
+      };
     }
 
     return schema;
   }
+  public ID: any;
 
-  static get jsonProperties() {
-    let properties = DataInterface.recursiveModel(this);
+  public async initAsync(): Promise<void> {
+    await super.initAsync();
+    await this.constructor.Init();
+    await this.createEntityIfNotExist();
+    this.startListenForDataChanges();
+  }
 
-    Object.keys(properties).map(function (key: any) {
-      let item = properties[key];
+  public async createEntityIfNotExist(): Promise<void> {
+    if (
+      this.entityId === undefined ||
+      this.entityId === '' ||
+      !window.omo.client.modelHas(window.omo.storeId, this.modelName, [
+        this.entityId
+      ])
+    ) {
+      let entity: any = {};
+      Object.keys(this._model).forEach(key => {
+        if (this._model[key].type !== 'property') {
+          entity[key] = this[key];
+        }
+      });
+      entity = (
+        await window.omo.client.modelCreate(
+          window.omo.storeId,
+          this.modelName,
+          [entity]
+        )
+      ).entitiesList[0];
+      this.entityId = entity.ID;
+    }
+    this.updateModel({ entity: { ID: this.entityId } });
+  }
 
-      // //Handle Relations
-      // if (item.type == "relation") {
-      //   item.quant = item.quant.;
-      // }
+  public startListenForDataChanges(): void {
+    window.omo.client.listen(
+      window.omo.storeId,
+      this.modelName,
+      this.entityId,
+      this.updateModel.bind(this)
+    );
+  }
 
+  public async updateModel(result: any): Promise<void> {
+    // TODO remove next line when textile fixed pubsub for listen changes on threads
+    // if (result.entity.ID !== this.entityId) { return; }
+    // tslint:disable-next-line: no-parameter-reassignment
+    result = await window.omo.client.modelFindByID(
+      window.omo.storeId,
+      this.modelName,
+      this.entityId
+    );
+    // TODO END
+    Object.keys(result.entity).forEach(key => {
+      if (this[key] !== result.entity[key]) {
+        this[key] = result.entity[key];
+      }
+    });
+  }
 
-      properties[key] = item;
+  public updated(changedProperties: any): void {
+    super.updated(changedProperties);
+    changedProperties.forEach((_oldValue, propName) => {
+      switch (propName) {
+        case "ID":
+          this.updateModel({ entity: { ID: this.entityId } });
+          break;
+        default:
+          if (this.autosave) {
+            this.saveModel();
+          }
+      }
+    });
+  }
+
+  public async saveModel(): Promise<void> {
+    if (!this.initialized) {
+      return;
+    }
+    if (this._model === undefined) {
+      return;
+    }
+
+    const model = {};
+    Object.keys(this._model).forEach(key => {
+      model[key] = this[key];
     });
 
-
-
-
-
-
-    return properties;
+    if (Object.values(model).some(val => val !== undefined)) {
+      window.omo.client.modelSave(
+        window.omo.storeId,
+        this.constructor._modelName,
+        [model]
+      );
+    }
   }
-  // static async foo(){
-  //   let properties = this.jsonProperties;
-
-  //   await Promise.all(Object.keys(properties).map(async(key) => {
-  //     let prop = properties[key];
-  //     if(prop.type == "relation"){
-  //       prop.options = (await window.omo.client.modelFind(window.omo.storeId,prop.quant._modelName,{})).entitiesList;
-  //     }
-  //     properties[key]=prop;
-  //   }))
-
-  // }
-
-  // static async bar(key:any,properties:any){
-
-  // }
 }

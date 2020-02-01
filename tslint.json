@@ -28,6 +28,7 @@
     "no-if-statement": false,
     "no-console": false,
     "no-this-assignment": false,
-    "no-string-literal": false
+    "no-string-literal": false,
+    "variable-name": false
   }
 }

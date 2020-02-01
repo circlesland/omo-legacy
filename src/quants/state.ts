@@ -1,35 +1,32 @@
-omo.quant(
-  class State extends omo.quanta.Quant {
-    done: boolean;
-    task: string;
-    static get styles() {
-      return [
-        omo.normalize,
-        omo.css``
-      ];
-    }
-    constructor() {
-      super();
-      this.done = false;
-      this.task = "";
-    }
+// omo.quant(
+//   class State extends omo.quantum.get("omo", "quantum", "quant") {
+//     public done: boolean;
+//     public task: string;
+//     static get styles(): any {
+//       return [omo.normalize, omo.css``];
+//     }
+//     constructor() {
+//       super();
+//       this.done = false;
+//       this.task = '';
+//     }
 
-    render() {
-      return omo.html`
-TODO
-          `;
-    }
+//     public render(): void {
+//       return omo.html`
+//         TODO
+//       `;
+//     }
 
-    static get model() {
-      return {
-        state: {
-          type: "string"
-        }
-      };
-    }
+//     public static get model(): any {
+//       return {
+//         state: {
+//           type: 'string'
+//         }
+//       };
+//     }
 
-    static get properties() {
-      return super.properties;
-    }
-  }
-);
+//     static get properties(): any {
+//       return super.properties;
+//     }
+//   }
+// );
