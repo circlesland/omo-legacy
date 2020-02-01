@@ -16,32 +16,26 @@ export default class QuantListener {
     const quantname = scriptElement.getAttribute("src");
     if (quantname == null || this.loadedQuanta.includes(quantname)) { return; };
 
-    const quant = this.getQuantOrHash(quantname);
-    if (quant === undefined) { return };
+    const meta = this.getMeta(quantname);
+    const code = await this.loadQuantFromStore(meta.author, meta.project, meta.name, meta.major, meta.minor, meta.patch);
+    const data = `omo.quantum.register(${code},'${meta.author}','${meta.project}','${meta.name}',${meta.major},${meta.minor},${meta.patch});`;
+    const node = document.createTextNode(data);
 
-    // this.loadedQuanta.push(hash);
-    // let blob = await window.omo.textile.ipfs.cat(hash);
-    // script.innerText = await blob.text();
     const script = document.createElement("script");
     script.type = "module";
     script.setAttribute("data-quant", quantname);
+    script.append(node);
 
-    const response = await omo.ipfs.cat("QmXBnvcCpUCm37BuzpySMQ1Wj1mGJaDYn3As3NmfqhDgXX");
-    script.innerText = `omo.quantum.register(${response.toString()},'${quantname}')`;
-    // script.innerText = 'omo.quantum.register(class Monacos extends   omo.quantum.quanta.omo.quantum.quant["0.1.0"] {      static get properties() {    return { name: { type: String } }; } constructor() { super();    this.name = "World";}  render() {   return html`<p>Hello, ${this.name}!</p>`;}});';
-
-    // constructor() { super(); this.code = ""; }    async initAsync() { await super.initAsync(); } render() { return omo.html `Monacos: ${this.code}`;} static get model() { return { code: {type: "string" } }; } static get properties() { return super.properties; } static get styles() {return [omo.normalize, omo.css ``];}});';
     this.head.append(script);
     scriptElement.setAttribute("loaded", "true");
-
   }
-  private getQuantOrHash(src: string): any {
+
+  public getMeta(src: string): any {
     const splitted = src.split('-');
     if (splitted.length !== 4) {
       console.error("In alpha only quants with full identifier are accepted. Please use name like: author-project-name-version. Your name was: ", src);
       return undefined;
     }
-    console.log("BREAK");
     const author = splitted[0];
     const project = splitted[1];
     const name = splitted[2];
@@ -54,7 +48,10 @@ export default class QuantListener {
     const major = Number.parseInt(version[0], 10);
     const minor = Number.parseInt(version[1], 10);
     const patch = Number.parseInt(version[2], 10);
-    return omo.quantum.get(author, project, name, major, minor, patch);
+    return { author, project, name, major, minor, patch }
+  }
+  private async loadQuantFromStore(author: string, project: string, name: string, major: number, minor: number, patch: number): Promise<any> {
+    return await omo.quantum.loadFromThread(author, project, name, major, minor, patch);
   }
 
   private loadAlreadyExistingQuanta(): void {
@@ -69,11 +66,6 @@ export default class QuantListener {
   private subscribeNodeAdded(): void {
     const observer = new MutationObserver(this.OnHeadNodeInserted.bind(this));
     observer.observe(this.head, { attributes: true, childList: true });
-    // this.head.addEventListener(
-    //   "DOMNodeInserted",
-    //   this.OnHeadNodeInserted.bind(this),
-    //   false
-    // );
   }
 
   // TODO use right typescript type
@@ -87,15 +79,8 @@ export default class QuantListener {
         if (node["type"] !== "quant") {
           return;
         }
-        console.log("LOADQUANT", node);
         this.loadQuant(node);
       })
     });
-    // const scriptNode = event.target;
-    // if (scriptNode.tagName && scriptNode.tagName.toLowerCase() !== "script") {
-    //   return;
-    // }
-    // if (scriptNode.type.toLowerCase() !== "quant") { return; }
-    // this.loadQuant(scriptNode);
   }
 }

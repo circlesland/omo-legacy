@@ -23,19 +23,28 @@ export default class Editor extends DragableQuant {
     static get styles(): any {
         return [omo.theme, omo.css`:host{height:100%;width:100%;position:relative;} #editor{position:absolute;width:100%;height:100%;top:0;left:0;}`];
     }
+    get code(): string {
+        if (this.editor !== undefined) { return this.editor.getValue(); }
+        return this._code;
+    }
+    set code(value) {
+        this._code = value;
+        if (this.editor !== undefined && this._code !== "") { this.editor.setValue(this._code); }
+    }
 
     public mode: any;
-    public code: any;
     public theme: any;
+    private _code: any;
     private editor: Ace.Editor;
-
     constructor() {
         super();
         if (this.mode === undefined) { this.mode = "javascript"; }
         if (this.code === undefined) { this.code = ""; }
     }
     public updated(changedProperties: any): void {
+        console.log(changedProperties);
         super.updated(changedProperties);
+        if (this.editor === undefined) { return; }
         changedProperties.forEach((_oldValue, propName) => {
             switch (propName) {
                 case "theme": if (this.theme !== undefined) {
@@ -44,12 +53,10 @@ export default class Editor extends DragableQuant {
                 case "mode": if (this.mode !== undefined) {
                     this.editor.session.setMode(`ace/mode/${this.mode}`);
                 } break;
-                case "code": if (this.code) {
-                    this.editor.setValue(this.code);
-                } break;
             }
         });
     }
+
 
 
     public firstUpdated(): void {
@@ -76,7 +83,7 @@ export default class Editor extends DragableQuant {
             this.editor.setValue(this.code);
         }
         if (this.theme !== undefined) {
-            this.editor.setTheme(`ace/theme${this.theme}`);
+            this.editor.setTheme(`ace/theme/${this.theme}`);
         }
         if (this.mode !== undefined) {
             this.editor.session.setMode(`ace/mode/${this.mode}`);

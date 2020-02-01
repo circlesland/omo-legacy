@@ -2,14 +2,14 @@ import { Client } from '@textile/threads-client';
 // import Logger from "./Logger";
 import { css, html } from 'lit-element';
 import Language from './language/Language';
-import { QuantLoader } from './QuantLoader';
+import { QuantStore } from './QuantStore';
 import { dragStyle } from './quants/DragStyle';
 import { normalize } from './quants/Normalize';
 import { theme } from './quants/Theme';
 
 export class QuantumKernel {
   // logger: Logger;
-  public quantum: QuantLoader;
+  public quantum: QuantStore;
   public html: any;
   public css: any;
   public normalize: any;
@@ -25,7 +25,7 @@ export class QuantumKernel {
     this.ready = false;
     // this.logger = new Logger();
     Language.init();
-    this.quantum = new QuantLoader();
+    this.quantum = new QuantStore();
 
     this.html = html;
     this.css = css;
