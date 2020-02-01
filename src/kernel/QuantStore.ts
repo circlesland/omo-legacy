@@ -5,8 +5,6 @@ import DragableQuant from "./quants/DragableQuant";
 import Editor from "./quants/Editor";
 
 export class QuantStore {
-
-
     public get QuantStoreId(): string { return "af8fd66c-3cbd-49b9-abbc-2811dc870388" }
 
     get all(): any {
@@ -61,7 +59,9 @@ export class QuantStore {
     }
     public quanta: any;
     private listener: QuantListener;
-
+    public getMeta(quantname): any {
+        return this.listener.getMeta(quantname);
+    }
     public register($class: any, author: string, project: string, name: string, major: number, minor: number, patch: number): void {
         this.storeQuant(author, project, name, $class, major, minor, patch);
     }
@@ -116,17 +116,26 @@ export class QuantStore {
         catch (err) { if (err.message !== 'already registered model') { throw err; } }
         this.storeQuant("omo", "quantum", "quant", DragableQuant, 0, 1, 0);
         this.storeQuant("omo", "quantum", "editor", Editor, 0, 1, 0);
-        this.storeQuant("omo", "quantum", "codeEditor", CodeEditor, 0, 1, 0);
+        this.storeQuant("omo", "quantum", "codeEditor", CodeEditor, 0, 1, 42);
         // this.CreateOrUpdateQuant("omo", "quantum", "simple", "QmYWVoFsaCwVo2KVHTbskRn7KBs9PxvF68Zv1tPiocBdEm");
         this.listener = new QuantListener();
         console.log(this.listener);
     }
-    public async saveQuant(quant: string, code: string): Promise<void> {
-        await omo.ipfs.files.rm(`/quanta/${quant}`);
+    public async saveQuant(author: string, project: string, name: string, major: number, minor: number, patch: number, code: string): Promise<void> {
+        const quant = this.getQuantName(author, project, name, major, minor, patch);
+        console.log();
+
+        // if (
+        // (await omo.ipfs.files.ls(`/quanta/`, {})).some((file: string) => file === quant)) {
+        try {
+            await omo.ipfs.files.rm(`/quanta/${quant}`);
+        } catch {
+            /* */
+        }
+        // }
         await omo.ipfs.files.write(`/quanta/${quant}`, code, { create: true });
-        const hash = (await omo.ipfs.files.stat("/quanta/omo-quantum-simple-0.1.0")).hash;
-        const meta = this.listener.getMeta(quant);
-        await this.CreateOrUpdateQuant(meta.author, meta.project, meta.name, hash);
+        const hash = (await omo.ipfs.files.stat(`/quanta/${quant}`)).hash;
+        await this.CreateOrUpdateQuant(author, project, name, hash);
     }
     public async CreateOrUpdateQuant(author: string, project: string, name: string, codeCid: string): Promise<any> {
         const query = new Query();
@@ -158,8 +167,13 @@ export class QuantStore {
     public storeQuant(author: string, project: string, name: string, constructor: any, major: number, minor: number, patch: number): void {
         const version = this.getVersion(author, project, name, major, minor, patch);
         this.quanta[author][project][name][version] = constructor;
-        const quantName = `${author.toLowerCase()}-${project.toCamelCase()}-${name.toLowerCase()}-${version}`;
+        const quantName = this.getQuantName(author, project, name, major, minor, patch);
         window.customElements.define(quantName, constructor);
+    }
+
+    public getQuantName(author: string, project: string, name: string, major: number, minor: number, patch: number): string {
+        const version = this.getVersion(author, project, name, major, minor, patch);
+        return `${author.toLowerCase()}-${project.toCamelCase()}-${name.toLowerCase()}-${version}`;
     }
 
     private andFilter(query: Query, property: string, value: string): void {

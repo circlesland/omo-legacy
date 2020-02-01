@@ -21,7 +21,7 @@ export default class Editor extends DragableQuant {
     }
 
     static get styles(): any {
-        return [omo.theme, omo.css`:host{height:100%;width:100%;position:relative;} #editor{position:absolute;width:100%;height:100%;top:0;left:0;}`];
+        return [omo.theme, omo.css`:host{height:100%;width:100%;position:relative;} #editor{position:absolute;width:100%;height:100%;top:0;left:0;} input{display:inline;}`];
     }
     get code(): string {
         if (this.editor !== undefined) { return this.editor.getValue(); }
