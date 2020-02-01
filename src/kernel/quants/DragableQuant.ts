@@ -1,7 +1,7 @@
 // import DataInterface from './DataInterface';
-import Quant from './Quant';
+import DataInterface from './DataInterface';
 
-export default class DragableQuant extends Quant {
+export default class DragableQuant extends DataInterface {
   public async initAsync(): Promise<void> {
 
     await super.initAsync();
@@ -11,5 +11,8 @@ export default class DragableQuant extends Quant {
   }
   static get model(): any {
     return super.model;
+  }
+  public updated(changedProperties: any): void {
+    super.updated(changedProperties);
   }
 }

@@ -37,8 +37,8 @@ export class QuantumKernel {
     // window.customElements.define('omo-quant', DragableQuant);
     // this.quanta.load(DragableQuant);
 
-    this.client = new Client("http://localhost:7006");
-    // this.client = new Client('http://81.169.194.192:7006');
+    // this.client = new Client("http://localhost:7006");
+    this.client = new Client('http://81.169.194.192:7006');
     const urlParams = new URLSearchParams(window.location.search);
     const storeId = urlParams.get('storeId');
     this.storeId = storeId == null ? '' : storeId;
@@ -56,8 +56,8 @@ export class QuantumKernel {
     // this.ipfs = await IPFS.create();
     const ipfsClient = require('ipfs-http-client');
     this.ipfs = await ipfsClient({
-      // host: '81.169.194.192',
-      host: 'localhost',
+      host: '81.169.194.192',
+      // host: 'localhost',
       port: '5001',
       protocol: 'http'
     });

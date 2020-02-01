@@ -1,6 +1,6 @@
 import QuantListener from "./QuantListener";
 import DragableQuant from "./quants/DragableQuant";
-import Monaco from "./quants/Monaco";
+import Editor from "./quants/Editor";
 
 export class QuantLoader {
     public quanta: any;
@@ -30,7 +30,7 @@ export class QuantLoader {
         }
         catch (err) { if (err.message !== 'already registered model') { throw err; } }
         this.storeQuant("omo", "quantum", "quant", DragableQuant, 0, 1, 0);
-        this.storeQuant("omo", "quantum", "monaco", Monaco, 0, 2, 0);
+        this.storeQuant("omo", "quantum", "editor", Editor, 0, 1, 0);
         this.listener = new QuantListener();
         console.log("listener", this.listener);
     }
