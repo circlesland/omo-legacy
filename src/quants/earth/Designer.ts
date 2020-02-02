@@ -27,7 +27,11 @@ export default class Designer extends DragableQuant {
     this.contextSwitch = this.root.querySelector('omo-earth-contextswitch');
     this.splitView = this.root.querySelector('omo-earth-splitView');
     this.versions = this.root.querySelector('omo-earth-versions');
-    this.quantaList.addEventListener('selectedQuant', () => this.setSelectedQuant(this.quantaList.selectedQuant), false);
+    this.quantaList.addEventListener(
+      'selectedQuant',
+      () => this.setSelectedQuant(this.quantaList.selectedQuant),
+      false
+    );
   }
 
   private async setSelectedQuant(selectedQuant: any): Promise<void> {
@@ -38,33 +42,32 @@ export default class Designer extends DragableQuant {
     // this.splitView.setColumns(1);
 
     this.splitView.setRows(2);
-    instance.slot = "slot-0-0"
+    instance.slot = 'slot-0-0';
     await instance.initAsync();
     this.splitView.append(instance);
-    const codeEditorCtor = omo.quantum.getByName("omo-earth-codeEditor");
+    const codeEditorCtor = omo.quantum.getByName('omo-earth-codeEditor');
     const codeEditor = new codeEditorCtor();
     await codeEditor.initAsync();
     codeEditor.quant = selectedQuant;
-    codeEditor.slot = "slot-1-0";
+    codeEditor.slot = 'slot-1-0';
     this.splitView.append(codeEditor);
 
     this.versions.quant = selectedQuant;
-
-
   }
 
   public static get styles(): any {
     return [
+      omo.theme,
       omo.css/*css*/ `
     :host{
-        height:100%;
+        height:100vh;
         display:grid;
           grid-template-areas: 
         "quanta nav views"
         "quanta split views"
         "data split versions"
         "data actions versions";
-        grid-template-columns: 16rem auto 16rem;
+        grid-template-columns: 16rem minmax(0, 1fr) 16rem;
         grid-template-rows: auto auto 1fr auto;
     }
     omo-earth-quantaList {grid-area:quanta;}

@@ -6,8 +6,8 @@ export default class Versions extends DragableQuant {
   }
   static get model(): any {
     return {
-      quant: { type: "string" },
-      versions: { type: "array" }
+      quant: { type: 'string' },
+      versions: { type: 'array' }
     };
   }
   static get styles() {
@@ -23,34 +23,37 @@ export default class Versions extends DragableQuant {
   public render(): void {
     return omo.html`
     
-    <div claVersionssl px-8 py-6 bg-gray-200 w-1/5 text-right">
-      <p class="mt-8 uppercase text-gray-600 text-xs font-semibold">
+    <div class="h-full px-8 py-6 bg-gray-200 w-1/5 text-right">
+      <p  class=" mt-8 uppercase text-gray-600 text-xs font-semibold">
         Versions
       </p>
-      <ul class="mt-2 overflow-y-scroll">
+      <ul class="mt-2 h-full overflow-scroll">
     
         <li class="px-2 py-2 mb-1">
     
           <p class="font-semibold text-lg text-primary leading-tight truncate">
             LATEST
           </p>
-          <p class="text-xs text-gray-600">adsfljhiuasdljkfassdsasdjlfh</p>
-          <p class="text-sm text-gray-800">
-            my last commit message
-          </p>
         </li>
-        ${this.versions.map(version => omo.html`
+        ${this.versions.map(
+          version => omo.html`
         <li class="px-2 py-2 mb-1 hover:bg-primary hover:rounded-xl hover:text-white">
           <p class="font-semibold text-base leading-tight truncate">
-            ${version.versionName} ${omo.moment(version.created).locale(navigator.language.split('-')[0]).calendar()}
+            ${version.versionName} 
           </p>
-          <p class="text-xs text-gray-600">${version.code}</p>
-          <p class="text-sm text-gray-800">
+          <p class="text-xs text-gray-600 truncate">${omo
+            .moment(version.created)
+            .locale(navigator.language.split('-')[0])
+            .calendar()}
+          </p>
+          <!-- <p class="text-xs text-gray-600 truncate">${version.code}</p> -->
+          <!-- <p class="text-sm text-gray-800">
             ${version.commitMessage}
             ${JSON.stringify(version)}
-          </p>
+          </p> -->
         </li>
-        `)}
+        `
+        )}
     
     
     
@@ -65,7 +68,9 @@ export default class Versions extends DragableQuant {
     super.updated(changedProperties);
     changedProperties.forEach((_oldValue, propName) => {
       switch (propName) {
-        case "quant": this.loadVersions(); break;
+        case 'quant':
+          this.loadVersions();
+          break;
       }
     });
   }
