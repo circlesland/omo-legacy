@@ -39,32 +39,32 @@ export default class SplitView extends DragableQuant {
             .splitView{
                 display:grid;
                 grid-template-columns: ${this.columns.map(
-      (_col: any) => omo.html` 1fr`
-    )};
+                  (_col: any) => omo.html` 1fr`
+                )};
                 grid-template-rows: ${this.rows.map(
-      (_row: any) => omo.html` 1fr`
-    )};
+                  (_row: any) => omo.html` 1fr`
+                )};
             }
             </style>
             <div>
                 <label>columns</label>
                 <input type = "number" value = "${
-      this.columns.length
-      }" @change="${this.updateColumns}" >
+                  this.columns.length
+                }" @change="${this.updateColumns}" >
                 <label>rows </label>
                 <input type = "number" value = "${this.rows.length}" @change="${
       this.updateRows
-      }" >
-            </div>
-            <div class="splitView" >
-                ${this.rows.map(
-        (row: any) =>
-          omo.html`${this.columns.map(
-            (column: any) =>
-              omo.html`<div><slot name="slot-${row}-${column}"></slot></div>`
-          )}`
-      )}
-            </div>
+    }" >
+      </div>
+      <div class="splitView" >
+          ${this.rows.map(
+            (row: any) =>
+              omo.html`${this.columns.map(
+                (column: any) =>
+                  omo.html`<div><slot name="slot-${row}-${column}"></slot></div>`
+              )}`
+          )}
+      </div>
     `;
   }
   public async initAsync(): Promise<void> {
