@@ -1,70 +1,34 @@
-import DragableQuant from '../../kernel/quants/DragableQuant';
+import DesignerContext from './DesignerContext';
 
-export default class QuantaList extends DragableQuant {
+export default class QuantaList extends DesignerContext {
   static get properties(): any {
     return super.properties;
   }
   static get model(): any {
     return {
-      quanta: {
-        type: 'array'
-      },
-      selectedQuant: {
-        type: 'string'
-      }
-    };
+    }
   }
-  public quanta: any[];
-  public selectedQuant: any;
-  constructor() {
-    super();
-    this.autosave = false;
-    this.quanta = [];
-    this.listenToQuanta();
-  }
-  public async listenToQuanta(): Promise<void> {
-    omo.client.listen(
-      omo.quantum.QuantStoreId,
-      await omo.quantum.QuantaModelName,
-      '',
-      this.updateQuanta
-    );
-    this.updateQuanta();
-  }
-  public async updateQuanta(): Promise<void> {
-    this.quanta = await omo.quantum.all()
-  }
+
   public render(): void {
     return omo.html`
-        <div class="h-full px-8 py-6 bg-gray-200 w-1/5">
-            <p class="uppercase text-gray-600 text-xs font-semibold">Quanta</p>
-            <ul class="">
-                ${this.quanta.map((quant: any) => {
-                  const quantName = omo.quantum.getQuantName(
-                    quant.author,
-                    quant.project,
-                    quant.name,
-                    quant.version
-                  );
-                  return omo.html`         
-                    <li @click="${this.selectQuant}" class="px-2 py-1 font-semibold text-base hover--bg-primary hover--text-white leading-tight truncate">${quantName}</li>
-                `;
-                })}
-            </ul>
-        </div>
-        `;
+      <div class="h-full px-8 py-6 bg-gray-200 w-1/5">
+          <p class="uppercase text-gray-600 text-xs font-semibold">Quanta</p>
+          <ul class="">
+              ${this.quanta.map((quant: any) => {
+                const quantName = omo.quantum.getQuantName(quant.author,quant.project,quant.name,quant.version);
+                const active = quantName === this.quantName ? 'bg-primary text-white':''
+                return omo.html`         
+                  <li @click="${this.selectQuant}" class="px-2 py-1 font-semibold text-base ${active} hover--bg-primary hover--text-white leading-tight truncate">${quantName}</li>
+              `;
+              })}
+          </ul>
+      </div>
+    `;
   }
 
-  public async initAsync(): Promise<void> {
-    super.initAsync();
-  }
   public selectQuant(event: Event): void {
-    this.selectedQuant = event.srcElement['innerText'];
-      this.dispatchEvent(new CustomEvent('selectedQuant'));
-  }
-
-  public updated(changedProperties: any): void {
-    super.updated(changedProperties);
+    this.quantName = this.quantName === event.srcElement['innerText'] ? undefined : event.srcElement['innerText'];
+    this.dispatchEvent(new CustomEvent('selectedQuant'));
   }
 
   static get styles() {

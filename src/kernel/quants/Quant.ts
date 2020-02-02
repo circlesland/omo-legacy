@@ -1,49 +1,6 @@
 import { LitElement } from 'lit-element';
 
 export default class Quant extends LitElement {
-  get hasSlot(): boolean {
-    return this.renderRoot.querySelector('slot') !== undefined;
-  }
-
-  get slots(): any {
-    return this.renderRoot.querySelectorAll('slot');
-  }
-
-  static get model(): any {
-    return {};
-  }
-
-  // extracted model for LIT Element
-  static get properties(): any {
-    const props = JSON.parse(JSON.stringify(this.model));
-
-    Object.keys(props).map((key: any) => {
-      const item = props[key];
-
-      if (item.type === 'property') {
-        item.type = 'object';
-      }
-      props[key] = item;
-    });
-
-    // Make it conform for lit
-    return props;
-  }
-
-
-  // getModelRecursive(constructor: Function, properties: {}) {
-  //   if (constructor.model) {
-  //     Object.entries(constructor.model).forEach(prop => {
-  //       if (!properties[prop[0]]) properties[prop[0]] = prop[1];
-  //     });
-  //     properties = this.getModelRecursive(
-  //       Object.getPrototypeOf(constructor),
-  //       properties
-  //     );
-  //   }
-  //   return properties;
-  // }
-
   public static recursiveModel(constructor: any): any {
     let properties = {};
     if (constructor.recursiveModel !== undefined) {
@@ -51,9 +8,7 @@ export default class Quant extends LitElement {
       properties = constructor.recursiveModel(parentConstructor);
 
       Object.entries(constructor.model).forEach(prop => {
-        if (!properties[prop[0]]) {
-          properties[prop[0]] = prop[1];
-        }
+        if (!properties[prop[0]]) { properties[prop[0]] = prop[1]; }
       });
     }
     return properties;
@@ -63,25 +18,45 @@ export default class Quant extends LitElement {
   public initialized: boolean;
   public root: ShadowRoot | undefined;
 
+
   constructor() {
     super();
-
     this.initialized = false;
     this.autosave = true;
-    // this.init();
-    // this.initAsync().then(() => (this.initialized = true));
   }
 
-  // public updated(changedProperties: any): void {
-  //   // changedProperties.forEach((_oldValue, propName) => {
-  //   //   this.dispatchEvent(new CustomEvent(propName));
-  //   // });
-  // }
-
-  public render(): any {
-    return window.omo.html`<p>Please implement render function<p>`;
+  /* #region static getter */
+  static get model(): any {
+    return {
+    };
   }
 
+  static get properties(): any {
+    const props = JSON.parse(JSON.stringify(this.model));
+    Object.keys(props).map((key: any) => {
+      const item = props[key];
+      if (item.type === 'property') {
+        item.type = 'object';
+      }
+      props[key] = item;
+    });
+    return props;
+  }
+  /* #endregion */
+  /* #region getters */
+  get hasSlot(): boolean {
+    return this.renderRoot.querySelector('slot') !== undefined;
+  }
+
+  get slots(): any {
+    return this.renderRoot.querySelectorAll('slot');
+  }
+
+  get language(): string {
+    return navigator.language;
+  }
+  /* #endregion */
+  /* #region child/slot logic */
   public append(node: Node): void {
     if (this.hasSlot) {
       super.append(node);
@@ -92,38 +67,32 @@ export default class Quant extends LitElement {
     }
   }
 
+  public clear(): void {
+    while (this.firstChild) {
+      this.removeChild(this.firstChild);
+    }
+  }
+  /* #endregion */
+  /* #region rendering */
+  public render(): any {
+    return window.omo.html`<p>Please implement render function<p>`;
+  }
+
   public createRenderRoot(): any {
     this.root = this.attachShadow({
       mode: 'open'
     });
     return this.root;
   }
-
-  public init(): void {
-    // this.initAsync().then(() => this.initialized = true);
-  }
-
+  /* #endregion */
+  /* #region lifecycle */
   public async initAsync(): Promise<void> {
     /**/
   }
-  public clear(): void {
-    console.log("CLEAR");
-    while (this.firstChild) {
-      this.removeChild(this.firstChild);
-    }
-  }
-}
 
-declare global {
-  interface Function {
-    model: any;
-    recursiveModel: any;
-    createSchemaProperties: any;
-    createJsonSchema: any;
-    getModelName: any;
-    _model: any;
-    _modelName: any;
-    Init: any;
-    schemaProperties: any;
+  public connectedCallback(): void {
+    super.connectedCallback();
+    this.initAsync().then(() => this.initialized = true);
   }
+  /* #endregion */
 }

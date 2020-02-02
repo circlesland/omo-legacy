@@ -16,6 +16,7 @@ import Editor from "./quants/Editor";
 export class QuantStore {
 
     public get QuantStoreId(): string { return "af8fd66c-3cbd-49b9-abbc-2811dc870388" }
+    // public get QuantStoreId(): string { return "e2a22ee9-e231-480e-8967-c79543a1ed8b" }
     public QuantaModelName;
     public VersionModelName;
     public quanta: any;
