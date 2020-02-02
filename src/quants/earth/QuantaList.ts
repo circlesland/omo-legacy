@@ -32,12 +32,12 @@ export default class QuantaList extends DragableQuant {
     this.updateQuanta();
   }
   public async updateQuanta(): Promise<void> {
-    this.quanta = await omo.quantum.all()
+    this.quanta = await omo.quantum.all();
   }
   public render(): void {
     return omo.html`
         <div class="h-full px-8 py-6 bg-gray-200 w-1/5">
-            <p class="uppercase text-gray-600 text-xs font-semibold">Quanta</p>
+            <p class="uppercase text-gray-600 text-xs font-semibold">Quanta Models</p>
             <ul class="">
                 ${this.quanta.map((quant: any) => {
                   const quantName = omo.quantum.getQuantName(
@@ -60,7 +60,7 @@ export default class QuantaList extends DragableQuant {
   }
   public selectQuant(event: Event): void {
     this.selectedQuant = event.srcElement['innerText'];
-      this.dispatchEvent(new CustomEvent('selectedQuant'));
+    this.dispatchEvent(new CustomEvent('selectedQuant'));
   }
 
   public updated(changedProperties: any): void {
