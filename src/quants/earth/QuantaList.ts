@@ -47,7 +47,7 @@ export default class QuantaList extends DragableQuant {
                     quant.version
                   );
                   return omo.html`         
-                    <li @click="${this.selectQuant}" class="px-2 py-1 font-semibold text-base hover:bg-primary hover:text-white leading-tight truncate">${quantName}</li>
+                    <li @click="${this.selectQuant}" class="px-2 py-1 font-semibold text-base hover--bg-primary hover--text-white leading-tight truncate">${quantName}</li>
                 `;
                 })}
             </ul>
