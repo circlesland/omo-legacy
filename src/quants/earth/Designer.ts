@@ -1,4 +1,5 @@
 import DragableQuant from '../../kernel/quants/DragableQuant';
+import QuantLoadedEvent from '../../kernel/events/QuantLoadedEvent';
 
 export default class Designer extends DragableQuant {
   private quantaList: any;
@@ -8,6 +9,7 @@ export default class Designer extends DragableQuant {
 
   constructor() {
     super();
+    document.addEventListener(QuantLoadedEvent.LOADED, this.quantLoaded.bind(this))
   }
   public render(): void {
     return omo.html`
@@ -21,7 +23,9 @@ export default class Designer extends DragableQuant {
         `;
   }
 
+
   public firstUpdated(changedProperties: any): void {
+    console.log("first updated");
     super.firstUpdated(changedProperties);
     this.quantaList = this.root.querySelector('omo-earth-quantalist');
     this.contextSwitch = this.root.querySelector('omo-earth-contextswitch');
@@ -35,15 +39,34 @@ export default class Designer extends DragableQuant {
   }
 
   private async setSelectedQuant(selectedQuant: any): Promise<void> {
+    console.debug("Quant selected")
+
+    const quant = await omo.quantum.loadQuant(selectedQuant);
+    if (quant !== undefined) {
+      this.updateView(quant, selectedQuant);
+    }
+  }
+
+  private async quantLoaded(event: QuantLoadedEvent): Promise<void> {
+    console.debug("quant loaded", event);
+    const selectedQuant = event.QuantName;
     const constructor = omo.quantum.getByName(selectedQuant);
+    this.updateView(constructor, selectedQuant)
+  }
+
+  private async updateView(constructor: any, selectedQuant: string): Promise<void> {
     const instance = new constructor();
 
     this.contextSwitch.selectedQuant = selectedQuant;
     // this.splitView.setColumns(1);
-
+    this.splitView.clear();
+    this.splitView.setColumns(1)
     this.splitView.setRows(2);
     instance.slot = 'slot-0-0';
-    await instance.initAsync();
+    if (instance['initAsync']) {
+      await instance.initAsync();
+    }
+
     this.splitView.append(instance);
     const codeEditorCtor = omo.quantum.getByName('omo-earth-codeEditor');
     const codeEditor = new codeEditorCtor();

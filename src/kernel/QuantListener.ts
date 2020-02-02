@@ -1,3 +1,5 @@
+import QuantLoadedEvent from "./events/QuantLoadedEvent";
+
 // /**
 //  * The QuantListener is one of the core features it listen to the DOM an then apply the magic of resolving depencies
 //  */
@@ -39,19 +41,34 @@ export default class QuantListener {
     this.addOrUpdateScriptElement(code, author, project, name, version, quantname);
   }
 
-  private async loadQuant(scriptElement: HTMLScriptElement): Promise<void> {
-    const quantHash = scriptElement.getAttribute("src");
+  public async loadQuantByHash(quantHash: string, name: string): Promise<boolean> {
     console.debug("Start loading quant: ", quantHash);
+    if (quantHash == null) {
+      console.error("no hash provided");
 
-    if (quantHash == null || this.loadedQuanta.includes(quantHash)) { return; };
-
-    let code = (await omo.ipfs.cat(quantHash)).toString();
-    const data = `omo.quantum.registerQuant(${code},'${quantHash}');`;
+      return false;
+    }
+    if (this.loadedQuanta.includes(quantHash)) {
+      console.debug("quant is already loaded")
+      const event = new QuantLoadedEvent(QuantLoadedEvent.LOADED)
+      event.QuantName = name;
+      document.dispatchEvent(event);
+      return true;
+    }
+    const code = (await omo.ipfs.cat(quantHash)).toString();
+    const data = `try{omo.quantum.registerQuant(${code},'${quantHash}','${name}');}catch(err){console.error(err);}`;
     const node = document.createTextNode(data);
     const script = document.createElement("script");
     script.type = "module";
     script.append(node);
+    script.onload = () => console.debug("script loaded");
     this.head.append(script);
+    return false;
+  }
+
+  private async loadQuant(scriptElement: HTMLScriptElement): Promise<void> {
+    const quantHash = scriptElement.getAttribute("src");
+    await this.loadQuantByHash(quantHash, null);
 
     // const quantMeta = await omo.quantum.getQuantMetaFromHash(quantHash);
     // const meta = this.getMeta(quantname);

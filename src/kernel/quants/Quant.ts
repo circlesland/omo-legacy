@@ -106,6 +106,12 @@ export default class Quant extends LitElement {
   public async initAsync(): Promise<void> {
     /**/
   }
+  public clear(): void {
+    console.log("CLEAR");
+    while (this.firstChild) {
+      this.removeChild(this.firstChild);
+    }
+  }
 }
 
 declare global {
