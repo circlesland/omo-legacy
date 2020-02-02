@@ -2,15 +2,18 @@
 //  * The QuantListener is one of the core features it listen to the DOM an then apply the magic of resolving depencies
 //  */
 export default class QuantListener {
-  public loadedQuanta: string[];
+  // private loadedQuanta: Array<{ name: string, hash: string }>;
+  private loadedQuanta: string[];
   private head: HTMLHeadElement;
 
   constructor() {
+    console.debug("Quantlistener created");
     this.loadedQuanta = [];
     this.head = document.getElementsByTagName("head")[0];
     this.loadAlreadyExistingQuanta();
     this.subscribeNodeAdded();
   }
+
   public getMeta(src: string): any {
     const splitted = src.split('-');
 
@@ -29,22 +32,38 @@ export default class QuantListener {
 
     return { author, project, name, version }
   }
+
   public async ReplaceVersion(author: string, project: string, name: string, version: string, codeCid: string): Promise<void> {
     const quantname = omo.quantum.getQuantName(author, project, name, version);
     const code = await omo.ipfs.cat(codeCid);
     this.addOrUpdateScriptElement(code, author, project, name, version, quantname);
   }
+
   private async loadQuant(scriptElement: HTMLScriptElement): Promise<void> {
-    const quantname = scriptElement.getAttribute("src");
-    if (quantname == null || this.loadedQuanta.includes(quantname)) { return; };
+    const quantHash = scriptElement.getAttribute("src");
+    console.debug("Start loading quant: ", quantHash);
 
-    const meta = this.getMeta(quantname);
-    const code = await this.loadQuantFromStore(meta.author, meta.project, meta.name, meta.version);
+    if (quantHash == null || this.loadedQuanta.includes(quantHash)) { return; };
 
-    this.addOrUpdateScriptElement(code, meta.author, meta.project, meta.name, meta.version, quantname);
+    let code = (await omo.ipfs.cat(quantHash)).toString();
+    const data = `omo.quantum.registerQuant(${code},'${quantHash}');`;
+    const node = document.createTextNode(data);
+    const script = document.createElement("script");
+    script.type = "module";
+    script.append(node);
+    this.head.append(script);
 
-    scriptElement.setAttribute("loaded", "true");
+    // const quantMeta = await omo.quantum.getQuantMetaFromHash(quantHash);
+    // const meta = this.getMeta(quantname);
+    // const code = await this.loadQuantFromStore(meta.author, meta.project, meta.name, meta.version);
+    // const quantname = scriptElement.getAttribute("src");
+    // if (quantname == null || this.loadedQuanta.includes(quantname)) { return; };
+    // const meta = this.getMeta(quantname);
+    // const code = await this.loadQuantFromStore(meta.author, meta.project, meta.name, meta.version);
+    // this.addOrUpdateScriptElement(code, meta.author, meta.project, meta.name, meta.version, quantname);
+    // scriptElement.setAttribute("loaded", "true");
   }
+
   private addOrUpdateScriptElement(code: any, author: string, project: string, name: string, version: string, quantname: string): void {
     const data = `omo.quantum.register(${code},'${author}','${project}','${name}','${version}');`;
     const node = document.createTextNode(data);
@@ -55,9 +74,10 @@ export default class QuantListener {
     this.head.append(script);
   }
 
-  private async loadQuantFromStore(author: string, project: string, name: string, version: string): Promise<any> {
-    return omo.quantum.loadFromThread(author, project, name, version);
-  }
+  // TODO remove
+  // private async loadQuantFromStore(author: string, project: string, name: string, version: string): Promise<any> {
+  //   return omo.quantum.loadFromThread(author, project, name, version);
+  // }
   private loadAlreadyExistingQuanta(): void {
     const unloadedQuanta = this.head.querySelectorAll<HTMLScriptElement>(
       "script[type='quant']:not([loaded])"
@@ -66,10 +86,12 @@ export default class QuantListener {
       this.loadQuant(element);
     });
   }
+
   private subscribeNodeAdded(): void {
     const observer = new MutationObserver(this.OnHeadNodeInserted.bind(this));
     observer.observe(this.head, { attributes: true, childList: true });
   }
+
   // TODO use right typescript type
   private OnHeadNodeInserted(mutationslist: any /*MutationRecord[]*/): void {
     console.log(Object.values(mutationslist));

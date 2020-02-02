@@ -18,6 +18,11 @@ export class QuantStore {
     public VersionModelName;
     public quanta: any;
     private listener: QuantListener;
+    private loadedQuants: Array<{ hash: string, quant: Function }>;
+
+    constructor() {
+        this.loadedQuants = Array(0);
+    }
 
     public async all(): Promise<any> {
         return (await omo.client.modelFind(this.QuantStoreId, this.QuantaModelName, {})).entitiesList;
@@ -35,6 +40,7 @@ export class QuantStore {
         query = query.orderByDesc("created");
         return (await omo.client.modelFind(this.QuantStoreId, this.VersionModelName, {})).entitiesList;
     }
+
     private get quantaSchema(): any {
         return {
             "$id": "https://example.com/person.schema.json",
@@ -88,22 +94,37 @@ export class QuantStore {
             "type": "object",
         };
     }
+    // TODO remove
     public getMeta(quantname): any {
         return this.listener.getMeta(quantname);
     }
-    public register($class: any, author: string, project: string, name: string, version: string): void {
+
+    // TODO remove
+    public register($class: any, author: string, project: string, name: string, version: string, hash: string): void {
         const versionName = version === undefined ? "latest" : version;
         this.createVersion(author, project, name, versionName);
-        this.storeQuant(author, project, name, $class, versionName);
+        this.storeQuant(author, project, name, $class, versionName, hash);
     }
+
+    public registerQuant(quant: Function, hash: string): void {
+        if (this.loadedQuants.some(item => item.hash == hash)) {
+            console.debug("Quant already registered nothing to do.", hash, quant);
+            return;
+        }
+        this.loadedQuants.push({ hash, quant });
+        window.customElements.define(hash.toTag(), quant);
+        console.debug("Quant registered", hash);
+    }
+
+
     public getByName(name: string): any {
         const meta = this.getMeta(name);
         return this.get(meta.author, meta.project, meta.name, meta.version);
     }
     public get(author: string, project: string, name: string, version: string): any {
         const versionName = version === undefined ? "latest" : version;
-        if (typeof (this.quanta[author][project][name][versionName]) === "function") {
-            return this.quanta[author][project][name][versionName];
+        if (typeof (this.quanta[author][project][name][versionName].constructor) === "function") {
+            return this.quanta[author][project][name][versionName].constructor;
         }
         throw Error("Quant not loaded");
     }
@@ -150,17 +171,17 @@ export class QuantStore {
 
 
         // TODO remove Preload 
-        this.storeQuant("omo", "earth", "quant", DragableQuant, "latest");
-        this.storeQuant("omo", "earth", "editor", Editor, "latest");
-        this.storeQuant("omo", "earth", "codeEditor", CodeEditor, "latest");
-        this.storeQuant("omo", "earth", "splitView", SplitView, "latest");
-        this.storeQuant("omo", "earth", "data", Data, "latest");
-        this.storeQuant("omo", "earth", "actions", Actions, "latest");
-        this.storeQuant("omo", "earth", "versions", Versions, "latest");
-        this.storeQuant("omo", "earth", "contextSwitch", ContextSwitch, "latest");
-        this.storeQuant("omo", "earth", "viewsChooser", ViewsChooser, "latest");
-        this.storeQuant("omo", "earth", "quantaList", QuantaList, "latest");
-        this.storeQuant("omo", "earth", "designer", Designer, "latest");
+        this.storeQuant("omo", "earth", "quant", DragableQuant, "latest", "OmoEarthQuant");
+        this.storeQuant("omo", "earth", "editor", Editor, "latest", "OmoEarthEditor");
+        this.storeQuant("omo", "earth", "codeEditor", CodeEditor, "latest", "OmoEarthCodeeditor");
+        this.storeQuant("omo", "earth", "splitView", SplitView, "latest", "Omo-Earth-Splitview");
+        this.storeQuant("omo", "earth", "data", Data, "latest", "OmoEarthData");
+        this.storeQuant("omo", "earth", "actions", Actions, "latest", "OmoEarthActions");
+        this.storeQuant("omo", "earth", "versions", Versions, "latest", "OmoEarthVersions");
+        this.storeQuant("omo", "earth", "contextSwitch", ContextSwitch, "latest", "OmoEarthContextswitch");
+        this.storeQuant("omo", "earth", "viewsChooser", ViewsChooser, "latest", "OmoEarthViewschooser");
+        this.storeQuant("omo", "earth", "quantaList", QuantaList, "latest", "OmoEarthQuantalist");
+        this.storeQuant("omo", "earth", "designer", Designer, "latest", "OmoEarthDesigner");
 
         this.listener = new QuantListener();
     }
@@ -225,14 +246,14 @@ export class QuantStore {
         this.listener.ReplaceVersion(author, project, name, version, code);
     }
 
-    public storeQuant(author: string, project: string, name: string, constructor: any, version: string): void {
-        // TODO remove when ready with custom loading
+    // TODO remove
+    public storeQuant(author: string, project: string, name: string, constructor: any, version: string, hash: string): void {
+        // TODO remove when all quants are loaded via ipfs
         this.createVersion(author, project, name, version);
 
-        // TODO ovveride Logic when custom elements can be deregistered
-        this.quanta[author][project][name][version] = constructor;
-        const quantName = this.getQuantName(author, project, name, version);
-        window.customElements.define(quantName, constructor);
+        this.quanta[author][project][name][version] = { constructor, hash };
+        window.customElements.define(hash.toTag(), constructor);
+        console.log("Custom element registered: ", hash.toTag())
     }
 
     public getQuantName(author: string, project: string, name: string, version: string): string {

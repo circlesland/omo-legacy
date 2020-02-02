@@ -1,4 +1,4 @@
-class Simple extends omo.quantum.get("omo", "quantum", "quant", undefined) {
+class Simple extends omo.quantum.get("omo", "earth", "quant", undefined) {
     static get styles(): any {
         return [
             omo.normalize,
@@ -11,7 +11,7 @@ class Simple extends omo.quantum.get("omo", "quantum", "quant", undefined) {
 
     public render(): void {
         return omo.html`
-        <!-- <h1>${this}</h1> -->
+        <h1>Hallo ${this.name}</h1>
       `;
     }
 

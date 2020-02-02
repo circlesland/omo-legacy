@@ -1,4 +1,3 @@
-// import DataInterface from './DataInterface';
 import DataInterface from './DataInterface';
 
 export default class DragableQuant extends DataInterface {

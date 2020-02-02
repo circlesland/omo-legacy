@@ -11,6 +11,8 @@ export default class StringCases {
     String.prototype.toSentenceCase = StringCases.toSentenceCase;
     String.prototype.toHeaderCase = StringCases.toHeaderCase;
     String.prototype.toParamCase = StringCases.toParamCase;
+    String.prototype.toTag = StringCases.toTag;
+    String.prototype.toHash = StringCases.toHash;
   }
   public static toCamelCase(value: any): string {
     if (!value) {
@@ -68,8 +70,22 @@ export default class StringCases {
       .toSnakeCase(value)
       .replace(/_/g, '-');
   }
+  public static toTag(value: any): string {
+    if (!value) {
+      value = this;
+    }
+    return value
+      .replace(/([A-Z])/g, (_m: string, a: string, _b: string) => '-' + a)
+      .replace(/([A-Z])/g, (_m: string, a: string, _b: string) => '-' + a)
+      .toParamCase();
+  }
+  public static toHash(value: any): string {
+    if (!value) {
+      value = this;
+    }
+    return value.toPascalCase();
+  }
 }
-
 declare global {
   interface String {
     toSnakeCase: (value?: string) => string;
@@ -81,5 +97,7 @@ declare global {
     toHeaderCase: (value?: string) => string;
     toParamCase: (value?: string) => string;
     toCamelCase: (value?: string) => string;
+    toTag: (value?: string) => string;
+    toHash: (value?: string) => string;
   }
 }
