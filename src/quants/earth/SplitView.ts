@@ -36,34 +36,35 @@ export default class SplitView extends DragableQuant {
   public render(): void {
     return omo.html`
             <style>
-            .splitView{
+            :host .splitView{
                 display:grid;
                 grid-template-columns: ${this.columns.map(
-                  (_col: any) => omo.html` 1fr`
-                )};
+      (_col: any) => omo.html` 100%`
+    )};
                 grid-template-rows: ${this.rows.map(
-                  (_row: any) => omo.html` 1fr`
-                )};
+      (_row: any) => omo.html` 50%`
+    )};
             }
             </style>
-            <div>
+
+            <!-- <div>
                 <label>columns</label>
                 <input type = "number" value = "${
-                  this.columns.length
-                }" @change="${this.updateColumns}" >
+      this.columns.length
+      }" @change="${this.updateColumns}" >
                 <label>rows </label>
                 <input type = "number" value = "${this.rows.length}" @change="${
       this.updateRows
-    }" >
-      </div>
+      }" >
+      </div> -->
       <div class="splitView" >
           ${this.rows.map(
-            (row: any) =>
-              omo.html`${this.columns.map(
-                (column: any) =>
-                  omo.html`<div><slot name="slot-${row}-${column}"></slot></div>`
-              )}`
-          )}
+        (row: any) =>
+          omo.html`${this.columns.map(
+            (column: any) =>
+              omo.html`<div style="overflow:scroll;"><slot name="slot-${row}-${column}"></slot></div>`
+          )}`
+      )}
       </div>
     `;
   }
@@ -112,8 +113,10 @@ export default class SplitView extends DragableQuant {
         :host{
             height:100%;
             display:grid;
-            grid-template-rows:auto 1fr
+        grid-template-rows: 100%;
             }
+
+     
         `
     ];
   }
