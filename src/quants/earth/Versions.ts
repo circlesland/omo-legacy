@@ -37,7 +37,7 @@ export default class Versions extends DragableQuant {
         </li>
         ${this.versions.map(
           version => omo.html`
-        <li class="px-2 py-2 mb-1 hover:bg-primary hover:rounded-xl hover:text-white">
+        <li class="px-2 py-2 mb-1 hover--bg-primary hover--rounded-xl hover:text-white">
           <p class="font-semibold text-base leading-tight truncate">
             ${version.versionName} 
           </p>
@@ -46,11 +46,10 @@ export default class Versions extends DragableQuant {
             .locale(navigator.language.split('-')[0])
             .calendar()}
           </p>
-          <!-- <p class="text-xs text-gray-600 truncate">${version.code}</p> -->
-          <!-- <p class="text-sm text-gray-800">
+          <p class="text-xs text-gray-600 truncate">${version.code}</p>
+          <p class="text-sm text-gray-800">
             ${version.commitMessage}
-            ${JSON.stringify(version)}
-          </p> -->
+          </p>
         </li>
         `
         )}

@@ -31,16 +31,17 @@ export class QuantStore {
     }
     public async versions(name): Promise<any> {
         const descriptor = await this.getDescriptor(name);
-        const hash = descriptor.code
+        // const hash = descriptor.code
 
         let query = new Query();
-        this.andFilter(query, "quant", hash);
+        this.andFilter(query, "quant", descriptor.ID);
         query = query.orderByDesc("created");
-        return (await omo.client.modelFind(this.QuantStoreId, this.VersionModelName, {})).entitiesList;
+        return (await omo.client.modelFind(this.QuantStoreId, this.VersionModelName, query)).entitiesList;
     }
     public async loadQuant(quantName: any): Promise<any> {
         const descriptor = await this.getDescriptor(quantName);
-        if (await this.listener.loadQuantByHash(descriptor.code, quantName)) {
+        const version = await this.getVersion(descriptor.latest);
+        if (await this.listener.loadQuantByHash(version.code, quantName)) {
             return this.getByName(quantName);
         }
     }
@@ -117,7 +118,10 @@ export class QuantStore {
             throw Error("Quant is not in our database");
         }
 
-        const quant = result.entitiesList[0];
+        let quant = result.entitiesList[0];
+        if (quant["latest"] !== undefined) {
+            quant = await this.getVersion(quant.latest);
+        }
         const response = await omo.ipfs.cat(quant.code);
         return response.toString();
     }
@@ -146,6 +150,7 @@ export class QuantStore {
         this.storeQuant("omo", "earth", "viewsChooser", ViewsChooser, "latest", "OmoEarthViewschooser", true);
         this.storeQuant("omo", "earth", "quantaList", QuantaList, "latest", "OmoEarthQuantalist", true);
         this.storeQuant("omo", "earth", "designer", Designer, "latest", "OmoEarthDesigner", true);
+        // this.storeQuant("omo", "earth", "simple", Minimal, "latest", "OmoEarthMinimal", true);
 
         this.listener = new QuantListener();
     }
@@ -154,7 +159,7 @@ export class QuantStore {
         await this.CreateOrUpdateQuant(author, project, name, hash, version, commitMessage);
     }
     public async saveQuantToMFS(author: string, project: string, name: string, version: string, code: string): Promise<string> {
-        const versionName = version === undefined ? "latest" : version;
+        const versionName = version === undefined ? new Date() : version;
         try { await omo.ipfs.files.mkdir(`/quanta`).catch(); } catch {/**/ }
         try { await omo.ipfs.files.mkdir(`/quanta/${author}`).catch(); } catch {/**/ }
         try { await omo.ipfs.files.mkdir(`/quanta/${author}/${project}`).catch(); } catch {/**/ }
@@ -165,49 +170,34 @@ export class QuantStore {
         return (await omo.ipfs.files.stat(`/quanta/${author}/${project}/${name}/${versionName}/${name}`)).hash;
     }
     public async CreateOrUpdateQuant(author: string, project: string, name: string, code: string, version: string, commitMessage: string): Promise<any> {
-        let newVersion = {};
         const query = new Query();
         this.andFilter(query, "author", author);
         this.andFilter(query, "project", project);
         this.andFilter(query, "name", name);
 
         // Get latest Version
-        const latestVersion = await omo.client.modelFind(this.QuantStoreId, this.QuantaModelName, query);
-        if (latestVersion.entitiesList.length > 1) {
+        let result = await omo.client.modelFind(this.QuantStoreId, this.QuantaModelName, query);
+        if (result.entitiesList.length > 1) {
             throw Error("Something went totally wrong");
         }
 
-        // If new quant 
-        if (latestVersion.entitiesList.length === 0) {
-            // store new quant
-            const newQuant = { author, code, name, project };
+        let latestVersion: any;
+        // New Version
+        if (result.entitiesList.length === 0) {
+            const newQuant = { author, name, project, ID: "", latest: "" };
             await omo.client.modelCreate(this.QuantStoreId, this.QuantaModelName, [newQuant]);
-
-            // get new quant
-            const storedQuant = await omo.client.modelFind(this.QuantStoreId, this.QuantaModelName, query);
-
-            // create Version
-            newVersion = { code, commitMessage, created: Date.now(), quant: storedQuant.entitiesList[0].ID, versionName: version };
-            // store it to versions
-            await omo.client.modelCreate(this.QuantStoreId, this.VersionModelName, [newVersion]);
+            latestVersion = newQuant;
         }
-
-        // if latest exist 
         else {
-            // if version == latest 
-            if (version === "latest") {
-                // Update latest version
-                const toUpdate = latestVersion.entitiesList[0];
-                toUpdate["code"] = code;
-                await omo.client.modelSave(this.QuantStoreId, this.QuantaModelName, [toUpdate]);
-            }
-            // store Version to version thread
-            newVersion = { code, commitMessage, created: Date.now(), quant: latestVersion.entitiesList[0].ID, versionName: version };
-            await omo.client.modelCreate(this.QuantStoreId, this.VersionModelName, [newVersion]);
+            latestVersion = result.entitiesList[0];
         }
 
+        const newVersion = { code, commitMessage, created: Date.now(), quant: latestVersion.ID, versionName: version, ID: "" };
+        await omo.client.modelCreate(this.QuantStoreId, this.VersionModelName, [newVersion]);
+        latestVersion.latest = newVersion.ID;
+        await omo.client.modelSave(this.QuantStoreId, this.QuantaModelName, [latestVersion]);
         // Finally replace loaded Version or add version to DOM
-        this.listener.ReplaceVersion(author, project, name, version, code);
+        // this.listener.ReplaceVersion(author, project, name, version, code);
     }
     public linkRegisteredQuant(quantName: string, quant: Function, hash: string): void {
         const meta = this.getMeta(quantName);
@@ -277,7 +267,7 @@ export class QuantStore {
                 "author": {
                     "type": "string"
                 },
-                "code": {
+                "latest": {
                     "type": "string"
                 },
                 "name": {
@@ -327,5 +317,10 @@ export class QuantStore {
         this.andFilter(query, "name", meta.name);
         const response = await omo.client.modelFind(this.QuantStoreId, this.QuantaModelName, query);
         return response.entitiesList[0];
+    }
+    private async getVersion(quantID: string): Promise<any> {
+        const result = await omo.client.modelFindByID(this.QuantStoreId, this.VersionModelName, quantID);
+        // const res2 = await omo.client.modelFind(this.QuantStoreId, this.VersionModelName, {});
+        return result.entity;
     }
 }

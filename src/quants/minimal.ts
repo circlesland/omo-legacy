@@ -1,3 +1,5 @@
-// omo.quant(class Minimal extends omo.quantum.get("omo", "quantum", "quant") {
+import DragableQuant from "../kernel/quants/DragableQuant";
 
-// });
+export class Minimal extends DragableQuant {
+
+}
