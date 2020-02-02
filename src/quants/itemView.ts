@@ -56,7 +56,7 @@
 //               </div>
 //           `
 //           )}
-//           </form>   
+//           </form>
 //         </div>
 //         ${JSON.stringify(this.quant.model)}
 //       `;

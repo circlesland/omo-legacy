@@ -7,13 +7,13 @@ export default class CodeEditor extends DragableQuant {
   public version: any;
   public static get model(): any {
     return {
-      quant: {
+      name: {
         type: 'string'
       },
       project: {
         type: 'string'
       },
-      name: {
+      quant: {
         type: 'string'
       },
       version: {
@@ -73,13 +73,13 @@ export default class CodeEditor extends DragableQuant {
     return omo.html`
         <omo-earth-editor theme="monokai" mode="javascript"></omo-earth-editor>
         <div class="actions p-1">
-            <input type="text" .value="${this.author}" name="author">
-            <input type="text" .value="${this.project}" name="project">
-            <input type="text" .value="${this.name}" name="name">
-            <input type="text" placeholder="version name" name="version">
-            <input type="text" placeholder="commit message" name="commitMessage">
-            <button @click="${this.saveQuant}"
-                class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">Save</button>
+          <input type="text" .value="${this.author}" name="author">
+          <input type="text" .value="${this.project}" name="project">
+          <input type="text" .value="${this.name}" name="name">
+          <input type="text" placeholder="version name" name="version">
+          <input type="text" placeholder="commit message" name="commitMessage">
+          <button @click="${this.saveQuant}"
+            class="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded">Save</button>
         </div>
         `;
   }

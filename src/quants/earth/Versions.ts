@@ -9,7 +9,7 @@ export default class Versions extends DesignerContext {
       versions: { type: 'array' }
     };
   }
-  static get styles() {
+  static get styles(): any[] {
     return [omo.theme];
   }
   public versions: any;
@@ -29,11 +29,16 @@ export default class Versions extends DesignerContext {
             LATEST
           </p>
         </li>
-        ${this.versions.map(version => omo.html`
+        ${this.versions.map(
+          version => omo.html`
         <li class="px-2 py-2 mb-1 hover--bg-primary hover--rounded-xl hover:text-white">
-          <p class="font-semibold text-base leading-tight truncate">${version.versionName}</p>
-          <p class="text-xs text-gray-600 truncate">${omo.moment(version.created)
-        .locale(this.language).calendar()}
+          <p class="font-semibold text-base leading-tight truncate">${
+            version.versionName
+          }</p>
+          <p class="text-xs text-gray-600 truncate">${omo
+            .moment(version.created)
+            .locale(this.language)
+            .calendar()}
           </p>
           <p class="text-xs text-gray-600 truncate">${version.code}</p>
           <p class="text-sm text-gray-800">
@@ -41,7 +46,7 @@ export default class Versions extends DesignerContext {
           </p>
         </li>
         `
-    )}
+        )}
     
     
     
@@ -57,11 +62,16 @@ export default class Versions extends DesignerContext {
     super.updated(changedProperties);
     changedProperties.forEach((_oldValue, propName) => {
       switch (propName) {
-        case 'quantName': this.loadCodeVersionsForQuant(); break;
+        case 'quantName':
+          this.loadCodeVersionsForQuant();
+          break;
       }
     });
   }
   public async loadCodeVersionsForQuant(): Promise<void> {
-    this.versions = this.quantName !== undefined ? await omo.quantum.versions(this.quantName) : [];
+    this.versions =
+      this.quantName !== undefined
+        ? await omo.quantum.versions(this.quantName)
+        : [];
   }
 }

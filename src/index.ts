@@ -1,11 +1,9 @@
 import { QuantumKernel } from './kernel/QuantumKernel';
 import { Ace } from './types/ace';
 
-
 if (!window.omo) {
   window.omo = new QuantumKernel();
 }
-
 
 declare global {
   interface Window {

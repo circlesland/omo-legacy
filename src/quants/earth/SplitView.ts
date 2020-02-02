@@ -39,32 +39,32 @@ export default class SplitView extends DragableQuant {
             :host .splitView{
                 display:grid;
                 grid-template-columns: ${this.columns.map(
-      (_col: any) => omo.html` 100%`
-    )};
+                  (_col: any) => omo.html` 100%`
+                )};
                 grid-template-rows: ${this.rows.map(
-      (_row: any) => omo.html` 50%`
-    )};
+                  (_row: any) => omo.html` 50%`
+                )};
             }
             </style>
 
             <!-- <div>
                 <label>columns</label>
                 <input type = "number" value = "${
-      this.columns.length
-      }" @change="${this.updateColumns}" >
+                  this.columns.length
+                }" @change="${this.updateColumns}" >
                 <label>rows </label>
                 <input type = "number" value = "${this.rows.length}" @change="${
       this.updateRows
-      }" >
+    }" >
       </div> -->
       <div class="splitView" >
           ${this.rows.map(
-        (row: any) =>
-          omo.html`${this.columns.map(
-            (column: any) =>
-              omo.html`<div style="overflow:scroll;"><slot name="slot-${row}-${column}"></slot></div>`
-          )}`
-      )}
+            (row: any) =>
+              omo.html`${this.columns.map(
+                (column: any) =>
+                  omo.html`<div style="overflow:scroll;"><slot name="slot-${row}-${column}"></slot></div>`
+              )}`
+          )}
       </div>
     `;
   }
@@ -106,7 +106,7 @@ export default class SplitView extends DragableQuant {
       Number.parseInt((event.target as HTMLInputElement).value, 10)
     );
   }
-  static get styles() {
+  static get styles(): any[] {
     return [
       omo.theme,
       omo.css/*css*/ `

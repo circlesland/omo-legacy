@@ -8,7 +8,8 @@ export default class ContextSwitch extends DragableQuant {
   public render(): void {
     return omo.html`
         <div class="bg-gray-100 px-4 py-2">
-            <h1 class="text-gray-700 font-semibold text-lg"><span class="lowercase font-bold">context: </span></span>${this.selectedQuant}</h1>   
+          <h1 class="text-gray-700 font-semibold text-lg"><span class="lowercase font-bold">context:
+            </span></span>${this.selectedQuant}</h1>
         </div>
     `;
   }
@@ -22,7 +23,7 @@ export default class ContextSwitch extends DragableQuant {
       }
     };
   }
-  static get styles() {
+  static get styles(): any[] {
     return [omo.theme];
   }
 }

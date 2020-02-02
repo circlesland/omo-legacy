@@ -1,4 +1,4 @@
-import QuantLoadedEvent from "./events/QuantLoadedEvent";
+import QuantLoadedEvent from './events/QuantLoadedEvent';
 
 // /**
 //  * The QuantListener is one of the core features it listen to the DOM an then apply the magic of resolving depencies
@@ -9,9 +9,9 @@ export default class QuantListener {
   private head: HTMLHeadElement;
 
   constructor() {
-    console.debug("Quantlistener created");
+    console.debug('Quantlistener created');
     this.loadedQuanta = [];
-    this.head = document.getElementsByTagName("head")[0];
+    this.head = document.getElementsByTagName('head')[0];
     this.loadAlreadyExistingQuanta();
     this.subscribeNodeAdded();
   }
@@ -22,35 +22,54 @@ export default class QuantListener {
     const author = splitted[0];
     const project = splitted[1];
     const name = splitted[2];
-    let version = "latest";
+    let version = 'latest';
 
     if (splitted.length < 3) {
-      throw Error("Only quants with full identifier are accepted. Please use name like: author-project-name-version or author-project-name Your name was: " + src);
+      throw Error(
+        'Only quants with full identifier are accepted. Please use name like: author-project-name-version or author-project-name Your name was: ' +
+          src
+      );
     }
 
     if (splitted.length === 4) {
       version = splitted[3];
     }
 
-    return { author, project, name, version }
+    return { author, project, name, version };
   }
 
-  public async ReplaceVersion(author: string, project: string, name: string, version: string, codeCid: string): Promise<void> {
+  public async ReplaceVersion(
+    author: string,
+    project: string,
+    name: string,
+    version: string,
+    codeCid: string
+  ): Promise<void> {
     const quantname = omo.quantum.getQuantName(author, project, name, version);
     const code = await omo.ipfs.cat(codeCid);
-    this.addOrUpdateScriptElement(code, author, project, name, version, quantname);
+    this.addOrUpdateScriptElement(
+      code,
+      author,
+      project,
+      name,
+      version,
+      quantname
+    );
   }
 
-  public async loadQuantByHash(quantHash: string, name: string): Promise<boolean> {
-    console.debug("Start loading quant: ", quantHash);
+  public async loadQuantByHash(
+    quantHash: string,
+    name: string
+  ): Promise<boolean> {
+    console.debug('Start loading quant: ', quantHash);
     if (quantHash == null) {
-      console.error("no hash provided");
+      console.error('no hash provided');
 
       return false;
     }
     if (this.loadedQuanta.includes(quantHash)) {
-      console.debug("quant is already loaded")
-      const event = new QuantLoadedEvent(QuantLoadedEvent.LOADED)
+      console.debug('quant is already loaded');
+      const event = new QuantLoadedEvent(QuantLoadedEvent.LOADED);
       event.QuantName = name;
       document.dispatchEvent(event);
       return true;
@@ -58,16 +77,16 @@ export default class QuantListener {
     const code = (await omo.ipfs.cat(quantHash)).toString();
     const data = `try{omo.quantum.registerQuant(${code},'${quantHash}','${name}');}catch(err){console.error(err);}`;
     const node = document.createTextNode(data);
-    const script = document.createElement("script");
-    script.type = "module";
+    const script = document.createElement('script');
+    script.type = 'module';
     script.append(node);
-    script.onload = () => console.debug("script loaded");
+    script.onload = () => console.debug('script loaded');
     this.head.append(script);
     return false;
   }
 
   private async loadQuant(scriptElement: HTMLScriptElement): Promise<void> {
-    const quantHash = scriptElement.getAttribute("src");
+    const quantHash = scriptElement.getAttribute('src');
     await this.loadQuantByHash(quantHash, null);
 
     // const quantMeta = await omo.quantum.getQuantMetaFromHash(quantHash);
@@ -81,12 +100,19 @@ export default class QuantListener {
     // scriptElement.setAttribute("loaded", "true");
   }
 
-  private addOrUpdateScriptElement(code: any, author: string, project: string, name: string, version: string, quantname: string): void {
+  private addOrUpdateScriptElement(
+    code: any,
+    author: string,
+    project: string,
+    name: string,
+    version: string,
+    quantname: string
+  ): void {
     const data = `omo.quantum.register(${code},'${author}','${project}','${name}','${version}');`;
     const node = document.createTextNode(data);
-    const script = document.createElement("script");
-    script.type = "module";
-    script.setAttribute("data-quant", quantname);
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.setAttribute('data-quant', quantname);
     script.append(node);
     this.head.append(script);
   }
@@ -114,14 +140,14 @@ export default class QuantListener {
     console.log(Object.values(mutationslist));
     mutationslist.forEach((mutation: any) => {
       mutation.addedNodes.forEach((node: any) => {
-        if (node.nodeName.toLowerCase() !== "script") {
+        if (node.nodeName.toLowerCase() !== 'script') {
           return;
         }
-        if (node["type"] !== "quant") {
+        if (node['type'] !== 'quant') {
           return;
         }
         this.loadQuant(node);
-      })
+      });
     });
   }
 }

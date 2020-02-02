@@ -15,7 +15,10 @@ export default class Designer extends DesignerContext {
   constructor() {
     super();
     this.autosave = false;
-    document.addEventListener(QuantLoadedEvent.LOADED, this.quantLoaded.bind(this))
+    document.addEventListener(
+      QuantLoadedEvent.LOADED,
+      this.quantLoaded.bind(this)
+    );
   }
 
   public render(): void {
@@ -36,7 +39,11 @@ export default class Designer extends DesignerContext {
     // this.contextSwitch = this.root.querySelector('omo-earth-contextswitch');
     // this.splitView = this.root.querySelector('omo-earth-splitView');
     // this.versions = this.root.querySelector('omo-earth-versions');
-    this.quantaList.addEventListener('selectedQuant', () => this.quantName = this.quantaList.quantName, false);
+    this.quantaList.addEventListener(
+      'selectedQuant',
+      () => (this.quantName = this.quantaList.quantName),
+      false
+    );
   }
 
   // private async setSelectedQuant(selectedQuant: any): Promise<void> {
@@ -81,7 +88,7 @@ export default class Designer extends DesignerContext {
   public static get styles(): any {
     return [
       omo.theme,
-      omo.css/*css*/`
+      omo.css/*css*/ `
       :host{
         height: 100%;
         display: grid;
@@ -107,7 +114,7 @@ export default class Designer extends DesignerContext {
   static get model(): any {
     return {
       quantName: {
-        type: "string"
+        type: 'string'
       }
     };
   }

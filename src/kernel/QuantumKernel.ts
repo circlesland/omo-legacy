@@ -1,12 +1,12 @@
 import { Client } from '@textile/threads-client';
 // import Logger from "./Logger";
 import { css, html } from 'lit-element';
+import * as moment from 'moment';
 import Language from './language/Language';
 import { dragStyle } from './quants/DragStyle';
 import { normalize } from './quants/Normalize';
 import { theme } from './quants/Theme';
 import { QuantStore } from './QuantStore';
-import * as moment from "moment";
 
 export class QuantumKernel {
   // logger: Logger;
@@ -21,7 +21,6 @@ export class QuantumKernel {
   public ipfs: any;
   public ready: boolean;
   public moment: any;
-
 
   constructor() {
     this.ready = false;

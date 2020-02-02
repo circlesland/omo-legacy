@@ -5,8 +5,7 @@ export default class QuantaList extends DesignerContext {
     return super.properties;
   }
   static get model(): any {
-    return {
-    }
+    return {};
   }
 
   public render(): void {
@@ -15,8 +14,14 @@ export default class QuantaList extends DesignerContext {
           <p class="uppercase text-gray-600 text-xs font-semibold">Quanta</p>
           <ul class="">
               ${this.quanta.map((quant: any) => {
-                const quantName = omo.quantum.getQuantName(quant.author,quant.project,quant.name,quant.version);
-                const active = quantName === this.quantName ? 'bg-primary text-white':''
+                const quantName = omo.quantum.getQuantName(
+                  quant.author,
+                  quant.project,
+                  quant.name,
+                  quant.version
+                );
+                const active =
+                  quantName === this.quantName ? 'bg-primary text-white' : '';
                 return omo.html`         
                   <li @click="${this.selectQuant}" class="px-2 py-1 font-semibold text-base ${active} hover--bg-primary hover--text-white leading-tight truncate">${quantName}</li>
               `;
@@ -27,11 +32,14 @@ export default class QuantaList extends DesignerContext {
   }
 
   public selectQuant(event: Event): void {
-    this.quantName = this.quantName === event.srcElement['innerText'] ? undefined : event.srcElement['innerText'];
+    this.quantName =
+      this.quantName === event.srcElement['innerText']
+        ? undefined
+        : event.srcElement['innerText'];
     this.dispatchEvent(new CustomEvent('selectedQuant'));
   }
 
-  static get styles() {
+  static get styles(): any[] {
     return [omo.theme];
   }
 }

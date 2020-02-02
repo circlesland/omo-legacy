@@ -8,7 +8,9 @@ export default class Quant extends LitElement {
       properties = constructor.recursiveModel(parentConstructor);
 
       Object.entries(constructor.model).forEach(prop => {
-        if (!properties[prop[0]]) { properties[prop[0]] = prop[1]; }
+        if (!properties[prop[0]]) {
+          properties[prop[0]] = prop[1];
+        }
       });
     }
     return properties;
@@ -18,7 +20,6 @@ export default class Quant extends LitElement {
   public initialized: boolean;
   public root: ShadowRoot | undefined;
 
-
   constructor() {
     super();
     this.initialized = false;
@@ -27,8 +28,7 @@ export default class Quant extends LitElement {
 
   /* #region static getter */
   static get model(): any {
-    return {
-    };
+    return {};
   }
 
   static get properties(): any {
@@ -92,7 +92,7 @@ export default class Quant extends LitElement {
 
   public connectedCallback(): void {
     super.connectedCallback();
-    this.initAsync().then(() => this.initialized = true);
+    this.initAsync().then(() => (this.initialized = true));
   }
   /* #endregion */
 }
