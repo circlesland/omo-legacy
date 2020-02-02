@@ -24,17 +24,16 @@ export default class QuantaList extends DragableQuant {
 
     }
     public async listenToQuanta(): Promise<void> {
-        omo.client.listen(omo.quantum.QuantStoreId, await omo.quantum.QuantModelName(), "", this.updateQuanta);
+        omo.client.listen(omo.quantum.QuantStoreId, omo.quantum.QuantaModelName, "", this.updateQuanta);
         this.updateQuanta();
     }
     public async updateQuanta(): Promise<void> {
-        this.quanta = (await omo.client.modelFind(omo.quantum.QuantStoreId, await omo.quantum.QuantModelName(), {})).entitiesList;
+        this.quanta = await omo.quantum.all();
     }
     public render(): void {
         return omo.html`
         ${this.quanta.map((quant: any) => {
-        const quantName = omo.quantum.getQuantName(quant.author, quant.project, quant.name, quant.major, quant.minor,
-        quant.patch);
+        const quantName = omo.quantum.getQuantName(quant.author, quant.project, quant.name, quant.version);
         return omo.html`<a @click="${this.selectQuant}">${quantName}</a>`
         })}`
     }

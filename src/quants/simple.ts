@@ -1,4 +1,4 @@
-class Simple extends omo.quantum.get("omo", "quantum", "quant", 0, 1, 0) {
+class Simple extends omo.quantum.get("omo", "quantum", "quant", undefined) {
     static get styles(): any {
         return [
             omo.normalize,
