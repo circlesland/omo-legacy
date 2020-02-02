@@ -60,6 +60,7 @@ export default class QuantaList extends DragableQuant {
   }
   public selectQuant(event: Event): void {
     this.selectedQuant = event.srcElement['innerText'];
+      this.dispatchEvent(new CustomEvent('selectedQuant'));
   }
 
   public updated(changedProperties: any): void {

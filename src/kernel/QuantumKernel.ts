@@ -6,6 +6,7 @@ import { dragStyle } from './quants/DragStyle';
 import { normalize } from './quants/Normalize';
 import { theme } from './quants/Theme';
 import { QuantStore } from './QuantStore';
+import * as moment from "moment";
 
 export class QuantumKernel {
   // logger: Logger;
@@ -19,6 +20,7 @@ export class QuantumKernel {
   public storeId: string;
   public ipfs: any;
   public ready: boolean;
+  public moment: any;
 
 
   constructor() {
@@ -32,6 +34,7 @@ export class QuantumKernel {
     this.normalize = normalize;
     this.dragStyle = dragStyle;
     this.theme = theme;
+    this.moment = moment;
 
     // this.quanta['Quant'] = DragableQuant;
     // window.customElements.define('omo-quant', DragableQuant);

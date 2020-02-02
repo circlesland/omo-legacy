@@ -59,8 +59,8 @@ export default class Editor extends DragableQuant {
 
 
 
-    public firstUpdated(): void {
-        this.initEditor();
+    public async initAsync(): Promise<void> {
+        await this.initEditor();
     }
 
     public render(): void {

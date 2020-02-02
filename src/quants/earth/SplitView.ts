@@ -27,37 +27,43 @@ export default class SplitView extends DragableQuant {
       this.columns = this.array(1);
     }
   }
+  public setColumns(count: number): void {
+    this.columns = this.array(count);
+  }
+  public setRows(count: number): void {
+    this.rows = this.array(count);
+  }
   public render(): void {
     return omo.html`
             <style>
             .splitView{
                 display:grid;
                 grid-template-columns: ${this.columns.map(
-                  (_col: any) => omo.html` 1fr`
-                )};
+      (_col: any) => omo.html` 1fr`
+    )};
                 grid-template-rows: ${this.rows.map(
-                  (_row: any) => omo.html` 1fr`
-                )};
+      (_row: any) => omo.html` 1fr`
+    )};
             }
             </style>
             <div>
                 <label>columns</label>
                 <input type = "number" value = "${
-                  this.columns.length
-                }" @change="${this.updateColumns}" >
+      this.columns.length
+      }" @change="${this.updateColumns}" >
                 <label>rows </label>
                 <input type = "number" value = "${this.rows.length}" @change="${
       this.updateRows
-    }" >
+      }" >
             </div>
             <div class="splitView" >
                 ${this.rows.map(
-                  (row: any) =>
-                    omo.html`${this.columns.map(
-                      (column: any) =>
-                        omo.html`<div><slot name="slot-${row}-${column}}">slot-${row}-${column}</slot></div>`
-                    )}`
-                )}
+        (row: any) =>
+          omo.html`${this.columns.map(
+            (column: any) =>
+              omo.html`<div><slot name="slot-${row}-${column}"></slot></div>`
+          )}`
+      )}
             </div>
     `;
   }
@@ -71,23 +77,24 @@ export default class SplitView extends DragableQuant {
     }
     return arr;
   }
-  public updated(changedProperties: any): void {
-    super.updated(changedProperties);
-    changedProperties.forEach((_oldValue, propName) => {
-      switch (propName) {
-        case 'columns':
-          if (this.columns === undefined || this.columns.length <= 0) {
-            this.columns = this.array(1);
-          }
-          break;
-        case 'rows':
-          if (this.rows === undefined || this.rows.length <= 0) {
-            this.rows = this.array(1);
-          }
-          break;
-      }
-    });
-  }
+  // public updated(changedProperties: any): void {
+  //   super.updated(changedProperties);
+  //   console.log("HBUINSKFJHBVH")
+  //   changedProperties.forEach((_oldValue, propName) => {
+  //     switch (propName) {
+  //       case 'columns':
+  //         if (this.columns === undefined || this.columns.length <= 0) {
+  //           this.columns = this.array(1);
+  //         }
+  //         break;
+  //       case 'rows':
+  //         if (this.rows === undefined || this.rows.length <= 0) {
+  //           this.rows = this.array(1);
+  //         }
+  //         break;
+  //     }
+  //   });
+  // }
   private updateColumns(event: Event): void {
     this.columns = this.array(
       Number.parseInt((event.target as HTMLInputElement).value, 10)

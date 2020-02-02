@@ -68,15 +68,15 @@ export default class Quant extends LitElement {
 
     this.initialized = false;
     this.autosave = true;
-    this.init();
-    this.initAsync().then(() => (this.initialized = true));
+    // this.init();
+    // this.initAsync().then(() => (this.initialized = true));
   }
 
-  public updated(changedProperties: any): void {
-    changedProperties.forEach((_oldValue, propName) => {
-      this.dispatchEvent(new CustomEvent(propName));
-    });
-  }
+  // public updated(changedProperties: any): void {
+  //   // changedProperties.forEach((_oldValue, propName) => {
+  //   //   this.dispatchEvent(new CustomEvent(propName));
+  //   // });
+  // }
 
   public render(): any {
     return window.omo.html`<p>Please implement render function<p>`;

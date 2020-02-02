@@ -29,8 +29,9 @@ export default class QuantListener {
 
     return { author, project, name, version }
   }
-  public async ReplaceVersion(author: string, project: string, name: string, version: string, code: string): Promise<void> {
+  public async ReplaceVersion(author: string, project: string, name: string, version: string, codeCid: string): Promise<void> {
     const quantname = omo.quantum.getQuantName(author, project, name, version);
+    const code = await omo.ipfs.cat(codeCid);
     this.addOrUpdateScriptElement(code, author, project, name, version, quantname);
   }
   private async loadQuant(scriptElement: HTMLScriptElement): Promise<void> {

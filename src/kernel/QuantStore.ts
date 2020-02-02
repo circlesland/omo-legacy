@@ -22,6 +22,19 @@ export class QuantStore {
     public async all(): Promise<any> {
         return (await omo.client.modelFind(this.QuantStoreId, this.QuantaModelName, {})).entitiesList;
     }
+    public async versions(name): Promise<any> {
+        const meta = this.getMeta(name);
+        let query = new Query();
+        this.andFilter(query, "author", meta.author);
+        this.andFilter(query, "project", meta.project);
+        this.andFilter(query, "name", meta.name);
+        const result = await omo.client.modelFind(this.QuantStoreId, this.QuantaModelName, query);
+        const hash = result.entitiesList[0].code
+        query = new Query();
+        this.andFilter(query, "quant", hash);
+        query = query.orderByDesc("created");
+        return (await omo.client.modelFind(this.QuantStoreId, this.VersionModelName, {})).entitiesList;
+    }
     private get quantaSchema(): any {
         return {
             "$id": "https://example.com/person.schema.json",
@@ -62,7 +75,7 @@ export class QuantStore {
                     "type": "string"
                 },
                 "created": {
-                    "type": "string"
+                    "type": "number"
                 },
                 "quant": {
                     "type": "string"
@@ -82,6 +95,10 @@ export class QuantStore {
         const versionName = version === undefined ? "latest" : version;
         this.createVersion(author, project, name, versionName);
         this.storeQuant(author, project, name, $class, versionName);
+    }
+    public getByName(name: string): any {
+        const meta = this.getMeta(name);
+        return this.get(meta.author, meta.project, meta.name, meta.version);
     }
     public get(author: string, project: string, name: string, version: string): any {
         const versionName = version === undefined ? "latest" : version;
@@ -153,13 +170,13 @@ export class QuantStore {
     }
     public async saveQuantToMFS(author: string, project: string, name: string, version: string, code: string): Promise<string> {
         const versionName = version === undefined ? "latest" : version;
-        try { await omo.ipfs.files.mkdir(`/quanta`); } catch {/**/ }
-        try { await omo.ipfs.files.mkdir(`/quanta/${author}`); } catch {/**/ }
-        try { await omo.ipfs.files.mkdir(`/quanta/${author}/${project}`); } catch {/**/ }
-        try { await omo.ipfs.files.mkdir(`/quanta/${author}/${project}/${name}`); } catch {/**/ }
-        try { await omo.ipfs.files.mkdir(`/quanta/${author}/${project}/${name}/${versionName}`); } catch {/**/ }
-        try { await omo.ipfs.files.rm(`/quanta/${author}/${project}/${name}/${versionName}/${name}`); } catch {/**/ }
-        try { await omo.ipfs.files.write(`/quanta/${author}/${project}/${name}/${versionName}/${name}`, code, { create: true }); } catch {/**/ }
+        try { await omo.ipfs.files.mkdir(`/quanta`).catch(); } catch {/**/ }
+        try { await omo.ipfs.files.mkdir(`/quanta/${author}`).catch(); } catch {/**/ }
+        try { await omo.ipfs.files.mkdir(`/quanta/${author}/${project}`).catch(); } catch {/**/ }
+        try { await omo.ipfs.files.mkdir(`/quanta/${author}/${project}/${name}`).catch(); } catch {/**/ }
+        try { await omo.ipfs.files.mkdir(`/quanta/${author}/${project}/${name}/${versionName}`).catch(); } catch {/**/ }
+        try { await omo.ipfs.files.rm(`/quanta/${author}/${project}/${name}/${versionName}/${name}`).catch(); } catch {/**/ }
+        try { await omo.ipfs.files.write(`/quanta/${author}/${project}/${name}/${versionName}/${name}`, code, { create: true }).catch(); } catch {/**/ }
         return (await omo.ipfs.files.stat(`/quanta/${author}/${project}/${name}/${versionName}/${name}`)).hash;
     }
     public async CreateOrUpdateQuant(author: string, project: string, name: string, code: string, version: string, commitMessage: string): Promise<any> {

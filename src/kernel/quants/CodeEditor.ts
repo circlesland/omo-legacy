@@ -4,12 +4,19 @@ export default class CodeEditor extends DragableQuant {
     public author: any;
     public project: any;
     public name: any;
-    public major: any;
-    public minor: any;
-    public patch: any;
+    public version: any;
     public static get model(): any {
         return {
             quant: {
+                type: 'string'
+            },
+            project: {
+                type: 'string'
+            },
+            name: {
+                type: 'string'
+            },
+            version: {
                 type: 'string'
             }
         }
@@ -44,7 +51,6 @@ export default class CodeEditor extends DragableQuant {
     }
 
     public firstUpdated(changedProperties): void {
-        console.log("TEST")
         super.firstUpdated(changedProperties);
         this.editor = this.root.children[0];
     }
@@ -91,9 +97,8 @@ export default class CodeEditor extends DragableQuant {
         this.author = meta.author;
         this.project = meta.project;
         this.name = meta.name;
-        this.major = meta.major;
-        this.minor = meta.minor;
-        this.patch = meta.patch;
+        this.version = meta.version;
+        await this.editor.initAsync();
         this.editor.code = await omo.quantum.loadFromThreadByName(this.quant);
     }
 }
