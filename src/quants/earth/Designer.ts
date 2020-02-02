@@ -30,7 +30,7 @@ export default class Designer extends DesignerContext {
         <omo-earth-actions></omo-earth-actions>
         <omo-earth-versions quantName="${this.quantName}"></omo-earth-versions>
         <omo-earth-splitView></omo-earth-splitView>
-        `;
+    `;
   }
 
   public firstUpdated(changedProperties: any): void {

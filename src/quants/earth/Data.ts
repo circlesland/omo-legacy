@@ -8,7 +8,7 @@ export default class Data extends DragableQuant {
     return omo.html`
         <div class="h-full px-8 py-6 bg-gray-200 w-1/5">
           <p class="mt-8 uppercase text-gray-600 text-xs font-semibold">
-            Data
+            Quanta Data
           </p>
           <ul class="mt-2">
             <li class="px-2 py-1 mb-1 hover:bg-primary hover:rounded-xl hover:text-white">

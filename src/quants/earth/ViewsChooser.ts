@@ -10,13 +10,16 @@ export default class ViewsChooser extends DragableQuant {
       <p class="uppercase text-gray-600 text-xs font-semibold">Views</p>
       <ul class="">
         <li class="px-2 py-1 font-semibold text-base bg-primary text-white leading-tight truncate">
-          omo-earth-preview
+          Code
         </li>
         <li class="px-2 py-1 font-semibold text-base hover:bg-primary hover:text-white leading-tight truncate">
-          omo-earth-code
+          Preview
         </li>
         <li class="px-2 py-1 font-semibold text-base hover:bg-primary hover:text-white leading-tight truncate">
-          omo-earth-schema
+          Table
+        </li>
+        <li class="px-2 py-1 font-semibold text-base hover:bg-primary hover:text-white leading-tight truncate">
+          Kanban
         </li>
       </ul>
     </div>
