@@ -9,8 +9,9 @@ export default class ContextSwitch extends DesignerContext {
         <div class="bg-gray-100 px-4 py-2">
           <h1 class="text-gray-700 font-semibold text-lg">
             <span class="lowercase font-bold">context:</span>
-            ${this.quantName === 'undefined' ? "quant" : this.quantName}@${this.versionName === '' ? 
-            "version" : this.versionName}
+            ${this.quantName === 'undefined' ? 'quant' : this.quantName}@${
+      this.versionName === '' ? 'version' : this.versionName
+    }
           </h1>
         </div>
     `;

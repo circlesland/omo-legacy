@@ -3,6 +3,7 @@ import Actions from '../quants/earth/Actions';
 import ContextSwitch from '../quants/earth/ContextSwitch';
 import Data from '../quants/earth/Data';
 import Designer from '../quants/earth/Designer';
+import Version from '../quants/earth/models/version';
 import QuantaList from '../quants/earth/QuantaList';
 import SplitView from '../quants/earth/SplitView';
 import Versions from '../quants/earth/Versions';
@@ -12,7 +13,6 @@ import QuantListener from './QuantListener';
 import CodeEditor from './quants/CodeEditor';
 import DragableQuant from './quants/DragableQuant';
 import Editor from './quants/Editor';
-import Version from '../quants/earth/models/version';
 
 export class QuantStore {
   public get QuantStoreId(): string {

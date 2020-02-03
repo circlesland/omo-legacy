@@ -29,10 +29,10 @@ export default class DesignerContext extends DragableQuant {
         type: 'array'
       },
       versionHash: {
-        type: "string"
+        type: 'string'
       },
       versionName: {
-        type: "string"
+        type: 'string'
       }
     };
   }

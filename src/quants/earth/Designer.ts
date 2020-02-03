@@ -40,8 +40,16 @@ export default class Designer extends DesignerContext {
     // this.contextSwitch = this.root.querySelector('omo-earth-contextswitch');
     // this.splitView = this.root.querySelector('omo-earth-splitView');
     this.versions = this.root.querySelector('omo-earth-versions');
-    this.quantaList.addEventListener('quantSelected', this.quantSelected.bind(this), false);
-    this.versions.addEventListener('versionSelected', this.versionSelected.bind(this), false);
+    this.quantaList.addEventListener(
+      'quantSelected',
+      this.quantSelected.bind(this),
+      false
+    );
+    this.versions.addEventListener(
+      'versionSelected',
+      this.versionSelected.bind(this),
+      false
+    );
   }
 
   private quantSelected(): void {
