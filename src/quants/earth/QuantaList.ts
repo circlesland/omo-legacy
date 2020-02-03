@@ -36,7 +36,7 @@ export default class QuantaList extends DesignerContext {
       this.quantName === event.srcElement['innerText']
         ? undefined
         : event.srcElement['innerText'];
-    this.dispatchEvent(new CustomEvent('selectedQuant'));
+    this.dispatchEvent(new CustomEvent('quantSelected'));
   }
 
   static get styles(): any[] {

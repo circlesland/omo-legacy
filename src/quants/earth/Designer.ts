@@ -4,12 +4,12 @@ import DesignerContext from './DesignerContext';
 import QuantaList from './QuantaList';
 // import QuantaList from './QuantaList';
 // import SplitView from './SplitView';
-// import Versions from './Versions';
+import Versions from './Versions';
 
 export default class Designer extends DesignerContext {
   // private contextSwitch: ContextSwitch;
   // private splitView: SplitView;
-  // private versions: Versions;
+  private versions: Versions;
   private quantaList: QuantaList;
 
   constructor() {
@@ -24,11 +24,12 @@ export default class Designer extends DesignerContext {
   public render(): void {
     return omo.html`
         <omo-earth-quantaList quantName="${this.quantName}"></omo-earth-quantaList>
-        <omo-earth-contextSwitch quantName="${this.quantName}"></omo-earth-contextSwitch>
+        <omo-earth-contextSwitch quantName="${this.quantName}" versionName="${this.versionName}"></omo-earth-contextSwitch>
         <omo-earth-viewsChooser></omo-earth-viewsChooser>
         <omo-earth-data></omo-earth-data>
         <omo-earth-actions></omo-earth-actions>
-        <omo-earth-versions quantName="${this.quantName}"></omo-earth-versions>
+        <omo-earth-versions quantName="${this.quantName}" versionHash="${this.versionId}" versionName="${this.versionName}">
+        </omo-earth-versions>
         <omo-earth-splitView></omo-earth-splitView>
     `;
   }
@@ -38,12 +39,18 @@ export default class Designer extends DesignerContext {
     this.quantaList = this.root.querySelector('omo-earth-quantalist');
     // this.contextSwitch = this.root.querySelector('omo-earth-contextswitch');
     // this.splitView = this.root.querySelector('omo-earth-splitView');
-    // this.versions = this.root.querySelector('omo-earth-versions');
-    this.quantaList.addEventListener(
-      'selectedQuant',
-      () => (this.quantName = this.quantaList.quantName),
-      false
-    );
+    this.versions = this.root.querySelector('omo-earth-versions');
+    this.quantaList.addEventListener('quantSelected', this.quantSelected.bind(this), false);
+    this.versions.addEventListener('versionSelected', this.versionSelected.bind(this), false);
+  }
+
+  private quantSelected(): void {
+    this.quantName = this.quantaList.quantName;
+  }
+
+  private versionSelected(): void {
+    this.versionId = this.versions.versionId;
+    this.versionName = this.versions.versionName;
   }
 
   // private async setSelectedQuant(selectedQuant: any): Promise<void> {

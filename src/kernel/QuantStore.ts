@@ -12,6 +12,7 @@ import QuantListener from './QuantListener';
 import CodeEditor from './quants/CodeEditor';
 import DragableQuant from './quants/DragableQuant';
 import Editor from './quants/Editor';
+import Version from '../quants/earth/models/version';
 
 export class QuantStore {
   public get QuantStoreId(): string {
@@ -33,10 +34,8 @@ export class QuantStore {
       await omo.client.modelFind(this.QuantStoreId, this.QuantaModelName, {})
     ).entitiesList;
   }
-  public async versions(name): Promise<any> {
+  public async versions(name): Promise<Version[]> {
     const descriptor = await this.getDescriptor(name);
-    // const hash = descriptor.code
-
     let query = new Query();
     this.andFilter(query, 'quant', descriptor.ID);
     query = query.orderByDesc('created');

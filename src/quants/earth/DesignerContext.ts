@@ -3,6 +3,8 @@ import DragableQuant from '../../kernel/quants/DragableQuant';
 export default class DesignerContext extends DragableQuant {
   public quantName: string | undefined;
   public quanta: any[];
+  public versionId: string | undefined;
+  public versionName: string | undefined;
 
   constructor() {
     super();
@@ -25,6 +27,12 @@ export default class DesignerContext extends DragableQuant {
       },
       quanta: {
         type: 'array'
+      },
+      versionHash: {
+        type: "string"
+      },
+      versionName: {
+        type: "string"
       }
     };
   }
