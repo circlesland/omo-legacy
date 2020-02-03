@@ -1,14 +1,18 @@
 import DragableQuant from '../../kernel/quants/DragableQuant';
 
 export default class DesignerContext extends DragableQuant {
+  public availableViews: any[];
   public quantName: string | undefined;
   public quanta: any[];
+  public selectedViews: any[];
   public versionId: string | undefined;
   public versionName: string | undefined;
 
   constructor() {
     super();
     this.quanta = [];
+    this.availableViews = [];
+    this.selectedViews = [];
   }
 
   public async initAsync(): Promise<void> {
@@ -22,10 +26,16 @@ export default class DesignerContext extends DragableQuant {
 
   static get model(): any {
     return {
+      availableViews: {
+        type: 'array'
+      },
       quantName: {
         type: 'string'
       },
       quanta: {
+        type: 'array'
+      },
+      selectedViews: {
         type: 'array'
       },
       versionHash: {

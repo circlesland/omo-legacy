@@ -5,12 +5,14 @@ import QuantaList from './QuantaList';
 // import QuantaList from './QuantaList';
 // import SplitView from './SplitView';
 import Versions from './Versions';
+import ViewsChooser from './ViewsChooser';
 
 export default class Designer extends DesignerContext {
   // private contextSwitch: ContextSwitch;
   // private splitView: SplitView;
   private versions: Versions;
   private quantaList: QuantaList;
+  private viewsChooser: ViewsChooser;
 
   constructor() {
     super();
@@ -40,6 +42,7 @@ export default class Designer extends DesignerContext {
     // this.contextSwitch = this.root.querySelector('omo-earth-contextswitch');
     // this.splitView = this.root.querySelector('omo-earth-splitView');
     this.versions = this.root.querySelector('omo-earth-versions');
+    this.viewsChooser = this.root.querySelector('omo-earth-viewschooser');
     this.quantaList.addEventListener(
       'quantSelected',
       this.quantSelected.bind(this),
@@ -54,6 +57,20 @@ export default class Designer extends DesignerContext {
 
   private quantSelected(): void {
     this.quantName = this.quantaList.quantName;
+    this.updateAvailableViews();
+  }
+
+  private updateAvailableViews(): void {
+    this.availableViews =
+      this.quantName !== undefined
+        ? [
+            { display: 'Code', view: 'omo-earth-codeeditor' },
+            { display: 'Preview', view: 'default' }
+          ]
+        : [];
+    this.selectedViews = ['omo-earth-codeeditor'];
+    this.viewsChooser.availableViews = this.availableViews;
+    this.viewsChooser.selectedViews = this.selectedViews;
   }
 
   private versionSelected(): void {

@@ -1,5 +1,5 @@
 import { css } from 'lit-element';
-
+// prettier-ignore
 export const theme = css`
   :host,
   html {
