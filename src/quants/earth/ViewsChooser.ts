@@ -27,7 +27,7 @@ export default class ViewsChooser extends DesignerContext {
     return [omo.theme];
   }
   private viewSelected(view:string):void{
- this.selectedViews =this.selectedViews.includes(view)?this.selectedViews.filter((item)=>item!==view):[...this.selectedViews,view];
-
+    this.selectedViews =this.selectedViews.includes(view)?this.selectedViews.filter((item)=>item!==view):[...this.selectedViews,view];
+    this.dispatchEvent(new CustomEvent('selectedViewsChanged'));
   }
 }

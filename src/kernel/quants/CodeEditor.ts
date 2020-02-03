@@ -43,6 +43,7 @@ export default class CodeEditor extends DragableQuant {
             justify-content:flex-end;
             align-items:center;
         }
+        .actions{ flex-wrap:wrap;}
         `
     ];
   }
@@ -62,6 +63,7 @@ export default class CodeEditor extends DragableQuant {
     super.updated(changedProperties);
     changedProperties.forEach((_oldValue, propName) => {
       switch (propName) {
+        case 'versionId':
         case 'quant':
           this.loadCode();
           break;
@@ -71,7 +73,7 @@ export default class CodeEditor extends DragableQuant {
 
   public render(): void {
     return omo.html`
-        <omo-earth-editor theme="monokai" mode="javascript"></omo-earth-editor>
+        <omo-earth-editor mode="javascript"></omo-earth-editor>
         <div class="actions p-1">
           <input type="text" .value="${this.author}" name="author">
           <input type="text" .value="${this.project}" name="project">

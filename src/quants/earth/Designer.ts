@@ -1,15 +1,12 @@
 import QuantLoadedEvent from '../../kernel/events/QuantLoadedEvent';
-// import ContextSwitch from './ContextSwitch';
 import DesignerContext from './DesignerContext';
 import QuantaList from './QuantaList';
-// import QuantaList from './QuantaList';
-// import SplitView from './SplitView';
+import SplitView from './SplitView';
 import Versions from './Versions';
 import ViewsChooser from './ViewsChooser';
 
 export default class Designer extends DesignerContext {
-  // private contextSwitch: ContextSwitch;
-  // private splitView: SplitView;
+  private splitView: SplitView;
   private versions: Versions;
   private quantaList: QuantaList;
   private viewsChooser: ViewsChooser;
@@ -39,8 +36,7 @@ export default class Designer extends DesignerContext {
   public firstUpdated(changedProperties: any): void {
     super.firstUpdated(changedProperties);
     this.quantaList = this.root.querySelector('omo-earth-quantalist');
-    // this.contextSwitch = this.root.querySelector('omo-earth-contextswitch');
-    // this.splitView = this.root.querySelector('omo-earth-splitView');
+    this.splitView = this.root.querySelector('omo-earth-splitView');
     this.versions = this.root.querySelector('omo-earth-versions');
     this.viewsChooser = this.root.querySelector('omo-earth-viewschooser');
     this.quantaList.addEventListener(
@@ -53,29 +49,52 @@ export default class Designer extends DesignerContext {
       this.versionSelected.bind(this),
       false
     );
+    this.viewsChooser.addEventListener(
+      'selectedViewsChanged',
+      this.selectedViewsChanged.bind(this),
+      false
+    );
   }
 
   private quantSelected(): void {
     this.quantName = this.quantaList.quantName;
     this.updateAvailableViews();
+    this.updateSelectedViews();
   }
-
   private updateAvailableViews(): void {
     this.availableViews =
       this.quantName !== undefined
         ? [
-            { display: 'Code', view: 'omo-earth-codeeditor' },
-            { display: 'Preview', view: 'default' }
-          ]
+          { display: 'Code', view: 'omo-earth-codeeditor', properties: { 'quant': 'quantName', 'version': 'versionId' } },
+          { display: 'Preview', view: 'default' }
+        ]
         : [];
     this.selectedViews = ['omo-earth-codeeditor'];
     this.viewsChooser.availableViews = this.availableViews;
-    this.viewsChooser.selectedViews = this.selectedViews;
   }
-
   private versionSelected(): void {
     this.versionId = this.versions.versionId;
     this.versionName = this.versions.versionName;
+  }
+
+  private selectedViewsChanged(): void {
+    this.selectedViews = this.viewsChooser.selectedViews;
+    this.updateSelectedViews()
+  }
+  private updateSelectedViews(): void {
+    this.viewsChooser.selectedViews = this.selectedViews;
+    this.splitView.selectedViews = this.selectedViews;
+
+    this.splitView.clear();
+    this.selectedViews.forEach(view => {
+      const viewProperties = this.availableViews.filter(x => x.view === view)[0].properties;
+      const newElem: HTMLElement = view === 'default' ? document.createElement("pre") : document.createElement(view);
+      newElem.slot = view;
+      if (viewProperties) {
+        Object.keys(viewProperties).forEach(key => newElem.setAttribute(key, this[viewProperties[key]]));
+      }
+      this.splitView.append(newElem);
+    });
   }
 
   // private async setSelectedQuant(selectedQuant: any): Promise<void> {
