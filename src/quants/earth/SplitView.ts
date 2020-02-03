@@ -10,12 +10,14 @@ export default class SplitView extends DesignerContext {
     <style>
     :host .splitView{
       display:grid;
-      grid-template-rows: ${this.selectedViews.map(() => omo.html` ${1 / this.selectedViews.length * 100}%`)};
+      grid-template-rows: ${this.selectedViews.map(
+        () => omo.html` ${(1 / this.selectedViews.length) * 100}%`
+      )};
     }
     </style>
     <div class="actions"></div>
     <div class="splitView">
-      ${this.selectedViews.map((view) => omo.html`<slot name="${view}"></slot>`)}
+      ${this.selectedViews.map(view => omo.html`<slot name="${view}"></slot>`)}
     </div>
     `;
   }

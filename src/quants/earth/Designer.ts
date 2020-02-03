@@ -65,9 +65,13 @@ export default class Designer extends DesignerContext {
     this.availableViews =
       this.quantName !== undefined
         ? [
-          { display: 'Code', view: 'omo-earth-codeeditor', properties: { 'quant': 'quantName', 'version': 'versionId' } },
-          { display: 'Preview', view: 'default' }
-        ]
+            {
+              display: 'Code',
+              properties: { quant: 'quantName', version: 'versionId' },
+              view: 'omo-earth-codeeditor'
+            },
+            { display: 'Preview', view: 'default' }
+          ]
         : [];
     this.selectedViews = ['omo-earth-codeeditor'];
     this.viewsChooser.availableViews = this.availableViews;
@@ -79,7 +83,7 @@ export default class Designer extends DesignerContext {
 
   private selectedViewsChanged(): void {
     this.selectedViews = this.viewsChooser.selectedViews;
-    this.updateSelectedViews()
+    this.updateSelectedViews();
   }
   private updateSelectedViews(): void {
     this.viewsChooser.selectedViews = this.selectedViews;
@@ -87,11 +91,17 @@ export default class Designer extends DesignerContext {
 
     this.splitView.clear();
     this.selectedViews.forEach(view => {
-      const viewProperties = this.availableViews.filter(x => x.view === view)[0].properties;
-      const newElem: HTMLElement = view === 'default' ? document.createElement("pre") : document.createElement(view);
+      const viewProperties = this.availableViews.filter(x => x.view === view)[0]
+        .properties;
+      const newElem: HTMLElement =
+        view === 'default'
+          ? document.createElement('pre')
+          : document.createElement(view);
       newElem.slot = view;
       if (viewProperties) {
-        Object.keys(viewProperties).forEach(key => newElem.setAttribute(key, this[viewProperties[key]]));
+        Object.keys(viewProperties).forEach(key =>
+          newElem.setAttribute(key, this[viewProperties[key]])
+        );
       }
       this.splitView.append(newElem);
     });

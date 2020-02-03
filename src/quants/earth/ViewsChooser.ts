@@ -11,11 +11,15 @@ export default class ViewsChooser extends DesignerContext {
       <ul class="">
         ${this.availableViews.map(view => {
           const selected = this.selectedViews.includes(view.view);
-          const selectedClass = selected ? "bg-primary text-white" : "";
+          const selectedClass = selected ? 'bg-primary text-white' : '';
           return omo.html`
-        <li @click="${()=>this.viewSelected(view.view)}" class="px-2 py-1 font-semibold text-base hover:bg-primary hover:text-white leading-tight truncate ${selectedClass}">
+        <li @click="${() =>
+          this.viewSelected(
+            view.view
+          )}" class="px-2 py-1 font-semibold text-base hover:bg-primary hover:text-white leading-tight truncate ${selectedClass}">
           ${view.display}</li>
-        `})}
+        `;
+        })}
       </ul>
     </div>
     `;
@@ -26,8 +30,10 @@ export default class ViewsChooser extends DesignerContext {
   static get styles(): any[] {
     return [omo.theme];
   }
-  private viewSelected(view:string):void{
-    this.selectedViews =this.selectedViews.includes(view)?this.selectedViews.filter((item)=>item!==view):[...this.selectedViews,view];
+  private viewSelected(view: string): void {
+    this.selectedViews = this.selectedViews.includes(view)
+      ? this.selectedViews.filter(item => item !== view)
+      : [...this.selectedViews, view];
     this.dispatchEvent(new CustomEvent('selectedViewsChanged'));
   }
 }
