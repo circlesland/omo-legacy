@@ -169,8 +169,14 @@ export default class Designer extends DesignerContext {
           "quanta split views"
           "data split versions"
           "data actions versions";
-        grid-template-columns: 16rem minmax(0, 1fr) 16rem;
-        grid-template-rows: auto auto 1fr auto;
+          grid-template-columns: 10px minmax(0, 1fr) 10px;
+
+      }
+      @media (min-width:768px){
+        :host{
+          grid-template-columns: 16rem minmax(0, 1fr) 16rem;
+          grid-template-rows: auto auto 1fr auto;
+        }
       }
 
       omo-earth-data {grid-area:data;}
