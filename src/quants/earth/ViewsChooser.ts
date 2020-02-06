@@ -13,25 +13,23 @@ export default class ViewsChooser extends DesignerContext {
       <ul class="">
     
       ${this.availableViews.map(item => {
-          const selected = this.selectedViews.includes(item.view);
-          const selectedClass = selected ? 'bg-primary text-white' : '';
-          return omo.html`
+        const selected = this.selectedViews.includes(item.view);
+        const selectedClass = selected ? 'bg-primary text-white' : '';
+        return omo.html`
         <li @click="${() =>
           this.viewSelected(
             item.view
           )}" class="px-2 py-1 font-semibold text-base hover:bg-primary hover:text-white leading-tight truncate ${selectedClass}">
           ${item.display}</li>
         `;
-        })}
+      })}
         </ul>
     </div>
     `;
   }
 
- 
   static get model(): any {
     return super.model;
-
   }
   static get properties(): any {
     return super.properties;

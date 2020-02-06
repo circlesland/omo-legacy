@@ -11,7 +11,8 @@ export default class CodeEditor extends DragableQuant {
     return {
       hash: {
         type: 'string'
-      }, name: {
+      },
+      name: {
         type: 'string'
       },
       project: {
@@ -77,7 +78,7 @@ export default class CodeEditor extends DragableQuant {
       }
     });
   }
-  public async loadHash() {
+  public async loadHash(): Promise<void> {
     this.editor.source = (await omo.ipfs.cat(this.hash)).toString();
   }
 
@@ -125,7 +126,9 @@ export default class CodeEditor extends DragableQuant {
     this.project = meta.project;
     this.name = meta.name;
     this.version = this.version === 'undefined' ? meta.version : this.version;
-    this.editor.source = await omo.quantum.loadFromThreadByName(this.quant, this.version);
-
+    this.editor.source = await omo.quantum.loadFromThreadByName(
+      this.quant,
+      this.version
+    );
   }
 }

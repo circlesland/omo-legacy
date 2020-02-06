@@ -39,7 +39,6 @@ export default class Editor extends DragableQuant {
     }
   }
 
-
   public mode: any;
   public theme: any;
   private _src: any;

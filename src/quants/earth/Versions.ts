@@ -81,7 +81,7 @@ export default class Versions extends DesignerContext {
       }
     });
   }
-  
+
   public async UpdateVersion(): Promise<void> {
     this.versions =
       this.quantName !== undefined

@@ -11,8 +11,8 @@ export default class SplitView extends DesignerContext {
     :host .splitView{
       display:grid;
       grid-template-rows: ${this.selectedViews.map(
-      () => omo.html` ${(1 / this.selectedViews.length) * 100}%`
-    )};
+        () => omo.html` ${(1 / this.selectedViews.length) * 100}%`
+      )};
     }
     </style>
     <div class="actions"></div>
@@ -39,14 +39,18 @@ export default class SplitView extends DesignerContext {
   public addChildren(): void {
     this.clear();
     this.selectedViews.forEach(view => {
-      const newElem: HTMLElement = view === 'default'
-        ? document.createElement(this.quantName)
-        : document.createElement(view);
+      const newElem: HTMLElement =
+        view === 'default'
+          ? document.createElement(this.quantName)
+          : document.createElement(view);
       newElem.slot = view;
-      if (view.startsWith("omo-earth-codeeditor")) {
+      if (view.startsWith('omo-earth-codeeditor')) {
         newElem.addEventListener(
           'quantSaved',
-          () => { alert("saved"); this.dispatchEvent(new CustomEvent('quantSaved')) },
+          () => {
+            alert('saved');
+            this.dispatchEvent(new CustomEvent('quantSaved'));
+          },
           false
         );
       }
@@ -61,12 +65,15 @@ export default class SplitView extends DesignerContext {
 
       if (viewProperties) {
         this.childNodes.forEach(node => {
-          if (node.nodeName.toLowerCase() === view.toLowerCase() && node.nodeType === Node.ELEMENT_NODE) {
+          if (
+            node.nodeName.toLowerCase() === view.toLowerCase() &&
+            node.nodeType === Node.ELEMENT_NODE
+          ) {
             Object.keys(viewProperties).forEach(key =>
               (node as HTMLElement).setAttribute(key, this[viewProperties[key]])
             );
           }
-        })
+        });
       }
     });
   }

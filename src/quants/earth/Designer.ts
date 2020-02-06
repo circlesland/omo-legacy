@@ -1,9 +1,9 @@
 import QuantLoadedEvent from '../../kernel/events/QuantLoadedEvent';
 import DesignerContext from './DesignerContext';
 import QuantaList from './QuantaList';
+import SplitView from './SplitView';
 import Versions from './Versions';
 import ViewsChooser from './ViewsChooser';
-import SplitView from './SplitView';
 export default class Designer extends DesignerContext {
   private splitView: SplitView;
   private versions: Versions;
@@ -21,17 +21,27 @@ export default class Designer extends DesignerContext {
 
   public render(): void {
     return omo.html`
-        <omo-earth-quantaList quantName="${this.quantName}"></omo-earth-quantaList>
-        <omo-earth-contextSwitch quantName="${this.quantName}" versionName="${this.versionName}"></omo-earth-contextSwitch>
-        <omo-earth-viewsChooser availableViews="${JSON.stringify(this.availableViews)}"
-          selectedViews="${JSON.stringify(this.selectedViews)}">
+        <omo-earth-quantaList quantName="${
+          this.quantName
+        }"></omo-earth-quantaList>
+        <omo-earth-contextSwitch quantName="${this.quantName}" versionName="${
+      this.versionName
+    }"></omo-earth-contextSwitch>
+        <omo-earth-viewsChooser availableViews="${JSON.stringify(
+          this.availableViews
+        )}" selectedViews="${JSON.stringify(this.selectedViews)}">
         </omo-earth-viewsChooser>
         <omo-earth-data></omo-earth-data>
         <omo-earth-actions></omo-earth-actions>
-        <omo-earth-versions quantName="${this.quantName}" versionHash="${this.versionId}" versionName="${this.versionName}">
+        <omo-earth-versions quantName="${this.quantName}" versionHash="${
+      this.versionId
+    }" versionName="${this.versionName}">
         </omo-earth-versions>
-        <omo-earth-splitView quantName="${this.quantName}" versionHash="${this.versionHash}"
-          availableViews="${JSON.stringify(this.availableViews)}" selectedViews="${JSON.stringify(this.selectedViews)}">
+        <omo-earth-splitView quantName="${this.quantName}" versionHash="${
+      this.versionHash
+    }" availableViews="${JSON.stringify(
+      this.availableViews
+    )}" selectedViews="${JSON.stringify(this.selectedViews)}">
         </omo-earth-splitView>
     `;
   }
@@ -62,7 +72,6 @@ export default class Designer extends DesignerContext {
       this.quantSaved.bind(this),
       false
     );
-
   }
 
   private quantSaved(): void {
@@ -72,18 +81,25 @@ export default class Designer extends DesignerContext {
 
   private quantSelected(): void {
     this.quantName = this.quantaList.quantName;
-    this.versionName = "latest";
-    this.versionHash = "";
-    this.availableViews = [{
-      display: 'Code',
-      properties: { quant: 'quantName', version: 'versionName', hash: 'versionHash' },
-      view: "omo-earth-codeeditor"
-    }, {
-      display: 'Default',
-      properties: {},
-      view: "default"
-    }]
-    this.selectedViews = ["omo-earth-codeeditor"]
+    this.versionName = 'latest';
+    this.versionHash = undefined;
+    this.availableViews = [
+      {
+        display: 'Code',
+        properties: {
+          hash: 'versionHash',
+          quant: 'quantName',
+          version: 'versionName'
+        },
+        view: 'omo-earth-codeeditor'
+      },
+      {
+        display: 'Default',
+        properties: {},
+        view: 'default'
+      }
+    ];
+    this.selectedViews = ['omo-earth-codeeditor'];
   }
 
   private versionSelected(): void {
