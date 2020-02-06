@@ -7,6 +7,7 @@ export default class DesignerContext extends DragableQuant {
   public selectedViews: any[];
   public versionId: string | undefined;
   public versionName: string | undefined;
+  public versionHash: string | undefined;
 
   constructor() {
     super();
@@ -27,7 +28,7 @@ export default class DesignerContext extends DragableQuant {
   static get model(): any {
     return {
       availableViews: {
-        type: 'array'
+        type: 'object'
       },
       quantName: {
         type: 'string'

@@ -35,6 +35,12 @@ export default class Quant extends LitElement {
     const props = JSON.parse(JSON.stringify(this.model));
     Object.keys(props).map((key: any) => {
       const item = props[key];
+      if (item.type === 'array') {
+        item.type = Array;
+      }
+      if (item.type === 'object') {
+        item.type = Object;
+      }
       if (item.type === 'property') {
         item.type = 'object';
       }

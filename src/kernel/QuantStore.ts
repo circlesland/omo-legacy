@@ -108,13 +108,13 @@ export class QuantStore {
     }
     console.error('Quant not loaded');
   }
-  public async loadFromThreadByName(name: string): Promise<string> {
+  public async loadFromThreadByName(name: string, version: string): Promise<string> {
     const meta = this.listener.getMeta(name);
     return this.loadFromThread(
       meta.author,
       meta.project,
       meta.name,
-      meta.version
+      version !== "" ? version : meta.version
     );
   }
   public async loadFromThread(
@@ -130,6 +130,7 @@ export class QuantStore {
     let modelName = this.QuantaModelName;
 
     if (version !== 'latest') {
+      alert(version);
       this.andFilter(query, 'version', version);
       modelName = this.VersionModelName;
     }
@@ -496,7 +497,7 @@ export class QuantStore {
   ): void {
     omo.quantum.quanta[author][project][name][version] = { quant, hash };
     window.customElements.define(hash.toTag(), quant);
-    console.log('Custom element registered: ', hash.toTag());
+    // console.log('Custom element registered: ', hash.toTag());
   }
 
   public getQuantName(

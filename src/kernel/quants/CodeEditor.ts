@@ -1,13 +1,17 @@
 import DragableQuant from './DragableQuant';
+import Editor from './Editor';
 
 export default class CodeEditor extends DragableQuant {
   public author: any;
   public project: any;
   public name: any;
   public version: any;
+  public hash: any;
   public static get model(): any {
     return {
-      name: {
+      hash: {
+        type: 'string'
+      }, name: {
         type: 'string'
       },
       project: {
@@ -48,7 +52,7 @@ export default class CodeEditor extends DragableQuant {
     ];
   }
   public quant: string | undefined;
-  public editor: any;
+  public editor: Editor;
 
   constructor() {
     super();
@@ -56,19 +60,25 @@ export default class CodeEditor extends DragableQuant {
 
   public firstUpdated(changedProperties): void {
     super.firstUpdated(changedProperties);
-    this.editor = this.root.children[0];
+    this.editor = this.root.children[0] as Editor;
   }
 
   public updated(changedProperties: any): void {
     super.updated(changedProperties);
     changedProperties.forEach((_oldValue, propName) => {
       switch (propName) {
-        case 'versionId':
+        case 'hash':
+          this.loadHash();
+          break;
+        case 'version':
         case 'quant':
           this.loadCode();
           break;
       }
     });
+  }
+  public async loadHash() {
+    this.editor.source = (await omo.ipfs.cat(this.hash)).toString();
   }
 
   public render(): void {
@@ -87,7 +97,6 @@ export default class CodeEditor extends DragableQuant {
   }
 
   public async saveQuant(): Promise<void> {
-    console.log('before save');
     const author = this.root.querySelector(`input[name="author"]`)['value'];
     const project = this.root.querySelector(`input[name="project"]`)['value'];
     const name = this.root.querySelector(`input[name="name"]`)['value'];
@@ -101,10 +110,10 @@ export default class CodeEditor extends DragableQuant {
       project,
       name,
       version,
-      this.editor.code,
+      this.editor.source,
       commitMessage
     );
-    alert('quant uploaded');
+    this.dispatchEvent(new CustomEvent('quantSaved'));
   }
 
   private async loadCode(): Promise<void> {
@@ -115,8 +124,8 @@ export default class CodeEditor extends DragableQuant {
     this.author = meta.author;
     this.project = meta.project;
     this.name = meta.name;
-    this.version = meta.version;
-    await this.editor.initAsync();
-    this.editor.code = await omo.quantum.loadFromThreadByName(this.quant);
+    this.version = this.version === 'undefined' ? meta.version : this.version;
+    this.editor.source = await omo.quantum.loadFromThreadByName(this.quant, this.version);
+
   }
 }

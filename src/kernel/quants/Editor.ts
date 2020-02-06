@@ -4,10 +4,10 @@ import DragableQuant from './DragableQuant';
 export default class Editor extends DragableQuant {
   public static get model(): any {
     return {
-      code: {
+      mode: {
         type: 'string'
       },
-      mode: {
+      source: {
         type: 'string'
       },
       theme: {
@@ -26,30 +26,31 @@ export default class Editor extends DragableQuant {
       omo.css`:host{height:100%;width:100%;position:relative;} #editor{position:absolute;width:100%;height:100%;top:0;left:0;} input{display:inline;}`
     ];
   }
-  get code(): string {
+  get source(): string {
     if (this.editor !== undefined) {
       return this.editor.getValue();
     }
-    return this._code;
+    return this._src;
   }
-  set code(value) {
-    this._code = value;
-    if (this.editor !== undefined && this._code !== '') {
-      this.editor.setValue(this._code);
+  set source(value) {
+    this._src = value;
+    if (this.editor !== undefined && this._src !== '') {
+      this.editor.setValue(this._src);
     }
   }
 
+
   public mode: any;
   public theme: any;
-  private _code: any;
+  private _src: any;
   private editor: Ace.Editor;
   constructor() {
     super();
     if (this.mode === undefined) {
       this.mode = 'javascript';
     }
-    if (this.code === undefined) {
-      this.code = '';
+    if (this.source === undefined) {
+      this.source = '';
     }
   }
   public updated(changedProperties: any): void {
@@ -81,8 +82,8 @@ export default class Editor extends DragableQuant {
   public render(): void {
     return omo.html`<div id="editor"></div>`;
   }
-  public editorChanged(delta: Ace.Delta): void {
-    console.log(delta);
+  public editorChanged(_delta: Ace.Delta): void {
+    // console.log(delta);
   }
 
   private async initEditor(): Promise<void> {
@@ -94,8 +95,8 @@ export default class Editor extends DragableQuant {
 
   private configureEditor(elem: HTMLElement): void {
     this.editor = ace.edit(elem);
-    if (this.code !== undefined) {
-      this.editor.setValue(this.code);
+    if (this._src !== undefined) {
+      this.editor.setValue(this._src);
     }
     if (this.theme !== undefined) {
       this.editor.setTheme(`ace/theme/${this.theme}`);
@@ -104,16 +105,16 @@ export default class Editor extends DragableQuant {
       this.editor.session.setMode(`ace/mode/${this.mode}`);
     }
     this.editor.on('change', (delta: Ace.Delta) => this.editorChanged(delta));
-    this.editor.commands.addCommand({
-      bindKey: { win: 'Ctrl-S', mac: 'Command-S' },
-      exec: () => {
-        this.code = this.editor.getValue();
-        this.saveModel();
-        alert('quant saved');
-      },
-      name: 'myCommand',
-      readOnly: true // false if this command should not apply in readOnly mode
-    });
+    // this.editor.commands.addCommand({
+    //   bindKey: { win: 'Ctrl-S', mac: 'Command-S' },
+    //   exec: () => {
+    //     this.code = this.editor.getValue();
+    //     this.saveModel();
+    //     alert('quant saved');
+    //   },
+    //   name: 'myCommand',
+    //   readOnly: true // false if this command should not apply in readOnly mode
+    // });
     this.editor.commands.addCommand({
       bindKey: { win: 'Ctrl-1', mac: 'Command-1' },
       exec: () => {

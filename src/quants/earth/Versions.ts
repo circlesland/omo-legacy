@@ -41,7 +41,8 @@ export default class Versions extends DesignerContext {
               this.selectVersion(
                 version.ID,
                 version.versionName,
-                version.created
+                version.created,
+                version.code
               );
             }}" class="px-2 py-2 mb-1 hover--bg-primary hover--rounded-xl hover--text-white ${active}">
               ${latest}
@@ -64,6 +65,7 @@ export default class Versions extends DesignerContext {
     </div>
     `;
   }
+
   public async initAsync(): Promise<void> {
     super.initAsync();
   }
@@ -72,12 +74,14 @@ export default class Versions extends DesignerContext {
     super.updated(changedProperties);
     changedProperties.forEach((_oldValue, propName) => {
       switch (propName) {
+        case 'versionHash':
         case 'quantName':
           this.UpdateVersion();
           break;
       }
     });
   }
+  
   public async UpdateVersion(): Promise<void> {
     this.versions =
       this.quantName !== undefined
@@ -90,11 +94,13 @@ export default class Versions extends DesignerContext {
   public selectVersion(
     versionId: string,
     versionName: string,
-    versionCreated: number
+    versionCreated: number,
+    versionHash: string
   ): void {
     this.versionName =
       versionName !== '' ? versionName : versionCreated.toString();
     this.versionId = versionId;
+    this.versionHash = versionHash;
     this.dispatchEvent(new CustomEvent('versionSelected'));
   }
 }
