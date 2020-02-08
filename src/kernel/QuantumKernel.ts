@@ -23,6 +23,7 @@ export class QuantumKernel {
   public moment: any;
 
   constructor() {
+    console.debug("start creating kernel");
     this.ready = false;
     // this.logger = new Logger();
     Language.init();
@@ -40,7 +41,7 @@ export class QuantumKernel {
     // this.quanta.load(DragableQuant);
 
     // this.client = new Client("http://localhost:7006");
-    this.client = new Client('http://81.169.194.192:7006');
+    this.client = new Client({ host: 'http://81.169.194.192:7006' });
     const urlParams = new URLSearchParams(window.location.search);
     const storeId = urlParams.get('storeId');
     this.storeId = storeId == null ? '' : storeId;

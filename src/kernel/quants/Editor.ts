@@ -36,6 +36,7 @@ export default class Editor extends DragableQuant {
     this._src = value;
     if (this.editor !== undefined && this._src !== '') {
       this.editor.setValue(this._src);
+      this.editor.getSession().selection.clearSelection();
     }
   }
 
