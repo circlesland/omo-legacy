@@ -1,5 +1,6 @@
 import QuantLoadedEvent from '../../kernel/events/QuantLoadedEvent';
 import DesignerContext from './DesignerContext';
+import { ActionType } from './models/Action';
 import QuantaList from './QuantaList';
 import SplitView from './SplitView';
 import Versions from './Versions';
@@ -17,31 +18,32 @@ export default class Designer extends DesignerContext {
       QuantLoadedEvent.LOADED,
       this.quantLoaded.bind(this)
     );
+    this.actions = [{ Display: "new", Type: ActionType.Method }]
   }
 
   public render(): void {
     return omo.html`
         <omo-earth-quantaList quantName="${
-          this.quantName
-        }"></omo-earth-quantaList>
+              this.quantName
+              }"></omo-earth-quantaList>
         <omo-earth-contextSwitch quantName="${this.quantName}" versionName="${
-      this.versionName
-    }"></omo-earth-contextSwitch>
+              this.versionName
+              }"></omo-earth-contextSwitch>
         <omo-earth-viewsChooser availableViews="${JSON.stringify(
-          this.availableViews
-        )}" selectedViews="${JSON.stringify(this.selectedViews)}">
+                this.availableViews
+              )}" selectedViews="${JSON.stringify(this.selectedViews)}">
         </omo-earth-viewsChooser>
         <omo-earth-data></omo-earth-data>
-        <omo-earth-actions></omo-earth-actions>
+        <omo-earth-actions actions="${JSON.stringify(this.actions)}"></omo-earth-actions>
         <omo-earth-versions quantName="${this.quantName}" versionHash="${
-      this.versionId
-    }" versionName="${this.versionName}">
+              this.versionId
+              }" versionName="${this.versionName}">
         </omo-earth-versions>
         <omo-earth-splitView quantName="${this.quantName}" versionHash="${
-      this.versionHash
-    }" availableViews="${JSON.stringify(
-      this.availableViews
-    )}" selectedViews="${JSON.stringify(this.selectedViews)}">
+              this.versionHash
+              }" availableViews="${JSON.stringify(
+                this.availableViews
+              )}" selectedViews="${JSON.stringify(this.selectedViews)}">
         </omo-earth-splitView>
     `;
   }
@@ -100,6 +102,7 @@ export default class Designer extends DesignerContext {
       }
     ];
     this.selectedViews = ['omo-earth-codeeditor'];
+    this.actions = [{ Display: "new", Type: ActionType.Method }, { Display: "delete", Type: ActionType.Method }, { Display: "save", Type: ActionType.Method }]
   }
 
   private versionSelected(): void {
@@ -191,7 +194,7 @@ export default class Designer extends DesignerContext {
       @media (min-width:768px){
         :host{
           grid-template-columns: 16rem minmax(0, 1fr) 16rem;
-          grid-template-rows: auto auto 1fr auto;
+          grid-template-rows: auto auto minmax(0, 1fr) auto;
         }
       }
 
