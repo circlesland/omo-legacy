@@ -40,7 +40,7 @@ export class QuantumKernel {
     // window.customElements.define('omo-quant', DragableQuant);
     // this.quanta.load(DragableQuant);
 
-    // this.client = new Client("http://localhost:7006");
+    // this.client = new Client({ host: "http://localhost:7006" });
     this.client = new Client({ host: 'http://81.169.194.192:7006' });
     const urlParams = new URLSearchParams(window.location.search);
     const storeId = urlParams.get('storeId');

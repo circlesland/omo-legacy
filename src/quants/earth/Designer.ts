@@ -5,7 +5,9 @@ import QuantaList from './QuantaList';
 import SplitView from './SplitView';
 import Versions from './Versions';
 import ViewsChooser from './ViewsChooser';
+import Actions from './Actions';
 export default class Designer extends DesignerContext {
+  private actionView: Actions;
   private splitView: SplitView;
   private versions: Versions;
   private quantaList: QuantaList;
@@ -18,7 +20,7 @@ export default class Designer extends DesignerContext {
       QuantLoadedEvent.LOADED,
       this.quantLoaded.bind(this)
     );
-    this.actions = [{ Display: "new", Type: ActionType.Method }]
+    this.actions = [];//[{ Display: "new", Type: ActionType.Method, CallBack: () => { } }]
   }
 
   public render(): void {
@@ -34,7 +36,7 @@ export default class Designer extends DesignerContext {
               )}" selectedViews="${JSON.stringify(this.selectedViews)}">
         </omo-earth-viewsChooser>
         <omo-earth-data></omo-earth-data>
-        <omo-earth-actions actions="${JSON.stringify(this.actions)}"></omo-earth-actions>
+        <omo-earth-actions quantName="${this.quantName}"></omo-earth-actions>
         <omo-earth-versions quantName="${this.quantName}" versionHash="${
               this.versionId
               }" versionName="${this.versionName}">
@@ -47,13 +49,25 @@ export default class Designer extends DesignerContext {
         </omo-earth-splitView>
     `;
   }
+  public updated(changedProperties: any): void {
+    super.updated(changedProperties);
+    changedProperties.forEach((_oldValue, propName) => {
+      switch (propName) {
+        case 'actions':
+          console.log("AAAAAAAAction")
+          this.actionView.actions = this.actions;
+          break;
+      }
+    });
 
+  }
   public firstUpdated(changedProperties: any): void {
     super.firstUpdated(changedProperties);
     this.quantaList = this.root.querySelector('omo-earth-quantalist');
     this.versions = this.root.querySelector('omo-earth-versions');
     this.viewsChooser = this.root.querySelector('omo-earth-viewschooser');
     this.splitView = this.root.querySelector('omo-earth-splitview');
+    this.actionView = this.root.querySelector('omo-earth-actions');
     this.quantaList.addEventListener(
       'quantSelected',
       this.quantSelected.bind(this),
@@ -102,7 +116,11 @@ export default class Designer extends DesignerContext {
       }
     ];
     this.selectedViews = ['omo-earth-codeeditor'];
-    this.actions = [{ Display: "new", Type: ActionType.Method }, { Display: "delete", Type: ActionType.Method }, { Display: "save", Type: ActionType.Method }]
+    this.actions = [
+      { Display: "new", Type: ActionType.Method, CallBack: () => { console.log("new"); } },
+      { Display: "delete", Type: ActionType.Method, CallBack: () => omo.quantum.deleteQuant(this.quantName) }
+      // { Display: "save", Type: ActionType.Method, CallBack: () => { console.log("save"); } }
+    ];
   }
 
   private versionSelected(): void {

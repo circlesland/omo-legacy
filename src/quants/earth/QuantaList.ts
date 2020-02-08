@@ -26,8 +26,6 @@ export default class QuantaList extends DesignerContext {
                   <li @click="${
                     this.selectQuant
                   }" class="px-2 py-1 font-semibold text-base ${active} hover--bg-primary hover--text-white leading-tight truncate">${quantName}</li>
-                  <li><button @click="${() =>
-                    this.delete(quantName)}">del</button></li>
               `;
               })}
           </ul>
@@ -41,9 +39,6 @@ export default class QuantaList extends DesignerContext {
         ? undefined
         : event.srcElement['innerText'];
     this.dispatchEvent(new CustomEvent('quantSelected'));
-  }
-  public delete(quantName: string): void {
-    omo.quantum.deleteQuant(quantName);
   }
 
   static get styles(): any[] {
