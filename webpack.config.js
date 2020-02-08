@@ -11,6 +11,7 @@ module.exports = {
     },
     devServer: {
         contentBase: './dist'
+        // ,port: 8081
     },
     plugins: [
         new CleanWebpackPlugin(),

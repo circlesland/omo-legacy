@@ -36,12 +36,12 @@ export default class SplitView extends DesignerContext {
     });
   }
 
-  public addChildren(): void {
+  public async addChildren(): Promise<void> {
     this.clear();
     this.selectedViews.forEach(view => {
       const newElem: HTMLElement =
         view === 'default'
-          ? document.createElement(this.quantName)
+          ? this.getDefaultElement()
           : document.createElement(view);
       newElem.slot = view;
       if (view.startsWith('omo-earth-codeeditor')) {
@@ -76,6 +76,11 @@ export default class SplitView extends DesignerContext {
         });
       }
     });
+  }
+
+  private getDefaultElement(): HTMLElement {
+    omo.quantum.listener.loadQuantByHash(this.versionHash, this.quantName);
+    return document.createElement(this.versionHash.toTag());
   }
 
   static get styles(): any[] {

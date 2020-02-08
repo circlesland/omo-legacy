@@ -12,7 +12,7 @@ export default class Versions extends DesignerContext {
     };
   }
   static get styles(): any[] {
-    return [omo.theme];
+    return [omo.theme, omo.css/*css*/ `:host{overflow:scroll;}`];
   }
 
   public versions: Version[];

@@ -22,7 +22,7 @@ export class QuantStore {
   public QuantaModelName;
   public VersionModelName;
   public quanta: any;
-  private listener: QuantListener;
+  public listener: QuantListener;
   private loadedQuants: Array<{ hash: string; quant: any }>;
 
   constructor() {
@@ -108,6 +108,42 @@ export class QuantStore {
     }
     console.error('Quant not loaded');
   }
+  public async deleteQuant(quantName: string): Promise<void> {
+    const dialogResult = confirm(`Want to delete ${quantName}?`);
+    if (dialogResult) {
+      // Logic to delete the item
+      const meta = this.listener.getMeta(quantName);
+      let query = new Query();
+      this.andFilter(query, 'author', meta.author);
+      this.andFilter(query, 'project', meta.project);
+      this.andFilter(query, 'name', meta.name);
+
+      const result = await omo.client.modelFind(
+        this.QuantStoreId,
+        this.QuantaModelName,
+        query
+      );
+
+      query = new Query();
+      this.andFilter(query, 'quant', result.entitiesList[0].ID);
+      const toDelete = (
+        await omo.client.modelFind(
+          this.QuantStoreId,
+          this.VersionModelName,
+          query
+        )
+      ).entitiesList.map(item => item.ID);
+      await omo.client.modelDelete(
+        this.QuantStoreId,
+        this.VersionModelName,
+        toDelete
+      );
+      await omo.client.modelDelete(this.QuantStoreId, this.QuantaModelName, [
+        result.entitiesList[0].ID
+      ]);
+    }
+  }
+
   public async loadFromThreadByName(
     name: string,
     version: string
@@ -310,12 +346,14 @@ export class QuantStore {
     code: string,
     commitMessage: string
   ): Promise<void> {
+    const date = Date.now();
     const hash = await this.saveQuantToMFS(
       author,
       project,
       name,
       version,
-      code
+      code,
+      date
     );
     await this.CreateOrUpdateQuant(
       author,
@@ -323,7 +361,8 @@ export class QuantStore {
       name,
       hash,
       version,
-      commitMessage
+      commitMessage,
+      date
     );
   }
   public async saveQuantToMFS(
@@ -331,9 +370,12 @@ export class QuantStore {
     project: string,
     name: string,
     version: string,
-    code: string
+    code: string,
+    date: number
   ): Promise<string> {
-    const versionName = version === undefined ? new Date() : version;
+    const versionName = version === '' ? date.toString() : version;
+    alert(versionName);
+    alert(version);
     try {
       await omo.ipfs.files.mkdir(`/quanta`).catch();
     } catch {
@@ -356,34 +398,32 @@ export class QuantStore {
     } catch {
       /**/
     }
+    // try {
+    //   await omo.ipfs.files
+    //     .mkdir(`/quanta/${author}/${project}/${name}/${versionName}`)
+    //     .catch();
+    // } catch {
+    //   /**/
+    // }
     try {
       await omo.ipfs.files
-        .mkdir(`/quanta/${author}/${project}/${name}/${versionName}`)
+        .rm(`/quanta/${author}/${project}/${name}/${versionName}`)
         .catch();
     } catch {
       /**/
     }
     try {
       await omo.ipfs.files
-        .rm(`/quanta/${author}/${project}/${name}/${versionName}/${name}`)
-        .catch();
-    } catch {
-      /**/
-    }
-    try {
-      await omo.ipfs.files
-        .write(
-          `/quanta/${author}/${project}/${name}/${versionName}/${name}`,
-          code,
-          { create: true }
-        )
+        .write(`/quanta/${author}/${project}/${name}/${versionName}`, code, {
+          create: true
+        })
         .catch();
     } catch {
       /**/
     }
     return (
       await omo.ipfs.files.stat(
-        `/quanta/${author}/${project}/${name}/${versionName}/${name}`
+        `/quanta/${author}/${project}/${name}/${versionName}`
       )
     ).hash;
   }
@@ -393,7 +433,8 @@ export class QuantStore {
     name: string,
     code: string,
     version: string,
-    commitMessage: string
+    commitMessage: string,
+    date: number
   ): Promise<any> {
     const query = new Query();
     this.andFilter(query, 'author', author);
@@ -426,7 +467,7 @@ export class QuantStore {
       ID: '',
       code,
       commitMessage,
-      created: Date.now(),
+      created: date,
       quant: latestVersion.ID,
       versionName: version
     };
