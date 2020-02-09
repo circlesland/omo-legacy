@@ -23,7 +23,7 @@ export default class Designer extends DesignerContext {
 
   public render(): void {
     return omo.html`   
-   
+        <div class="nerdstatus">offline</div>
         <header class="w-100 bg-gray-200">
         <button class="px-3 hover:bg-green-400 uppercase font-semibold" @click="${() =>
           this.toggleClass('toggleLeft')}">
@@ -103,16 +103,21 @@ export default class Designer extends DesignerContext {
       :host {
         display: grid;
         grid-template-areas:
+          "status status status"
           "context context context"
           "nav main aside"
           "footer footer footer";
         grid-template-columns: 0px 1fr 0px;
-        grid-template-rows: auto 1fr auto;
+        grid-template-rows: 4px auto 1fr auto;
         height: 100%;
         width: 100%;
         overflow: hidden;
       }     
-
+      .nerdstatus {
+        background: #cd2626;
+        grid-area: status; 
+      }
+      
       header { grid-area: context; 
         display: flex;
         justify-content: space-between;
@@ -181,7 +186,7 @@ export default class Designer extends DesignerContext {
         }
       }
 
-      @media(min-width:900px){
+      @media(min-width:1200px){
         :host{
           grid-template-columns: 250px 1fr 250px;
         }
