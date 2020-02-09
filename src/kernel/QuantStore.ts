@@ -31,7 +31,11 @@ export class QuantStore {
 
   public async all(): Promise<any> {
     return (
-      await omo.textileThreads.modelFind(this.QuantStoreId, this.QuantaModelName, {})
+      await omo.textileThreads.modelFind(
+        this.QuantStoreId,
+        this.QuantaModelName,
+        {}
+      )
     ).entitiesList;
   }
   public async versions(name): Promise<Version[]> {
@@ -138,9 +142,11 @@ export class QuantStore {
         this.VersionModelName,
         toDelete
       );
-      await omo.textileThreads.modelDelete(this.QuantStoreId, this.QuantaModelName, [
-        result.entitiesList[0].ID
-      ]);
+      await omo.textileThreads.modelDelete(
+        this.QuantStoreId,
+        this.QuantaModelName,
+        [result.entitiesList[0].ID]
+      );
     }
   }
 
@@ -455,9 +461,11 @@ export class QuantStore {
     // New Version
     if (result.entitiesList.length === 0) {
       const newQuant = { author, name, project, ID: '', latest: '' };
-      await omo.textileThreads.modelCreate(this.QuantStoreId, this.QuantaModelName, [
-        newQuant
-      ]);
+      await omo.textileThreads.modelCreate(
+        this.QuantStoreId,
+        this.QuantaModelName,
+        [newQuant]
+      );
       latestVersion = newQuant;
     } else {
       latestVersion = result.entitiesList[0];
@@ -471,13 +479,17 @@ export class QuantStore {
       quant: latestVersion.ID,
       versionName: version
     };
-    await omo.textileThreads.modelCreate(this.QuantStoreId, this.VersionModelName, [
-      newVersion
-    ]);
+    await omo.textileThreads.modelCreate(
+      this.QuantStoreId,
+      this.VersionModelName,
+      [newVersion]
+    );
     latestVersion.latest = newVersion.ID;
-    await omo.textileThreads.modelSave(this.QuantStoreId, this.QuantaModelName, [
-      latestVersion
-    ]);
+    await omo.textileThreads.modelSave(
+      this.QuantStoreId,
+      this.QuantaModelName,
+      [latestVersion]
+    );
     // Finally replace loaded Version or add version to DOM
     // this.listener.ReplaceVersion(author, project, name, version, code);
   }

@@ -23,7 +23,7 @@ export class QuantumKernel {
   public moment: any;
 
   constructor() {
-    console.debug("start creating kernel");
+    console.debug('start creating kernel');
     this.ready = false;
     // this.logger = new Logger();
     Language.init();

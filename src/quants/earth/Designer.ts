@@ -1,12 +1,12 @@
 import QuantLoadedEvent from '../../kernel/events/QuantLoadedEvent';
+import Actions from './Actions';
 import DesignerContext from './DesignerContext';
+import { ActionType } from './models/Action';
 // import { ActionType } from './models/Action';
 import QuantaList from './QuantaList';
 import SplitView from './SplitView';
 import Versions from './Versions';
 import ViewsChooser from './ViewsChooser';
-import Actions from './Actions';
-import { ActionType } from './models/Action';
 
 export default class Designer extends DesignerContext {
   private splitView: SplitView;
@@ -15,7 +15,6 @@ export default class Designer extends DesignerContext {
   private viewsChooser: ViewsChooser;
   private actionView: Actions;
 
-
   constructor() {
     super();
     this.autosave = false;
@@ -23,7 +22,7 @@ export default class Designer extends DesignerContext {
       QuantLoadedEvent.LOADED,
       this.quantLoaded.bind(this)
     );
-    this.actions = [];//[{ Display: "new", Type: ActionType.Method, CallBack: () => { } }]
+    this.actions = []; // [{ Display: "new", Type: ActionType.Method, CallBack: () => { } }]
   }
 
   public render(): void {
@@ -31,7 +30,7 @@ export default class Designer extends DesignerContext {
         <div class="nerdstatus"></div>
         <header class="w-100 bg-gray-200">
           <button class="px-3 hover:bg-green-400 uppercase font-semibold" @click="${() =>
-                this.toggleClass('toggleLeft')}">
+            this.toggleClass('toggleLeft')}">
         
             <svg width="18px" height="15px" viewBox="0 0 18 15" version="1.1" xmlns="http://www.w3.org/2000/svg"
               xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -45,10 +44,10 @@ export default class Designer extends DesignerContext {
         
           </button>
           <omo-earth-contextSwitch quantName="${this.quantName}" versionName="${
-              this.versionName
-              }"></omo-earth-contextSwitch>
+      this.versionName
+    }"></omo-earth-contextSwitch>
           <button class="px-2 hover:bg-green-400 uppercase font-semibold" @click="${() =>
-                this.toggleClass('toggleRight')}">
+            this.toggleClass('toggleRight')}">
             <svg width="18px" height="15px" viewBox="0 0 18 15" version="1.1" xmlns="http://www.w3.org/2000/svg"
               xmlns:xlink="http://www.w3.org/1999/xlink">
               <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -65,7 +64,7 @@ export default class Designer extends DesignerContext {
           <div class="navtop px-8 py-6 bg-gray-100">
             <omo-earth-quantaList quantName="${
               this.quantName
-              }"></omo-earth-quantaList>
+            }"></omo-earth-quantaList>
           </div>
           <div class="navbottom px-8 py-6 bg-gray-100">
             </omo-earth-quantaList>
@@ -75,24 +74,24 @@ export default class Designer extends DesignerContext {
         
         <main>
           <omo-earth-splitView quantName="${this.quantName}" versionHash="${
-              this.versionHash
-              }" availableViews="${JSON.stringify(
-                this.availableViews
-              )}" selectedViews="${JSON.stringify(this.selectedViews)}">
+      this.versionHash
+    }" availableViews="${JSON.stringify(
+      this.availableViews
+    )}" selectedViews="${JSON.stringify(this.selectedViews)}">
           </omo-earth-splitView>
         </main>
         
         <aside>
           <div class="asidetop px-8 py-6 bg-gray-100">
             <omo-earth-viewsChooser availableViews="${JSON.stringify(
-                this.availableViews
-              )}" selectedViews="${JSON.stringify(this.selectedViews)}">
+              this.availableViews
+            )}" selectedViews="${JSON.stringify(this.selectedViews)}">
             </omo-earth-viewsChooser>
           </div>
           <div class="asidebottom px-8 py-6 bg-gray-100">
             <omo-earth-versions quantName="${this.quantName}" versionHash="${
-              this.versionId
-              }" versionName="${this.versionName}">
+      this.versionId
+    }" versionName="${this.versionName}">
             </omo-earth-versions>
           </div>
         </aside>
@@ -219,7 +218,7 @@ export default class Designer extends DesignerContext {
     ];
   }
 
-  toggleClass(toggle) {
+  public toggleClass(toggle: string): void {
     if (this.classList.contains(toggle)) {
       this.classList.remove(toggle);
     } else {
@@ -235,7 +234,6 @@ export default class Designer extends DesignerContext {
           break;
       }
     });
-
   }
   public firstUpdated(changedProperties: any): void {
     super.firstUpdated(changedProperties);
@@ -293,8 +291,18 @@ export default class Designer extends DesignerContext {
     ];
     this.selectedViews = ['omo-earth-codeeditor'];
     this.actions = [
-      { Display: "new", Type: ActionType.Method, CallBack: () => { console.log("new"); } },
-      { Display: "delete", Type: ActionType.Method, CallBack: () => omo.quantum.deleteQuant(this.quantName) }
+      {
+        CallBack: () => {
+          console.log('new');
+        },
+        Display: 'new',
+        Type: ActionType.Method
+      },
+      {
+        CallBack: () => omo.quantum.deleteQuant(this.quantName),
+        Display: 'delete',
+        Type: ActionType.Method
+      }
       // { Display: "save", Type: ActionType.Method, CallBack: () => { console.log("save"); } }
     ];
   }

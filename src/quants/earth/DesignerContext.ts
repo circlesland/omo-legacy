@@ -9,7 +9,7 @@ export default class DesignerContext extends DragableQuant {
   public versionId: string | undefined;
   public versionName: string | undefined;
   public versionHash: string | undefined;
-  public actions: Action[]
+  public actions: Action[];
 
   constructor() {
     super();

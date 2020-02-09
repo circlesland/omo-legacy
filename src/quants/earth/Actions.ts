@@ -9,11 +9,12 @@ export default class Actions extends DesignerContext {
 
     return omo.html`
       <div class="-100 px-1 p px-4 py-2y-2">
-        ${this.actions.map(action => omo.html`
+        ${this.actions.map(
+          action => omo.html`
         <button @click="${action.CallBack}"
           class="x-4 py-2 border-2 text-green-400 border-green-400 rounded-sm hover:bg-green-400 uppercase font-semibold">${action.Display}</button>
         `
-      )}
+        )}
       </div>
     `;
   }
