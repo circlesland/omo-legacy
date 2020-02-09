@@ -9,29 +9,27 @@ export default class QuantaList extends DesignerContext {
   }
 
   public render(): void {
-    return omo.html`
-      <div class="h-full px-8 py-6 bg-gray-200 w-1/5">
-          <p class="uppercase text-gray-600 text-xs font-semibold">Quanta</p>
-          <ul class="">
-              ${this.quanta.map((quant: any) => {
-                const quantName = omo.quantum.getQuantName(
-                  quant.author,
-                  quant.project,
-                  quant.name,
-                  quant.version
-                );
-                const active =
-                  quantName === this.quantName ? 'bg-primary text-white' : '';
-                return omo.html`         
-                  <li @click="${
-                    this.selectQuant
-                  }" class="px-2 py-1 font-semibold text-base ${active} hover--bg-primary hover--text-white leading-tight truncate">${quantName}</li>
-                  <li><button @click="${() =>
-                    this.delete(quantName)}">del</button></li>
-              `;
-              })}
-          </ul>
-      </div>
+    return omo.html` 
+      <p class="uppercase text-gray-600 text-xs font-semibold">Quanta</p>
+      <ul class="">
+          ${this.quanta.map((quant: any) => {
+            const quantName = omo.quantum.getQuantName(
+              quant.author,
+              quant.project,
+              quant.name,
+              quant.version
+            );
+            const active =
+              quantName === this.quantName ? 'bg-primary text-white' : '';
+            return omo.html`         
+              <li @click="${
+                this.selectQuant
+              }" class="px-2 py-1 font-semibold text-base ${active} hover--bg-primary hover--text-white leading-tight truncate">${quantName}</li>
+              <li><button @click="${() =>
+                this.delete(quantName)}">del</button></li>
+          `;
+          })}
+      </ul>
     `;
   }
 

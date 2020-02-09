@@ -6,11 +6,13 @@ export default class Actions extends DesignerContext {
   }
   public render(): void {
     return omo.html`
-      <div class="bg-gray-100 px-4 py-2">
-        ${this.actions.map(action => omo.html`
+      <div class="w-full bg-gray-200">
+        ${this.actions.map(
+          action => omo.html`
         <button
-          class="px-4 py-2 border-2 text-green-400 border-green-400 rounded-sm hover:bg-green-400 uppercase font-semibold">${action.Display}</button>
-        `)}
+          class="px-2 border-2 text-green-400 border-green-400 rounded-sm hover:bg-green-400 uppercase font-semibold">${action.Display}</button>
+        `
+        )}
       </div>
     `;
   }

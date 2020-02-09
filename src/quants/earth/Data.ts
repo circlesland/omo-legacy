@@ -6,7 +6,7 @@ export default class Data extends DragableQuant {
   }
   public render(): void {
     return omo.html`
-        <div class="h-full px-8 py-6 bg-gray-200 w-1/5">
+        <div class="">
           <p class="mt-8 uppercase text-gray-600 text-xs font-semibold">
             Quanta Data
           </p>

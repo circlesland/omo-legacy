@@ -8,9 +8,9 @@ export default class ViewsChooser extends DesignerContext {
   }
   public render(): void {
     return omo.html`
-    <div class="h-full px-8 py-6 bg-gray-200 w-1/5 text-right">
+    <div class="text-right">
       <p class="uppercase text-gray-600 text-xs font-semibold">Views</p>
-      <ul class="">
+      <ul>
     
       ${this.availableViews.map(item => {
         const selected = this.selectedViews.includes(item.view);

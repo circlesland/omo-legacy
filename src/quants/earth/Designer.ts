@@ -18,34 +18,201 @@ export default class Designer extends DesignerContext {
       QuantLoadedEvent.LOADED,
       this.quantLoaded.bind(this)
     );
-    this.actions = [{ Display: "new", Type: ActionType.Method }]
+    this.actions = [{ Display: 'new', Type: ActionType.Method }];
   }
 
   public render(): void {
-    return omo.html`
-        <omo-earth-quantaList quantName="${
+    return omo.html`   
+   
+        <header class="w-100 bg-gray-200">
+        <button class="px-3 hover:bg-green-400 uppercase font-semibold" @click="${() =>
+          this.toggleClass('toggleLeft')}">
+          
+          <svg width="18px" height="15px" viewBox="0 0 18 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+              <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                  <g id="align-left" class="h-5 w-5 fill-current text-gray-600 hover:text-green-400"  fill-rule="nonzero">
+                      <path d="M0,0 L18,0 L18,3 L0,3 L0,0 Z M0,6 L18,6 L18,9 L0,9 L0,6 Z M0,12 L12,12 L12,15 L0,15 L0,12 Z" id="Shape"></path>
+                  </g>
+              </g>
+          </svg>
+
+          </button>
+          <omo-earth-contextSwitch quantName="${this.quantName}" versionName="${
+      this.versionName
+    }"></omo-earth-contextSwitch>
+      <button class="px-2 hover:bg-green-400 uppercase font-semibold" @click="${() =>
+        this.toggleClass('toggleRight')}">
+        <svg width="18px" height="15px" viewBox="0 0 18 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+              <g id="align-left" class="h-5 w-5 fill-current text-gray-600 hover:text-green-400"  fill-rule="nonzero">
+                  <path d="M0,0 L18,0 L18,3 L0,3 L0,0 Z M0,6 L18,6 L18,9 L0,9 L0,6 Z M6,12 L18,12 L18,15 L6,15 L6,12 Z" id="Shape"></path>
+              </g>
+          </g>
+        </svg>
+      </button>
+      </header> 
+        
+        <nav>
+          <div class="navtop px-8 py-6 bg-gray-100">
+            <omo-earth-quantaList quantName="${
               this.quantName
-              }"></omo-earth-quantaList>
-        <omo-earth-contextSwitch quantName="${this.quantName}" versionName="${
-              this.versionName
-              }"></omo-earth-contextSwitch>
-        <omo-earth-viewsChooser availableViews="${JSON.stringify(
-                this.availableViews
-              )}" selectedViews="${JSON.stringify(this.selectedViews)}">
-        </omo-earth-viewsChooser>
-        <omo-earth-data></omo-earth-data>
-        <omo-earth-actions actions="${JSON.stringify(this.actions)}"></omo-earth-actions>
-        <omo-earth-versions quantName="${this.quantName}" versionHash="${
-              this.versionId
-              }" versionName="${this.versionName}">
-        </omo-earth-versions>
-        <omo-earth-splitView quantName="${this.quantName}" versionHash="${
-              this.versionHash
-              }" availableViews="${JSON.stringify(
-                this.availableViews
-              )}" selectedViews="${JSON.stringify(this.selectedViews)}">
-        </omo-earth-splitView>
+            }"></omo-earth-quantaList>
+          </div>
+          <div class="navbottom px-8 py-6 bg-gray-100">
+            </omo-earth-quantaList>
+            <omo-earth-data></omo-earth-data>
+          </div>
+        </nav>
+
+        <main>
+         <omo-earth-splitView quantName="${this.quantName}" versionHash="${
+      this.versionHash
+    }" availableViews="${JSON.stringify(
+      this.availableViews
+    )}" selectedViews="${JSON.stringify(this.selectedViews)}">
+          </omo-earth-splitView> 
+        </main>
+
+        <aside>
+          <div class="asidetop px-8 py-6 bg-gray-100">
+            <omo-earth-viewsChooser availableViews="${JSON.stringify(
+              this.availableViews
+            )}" selectedViews="${JSON.stringify(this.selectedViews)}">
+            </omo-earth-viewsChooser>
+          </div> 
+          <div class="asidebottom px-8 py-6 bg-gray-100">
+            <omo-earth-versions quantName="${this.quantName}" versionHash="${
+      this.versionId
+    }" versionName="${this.versionName}">
+            </omo-earth-versions>
+          </div>
+        </aside>
+
+        <footer class="bg-gray-200 p-2">
+            <omo-earth-actions actions="${JSON.stringify(
+              this.actions
+            )}"></omo-earth-actions>
+        </footer>
     `;
+  }
+
+  public static get styles(): any {
+    return [
+      omo.theme,
+      omo.css/*css*/ `
+      :host {
+        display: grid;
+        grid-template-areas:
+          "context context context"
+          "nav main aside"
+          "footer footer footer";
+        grid-template-columns: 0px 1fr 0px;
+        grid-template-rows: auto 1fr auto;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+      }     
+
+      header { grid-area: context; 
+        display: flex;
+        justify-content: space-between;
+      }
+      nav { 
+        grid-area: nav; 
+        overflow: hidden;
+        display: grid;
+        grid-template-areas:
+          "navtop"
+          "navbottom";
+        grid-template-rows: 50% 50%;
+      }
+      .navtop {
+        grid-area: navtop;
+        overflow-y: scroll;
+      }
+      .navbottom {
+        grid-area: navbottom;
+        overflow-y: scroll;
+      }
+      main { grid-area: main; }
+      aside { 
+        grid-area: aside; 
+        overflow: hidden;
+        display: grid;
+        grid-template-areas:
+          "asidetop"
+          "asidebottom";
+        grid-template-rows: 50% 50%;
+      }
+      .asidetop {
+        grid-area: asidetop;
+        overflow-y: scroll;
+      }
+      .asidebottom {
+        grid-area: asidebottom;
+        overflow-y: scroll;
+      }
+      footer { grid-area: footer; }
+
+      :host(.toggleLeft){
+        grid-template-columns: 1fr 0px 0px;
+      }
+
+      :host(.toggleRight){
+          grid-template-columns: 0px 0px 1fr;
+      }
+
+      :host(.toggleRight.toggleLeft){
+          grid-template-columns: 0px 1fr 0px;
+        
+      }
+
+      @media(min-width:768px){
+        :host{
+          grid-template-columns: 0px 1fr 250px;
+        }
+        
+        :host(.toggleLeft) {
+          grid-template-columns: 250px 1fr 0px;
+        }
+        
+        :host(.toggleRight){
+          grid-template-columns: 0px 1fr 0px;
+        }
+      }
+
+      @media(min-width:900px){
+        :host{
+          grid-template-columns: 250px 1fr 250px;
+        }
+        :host(.toggleRight){
+          grid-template-columns: 250px 1fr 0px;
+        }
+        :host(.toggleLeft){
+          grid-template-columns: 0px 1fr 250px;
+        }
+        :host(.toggleLeft.toggleRight) {
+          grid-template-columns: 0px 1fr 0px;
+        }    
+      }
+      
+      /*omo-earth-quantalist {grid-area:nav;}
+      omo-earth-data {grid-area:nav;}
+      omo-earth-actions {grid-area:actions;}
+      omo-earth-viewschooser {grid-area:aside;}
+      omo-earth-versions {grid-area:aside;}
+      omo-earth-splitview {grid-area:main;}
+      omo-earth-contextswitch {grid-area:context;}*/
+      `
+    ];
+  }
+
+  toggleClass(toggle) {
+    if (this.classList.contains(toggle)) {
+      this.classList.remove(toggle);
+    } else {
+      this.classList.add(toggle);
+    }
   }
 
   public firstUpdated(changedProperties: any): void {
@@ -102,7 +269,11 @@ export default class Designer extends DesignerContext {
       }
     ];
     this.selectedViews = ['omo-earth-codeeditor'];
-    this.actions = [{ Display: "new", Type: ActionType.Method }, { Display: "delete", Type: ActionType.Method }, { Display: "save", Type: ActionType.Method }]
+    this.actions = [
+      { Display: 'new', Type: ActionType.Method },
+      { Display: 'delete', Type: ActionType.Method },
+      { Display: 'save', Type: ActionType.Method }
+    ];
   }
 
   private versionSelected(): void {
@@ -175,37 +346,4 @@ export default class Designer extends DesignerContext {
   // this.splitView.append(codeEditor);
 
   // }
-
-  public static get styles(): any {
-    return [
-      omo.theme,
-      omo.css/*css*/ `
-      :host{
-        height: 100%;
-        display: grid;
-        grid-template-areas: 
-          "quanta nav views"
-          "quanta split views"
-          "data split versions"
-          "data actions versions";
-          grid-template-columns: 10px minmax(0, 1fr) 10px;
-
-      }
-      @media (min-width:768px){
-        :host{
-          grid-template-columns: 16rem minmax(0, 1fr) 16rem;
-          grid-template-rows: auto auto minmax(0, 1fr) auto;
-        }
-      }
-
-      omo-earth-data {grid-area:data;}
-      omo-earth-actions {grid-area:actions;}
-      omo-earth-versions {grid-area:versions;}
-      omo-earth-splitview {grid-area:split;}
-      omo-earth-quantalist {grid-area:quanta;}
-      my-element,
-      omo-earth-viewschooser {grid-area:views;}
-      omo-earth-contextswitch {grid-area:nav;}`
-    ];
-  }
 }
