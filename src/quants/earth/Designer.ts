@@ -23,7 +23,7 @@ export default class Designer extends DesignerContext {
 
   public render(): void {
     return omo.html`   
-        <div class="nerdstatus">offline</div>
+        <div class="nerdstatus"></div>
         <header class="w-100 bg-gray-200">
         <button class="px-3 hover:bg-green-400 uppercase font-semibold" @click="${() =>
           this.toggleClass('toggleLeft')}">
@@ -89,9 +89,9 @@ export default class Designer extends DesignerContext {
         </aside>
 
         <footer class="bg-gray-200 p-2">
-            <omo-earth-actions actions="${JSON.stringify(
-              this.actions
-            )}"></omo-earth-actions>
+          <omo-earth-actions actions="${JSON.stringify(
+            this.actions
+          )}"></omo-earth-actions>
         </footer>
     `;
   }
@@ -108,7 +108,7 @@ export default class Designer extends DesignerContext {
           "nav main aside"
           "footer footer footer";
         grid-template-columns: 0px 1fr 0px;
-        grid-template-rows: px auto 1fr auto;
+        grid-template-rows: 4px auto 1fr auto;
         height: 100%;
         width: 100%;
         overflow: hidden;
