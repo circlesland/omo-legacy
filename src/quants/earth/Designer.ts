@@ -231,7 +231,6 @@ export default class Designer extends DesignerContext {
     changedProperties.forEach((_oldValue, propName) => {
       switch (propName) {
         case 'actions':
-          console.log("AAAAAAAAction")
           this.actionView.actions = this.actions;
           break;
       }
