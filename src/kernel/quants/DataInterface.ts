@@ -48,7 +48,7 @@ export default class DataInterface extends Quant {
     modelName: string
   ): Promise<void> {
     try {
-      await window.omo.client.registerSchema(
+      await window.omo.textileThreads.registerSchema(
         window.omo.storeId,
         modelName,
         jsonSchema
@@ -176,7 +176,7 @@ export default class DataInterface extends Quant {
     if (
       this.entityId === undefined ||
       this.entityId === '' ||
-      !window.omo.client.modelHas(window.omo.storeId, this.modelName, [
+      !window.omo.textileThreads.modelHas(window.omo.storeId, this.modelName, [
         this.entityId
       ])
     ) {
@@ -187,7 +187,7 @@ export default class DataInterface extends Quant {
         }
       });
       entity = (
-        await window.omo.client.modelCreate(
+        await window.omo.textileThreads.modelCreate(
           window.omo.storeId,
           this.modelName,
           [entity]
@@ -198,7 +198,7 @@ export default class DataInterface extends Quant {
     this.updateModel({ entity: { ID: this.entityId } });
   }
   public startListenForDataChanges(): void {
-    window.omo.client.listen(
+    window.omo.textileThreads.listen(
       window.omo.storeId,
       this.modelName,
       this.entityId,
@@ -209,7 +209,7 @@ export default class DataInterface extends Quant {
     // TODO remove next line when textile fixed pubsub for listen changes on threads
     // if (result.entity.ID !== this.entityId) { return; }
     // tslint:disable-next-line: no-parameter-reassignment
-    result = await window.omo.client.modelFindByID(
+    result = await window.omo.textileThreads.modelFindByID(
       window.omo.storeId,
       this.modelName,
       this.entityId
@@ -247,7 +247,7 @@ export default class DataInterface extends Quant {
       model[key] = this[key];
     });
     if (Object.values(model).some(val => val !== undefined)) {
-      window.omo.client.modelSave(
+      window.omo.textileThreads.modelSave(
         window.omo.storeId,
         this.constructor._modelName,
         [model]
