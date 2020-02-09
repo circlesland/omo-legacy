@@ -5,11 +5,16 @@ import QuantaList from './QuantaList';
 import SplitView from './SplitView';
 import Versions from './Versions';
 import ViewsChooser from './ViewsChooser';
+import Actions from './Actions';
+import { ActionType } from './models/Action';
+
 export default class Designer extends DesignerContext {
   private splitView: SplitView;
   private versions: Versions;
   private quantaList: QuantaList;
   private viewsChooser: ViewsChooser;
+  private actionView: Actions;
+
 
   constructor() {
     super();
@@ -18,80 +23,82 @@ export default class Designer extends DesignerContext {
       QuantLoadedEvent.LOADED,
       this.quantLoaded.bind(this)
     );
-    // this.actions = [{ Display: 'new', Type: ActionType.Method , }];
+    this.actions = [];//[{ Display: "new", Type: ActionType.Method, CallBack: () => { } }]
   }
 
   public render(): void {
     return omo.html`   
         <div class="nerdstatus"></div>
         <header class="w-100 bg-gray-200">
-        <button class="px-3 hover:bg-green-400 uppercase font-semibold" @click="${() =>
-          this.toggleClass('toggleLeft')}">
-          
-          <svg width="18px" height="15px" viewBox="0 0 18 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+          <button class="px-3 hover:bg-green-400 uppercase font-semibold" @click="${() =>
+                this.toggleClass('toggleLeft')}">
+        
+            <svg width="18px" height="15px" viewBox="0 0 18 15" version="1.1" xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink">
               <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-                  <g id="align-left" class="h-5 w-5 fill-current text-gray-600 hover:text-green-400"  fill-rule="nonzero">
-                      <path d="M0,0 L18,0 L18,3 L0,3 L0,0 Z M0,6 L18,6 L18,9 L0,9 L0,6 Z M0,12 L12,12 L12,15 L0,15 L0,12 Z" id="Shape"></path>
-                  </g>
+                <g id="align-left" class="h-5 w-5 fill-current text-gray-600 hover:text-green-400" fill-rule="nonzero">
+                  <path d="M0,0 L18,0 L18,3 L0,3 L0,0 Z M0,6 L18,6 L18,9 L0,9 L0,6 Z M0,12 L12,12 L12,15 L0,15 L0,12 Z"
+                    id="Shape"></path>
+                </g>
               </g>
-          </svg>
-
+            </svg>
+        
           </button>
           <omo-earth-contextSwitch quantName="${this.quantName}" versionName="${
-      this.versionName
-    }"></omo-earth-contextSwitch>
-      <button class="px-2 hover:bg-green-400 uppercase font-semibold" @click="${() =>
-        this.toggleClass('toggleRight')}">
-        <svg width="18px" height="15px" viewBox="0 0 18 15" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-          <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-              <g id="align-left" class="h-5 w-5 fill-current text-gray-600 hover:text-green-400"  fill-rule="nonzero">
-                  <path d="M0,0 L18,0 L18,3 L0,3 L0,0 Z M0,6 L18,6 L18,9 L0,9 L0,6 Z M6,12 L18,12 L18,15 L6,15 L6,12 Z" id="Shape"></path>
+              this.versionName
+              }"></omo-earth-contextSwitch>
+          <button class="px-2 hover:bg-green-400 uppercase font-semibold" @click="${() =>
+                this.toggleClass('toggleRight')}">
+            <svg width="18px" height="15px" viewBox="0 0 18 15" version="1.1" xmlns="http://www.w3.org/2000/svg"
+              xmlns:xlink="http://www.w3.org/1999/xlink">
+              <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="align-left" class="h-5 w-5 fill-current text-gray-600 hover:text-green-400" fill-rule="nonzero">
+                  <path d="M0,0 L18,0 L18,3 L0,3 L0,0 Z M0,6 L18,6 L18,9 L0,9 L0,6 Z M6,12 L18,12 L18,15 L6,15 L6,12 Z"
+                    id="Shape"></path>
+                </g>
               </g>
-          </g>
-        </svg>
-      </button>
-      </header> 
+            </svg>
+          </button>
+        </header>
         
         <nav>
           <div class="navtop px-8 py-6 bg-gray-100">
             <omo-earth-quantaList quantName="${
               this.quantName
-            }"></omo-earth-quantaList>
+              }"></omo-earth-quantaList>
           </div>
           <div class="navbottom px-8 py-6 bg-gray-100">
             </omo-earth-quantaList>
             <omo-earth-data></omo-earth-data>
           </div>
         </nav>
-
+        
         <main>
-         <omo-earth-splitView quantName="${this.quantName}" versionHash="${
-      this.versionHash
-    }" availableViews="${JSON.stringify(
-      this.availableViews
-    )}" selectedViews="${JSON.stringify(this.selectedViews)}">
-          </omo-earth-splitView> 
+          <omo-earth-splitView quantName="${this.quantName}" versionHash="${
+              this.versionHash
+              }" availableViews="${JSON.stringify(
+                this.availableViews
+              )}" selectedViews="${JSON.stringify(this.selectedViews)}">
+          </omo-earth-splitView>
         </main>
-
+        
         <aside>
           <div class="asidetop px-8 py-6 bg-gray-100">
             <omo-earth-viewsChooser availableViews="${JSON.stringify(
-              this.availableViews
-            )}" selectedViews="${JSON.stringify(this.selectedViews)}">
+                this.availableViews
+              )}" selectedViews="${JSON.stringify(this.selectedViews)}">
             </omo-earth-viewsChooser>
-          </div> 
+          </div>
           <div class="asidebottom px-8 py-6 bg-gray-100">
             <omo-earth-versions quantName="${this.quantName}" versionHash="${
-      this.versionId
-    }" versionName="${this.versionName}">
+              this.versionId
+              }" versionName="${this.versionName}">
             </omo-earth-versions>
           </div>
         </aside>
-
+        
         <footer class="bg-gray-200 p-2">
-          <omo-earth-actions actions="${JSON.stringify(
-            this.actions
-          )}"></omo-earth-actions>
+          <omo-earth-actions quantName="${this.quantName}"></omo-earth-actions>
         </footer>
     `;
   }
@@ -219,13 +226,25 @@ export default class Designer extends DesignerContext {
       this.classList.add(toggle);
     }
   }
+  public updated(changedProperties: any): void {
+    super.updated(changedProperties);
+    changedProperties.forEach((_oldValue, propName) => {
+      switch (propName) {
+        case 'actions':
+          console.log("AAAAAAAAction")
+          this.actionView.actions = this.actions;
+          break;
+      }
+    });
 
+  }
   public firstUpdated(changedProperties: any): void {
     super.firstUpdated(changedProperties);
     this.quantaList = this.root.querySelector('omo-earth-quantalist');
     this.versions = this.root.querySelector('omo-earth-versions');
     this.viewsChooser = this.root.querySelector('omo-earth-viewschooser');
     this.splitView = this.root.querySelector('omo-earth-splitview');
+    this.actionView = this.root.querySelector('omo-earth-actions');
     this.quantaList.addEventListener(
       'quantSelected',
       this.quantSelected.bind(this),
@@ -274,11 +293,11 @@ export default class Designer extends DesignerContext {
       }
     ];
     this.selectedViews = ['omo-earth-codeeditor'];
-    // this.actions = [
-    //   { Display: 'new', Type: ActionType.Method },
-    //   { Display: 'delete', Type: ActionType.Method },
-    //   { Display: 'save', Type: ActionType.Method }
-    // ];
+    this.actions = [
+      { Display: "new", Type: ActionType.Method, CallBack: () => { console.log("new"); } },
+      { Display: "delete", Type: ActionType.Method, CallBack: () => omo.quantum.deleteQuant(this.quantName) }
+      // { Display: "save", Type: ActionType.Method, CallBack: () => { console.log("save"); } }
+    ];
   }
 
   private versionSelected(): void {
