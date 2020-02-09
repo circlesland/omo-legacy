@@ -1,6 +1,6 @@
 import QuantLoadedEvent from '../../kernel/events/QuantLoadedEvent';
 import DesignerContext from './DesignerContext';
-import { ActionType } from './models/Action';
+// import { ActionType } from './models/Action';
 import QuantaList from './QuantaList';
 import SplitView from './SplitView';
 import Versions from './Versions';
