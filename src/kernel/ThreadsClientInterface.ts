@@ -1,6 +1,9 @@
 import Client, { Entity, EntityList, JSONQuery } from "@textile/threads-client";
+// tslint:disable-next-line: no-submodule-imports no-implicit-dependencies
+import { NewStoreReply } from "@textile/threads-client-grpc/api_pb";
 
 export default class ThreadsClientInterface {
+
     public serverConnected: boolean;
     public localConnected: boolean;
 
@@ -63,12 +66,12 @@ export default class ThreadsClientInterface {
 
 
 
-    // public async newStore(): Promise<NewStoreReply.AsObject> {
-    //     const localStore = this.local.newStore();
-    //     const serverStore = this.server.newStore();
-    //     console.log(serverStore);
-    //     return serverStore;
-    // }
+    public async newStore(): Promise<NewStoreReply.AsObject> {
+        // const localStore = this.local.newStore();
+        const serverStore = this.server.newStore();
+        console.log(serverStore);
+        return serverStore;
+    }
 
     public async modelFind<T = any>(storeID: string, modelName: string, query: JSONQuery): Promise<EntityList<T>> {
         return this.server.modelFind(storeID, modelName, query);
@@ -127,7 +130,7 @@ export default class ThreadsClientInterface {
 
     private async getLocalStoreId(): Promise<string> {
         let id = window.localStorage.getItem("LocalStoreId");
-        if (id === undefined) {
+        if (id === null) {
             id = (await this.local.newStore()).id;
             window.localStorage.setItem("LocalStoreId", id)
         }

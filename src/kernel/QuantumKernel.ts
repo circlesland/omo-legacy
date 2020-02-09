@@ -38,14 +38,14 @@ export class QuantumKernel {
 
     this.textileThreads = new ThreadsClientInterface();
     // TODO implement with data
-    // const urlParams = new URLSearchParams(window.location.search);
-    // const storeId = urlParams.get('storeId');
-    // this.storeId = storeId == null ? '' : storeId;
-    // if (this.storeId === '') {
-    //   this.textileThreads.newStore().then(result => {
-    //     window.location.search += `storeId=${result.id}`;
-    //   });
-    // }
+    const urlParams = new URLSearchParams(window.location.search);
+    const storeId = urlParams.get('storeId');
+    this.storeId = storeId == null ? '' : storeId;
+    if (this.storeId === '') {
+      this.textileThreads.newStore().then(result => {
+        window.location.search += `storeId=${result.id}`;
+      });
+    }
     this.startClient();
   }
 
@@ -56,8 +56,8 @@ export class QuantumKernel {
     // this.ipfs = await IPFS.create();
     const ipfsClient = require('ipfs-http-client');
     this.ipfs = await ipfsClient({
-      // host: '81.169.194.192',
-      host: 'localhost',
+      host: '81.169.194.192',
+      // host: 'localhost',
       port: '5001',
       protocol: 'http'
     });
