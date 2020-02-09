@@ -5,6 +5,8 @@ export default class Actions extends DesignerContext {
     super();
   }
   public render(): void {
+    // tslint:disable: no-eval
+
     return omo.html`
       <div class="w-full bg-gray-200">
         ${this.actions.map(

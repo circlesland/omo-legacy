@@ -27,7 +27,7 @@ export default class QuantListener {
     if (splitted.length < 3) {
       throw Error(
         'Only quants with full identifier are accepted. Please use name like: author-project-name-version or author-project-name Your name was: ' +
-          src
+        src
       );
     }
 

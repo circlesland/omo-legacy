@@ -18,7 +18,7 @@ export default class Designer extends DesignerContext {
       QuantLoadedEvent.LOADED,
       this.quantLoaded.bind(this)
     );
-    this.actions = [{ Display: 'new', Type: ActionType.Method }];
+    // this.actions = [{ Display: 'new', Type: ActionType.Method , }];
   }
 
   public render(): void {
@@ -108,7 +108,7 @@ export default class Designer extends DesignerContext {
           "nav main aside"
           "footer footer footer";
         grid-template-columns: 0px 1fr 0px;
-        grid-template-rows: 4px auto 1fr auto;
+        grid-template-rows: px auto 1fr auto;
         height: 100%;
         width: 100%;
         overflow: hidden;
@@ -274,11 +274,11 @@ export default class Designer extends DesignerContext {
       }
     ];
     this.selectedViews = ['omo-earth-codeeditor'];
-    this.actions = [
-      { Display: 'new', Type: ActionType.Method },
-      { Display: 'delete', Type: ActionType.Method },
-      { Display: 'save', Type: ActionType.Method }
-    ];
+    // this.actions = [
+    //   { Display: 'new', Type: ActionType.Method },
+    //   { Display: 'delete', Type: ActionType.Method },
+    //   { Display: 'save', Type: ActionType.Method }
+    // ];
   }
 
   private versionSelected(): void {

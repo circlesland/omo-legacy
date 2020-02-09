@@ -31,7 +31,7 @@ export class QuantStore {
 
   public async all(): Promise<any> {
     return (
-      await omo.client.modelFind(this.QuantStoreId, this.QuantaModelName, {})
+      await omo.textileThreads.modelFind(this.QuantStoreId, this.QuantaModelName, {})
     ).entitiesList;
   }
   public async versions(name): Promise<Version[]> {
@@ -40,7 +40,7 @@ export class QuantStore {
     this.andFilter(query, 'quant', descriptor.ID);
     query = query.orderByDesc('created');
     return (
-      await omo.client.modelFind(
+      await omo.textileThreads.modelFind(
         this.QuantStoreId,
         this.VersionModelName,
         query
@@ -118,7 +118,7 @@ export class QuantStore {
       this.andFilter(query, 'project', meta.project);
       this.andFilter(query, 'name', meta.name);
 
-      const result = await omo.client.modelFind(
+      const result = await omo.textileThreads.modelFind(
         this.QuantStoreId,
         this.QuantaModelName,
         query
@@ -127,18 +127,18 @@ export class QuantStore {
       query = new Query();
       this.andFilter(query, 'quant', result.entitiesList[0].ID);
       const toDelete = (
-        await omo.client.modelFind(
+        await omo.textileThreads.modelFind(
           this.QuantStoreId,
           this.VersionModelName,
           query
         )
       ).entitiesList.map(item => item.ID);
-      await omo.client.modelDelete(
+      await omo.textileThreads.modelDelete(
         this.QuantStoreId,
         this.VersionModelName,
         toDelete
       );
-      await omo.client.modelDelete(this.QuantStoreId, this.QuantaModelName, [
+      await omo.textileThreads.modelDelete(this.QuantStoreId, this.QuantaModelName, [
         result.entitiesList[0].ID
       ]);
     }
@@ -173,7 +173,7 @@ export class QuantStore {
       this.andFilter(query, 'version', version);
       modelName = this.VersionModelName;
     }
-    const result = await omo.client.modelFind(
+    const result = await omo.textileThreads.modelFind(
       this.QuantStoreId,
       modelName,
       query
@@ -212,7 +212,7 @@ export class QuantStore {
     }
 
     try {
-      await omo.client.registerSchema(
+      await omo.textileThreads.registerSchema(
         this.QuantStoreId,
         this.QuantaModelName,
         this.quantaSchema
@@ -223,7 +223,7 @@ export class QuantStore {
       }
     }
     try {
-      await omo.client.registerSchema(
+      await omo.textileThreads.registerSchema(
         this.QuantStoreId,
         this.VersionModelName,
         this.versionSchema
@@ -442,7 +442,7 @@ export class QuantStore {
     this.andFilter(query, 'name', name);
 
     // Get latest Version
-    const result = await omo.client.modelFind(
+    const result = await omo.textileThreads.modelFind(
       this.QuantStoreId,
       this.QuantaModelName,
       query
@@ -455,7 +455,7 @@ export class QuantStore {
     // New Version
     if (result.entitiesList.length === 0) {
       const newQuant = { author, name, project, ID: '', latest: '' };
-      await omo.client.modelCreate(this.QuantStoreId, this.QuantaModelName, [
+      await omo.textileThreads.modelCreate(this.QuantStoreId, this.QuantaModelName, [
         newQuant
       ]);
       latestVersion = newQuant;
@@ -471,11 +471,11 @@ export class QuantStore {
       quant: latestVersion.ID,
       versionName: version
     };
-    await omo.client.modelCreate(this.QuantStoreId, this.VersionModelName, [
+    await omo.textileThreads.modelCreate(this.QuantStoreId, this.VersionModelName, [
       newVersion
     ]);
     latestVersion.latest = newVersion.ID;
-    await omo.client.modelSave(this.QuantStoreId, this.QuantaModelName, [
+    await omo.textileThreads.modelSave(this.QuantStoreId, this.QuantaModelName, [
       latestVersion
     ]);
     // Finally replace loaded Version or add version to DOM
@@ -642,7 +642,7 @@ export class QuantStore {
     this.andFilter(query, 'author', meta.author);
     this.andFilter(query, 'project', meta.project);
     this.andFilter(query, 'name', meta.name);
-    const response = await omo.client.modelFind(
+    const response = await omo.textileThreads.modelFind(
       this.QuantStoreId,
       this.QuantaModelName,
       query
@@ -650,7 +650,7 @@ export class QuantStore {
     return response.entitiesList[0];
   }
   private async getVersion(quantID: string): Promise<any> {
-    const result = await omo.client.modelFindByID(
+    const result = await omo.textileThreads.modelFindByID(
       this.QuantStoreId,
       this.VersionModelName,
       quantID

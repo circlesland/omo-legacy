@@ -55,7 +55,7 @@ export default class DesignerContext extends DragableQuant {
   }
 
   public listenToQuanta(): void {
-    omo.client.listen(
+    omo.textileThreads.listen(
       omo.quantum.QuantStoreId,
       omo.quantum.QuantaModelName,
       '',
