@@ -16,5 +16,3 @@ empowering paradigm shifting visionary technologies, startups and cooperations
 **Values**
 
 open source everything . life as a service . cutting edge evolution
-
-### Summary
