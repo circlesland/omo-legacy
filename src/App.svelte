@@ -1,8 +1,8 @@
 <script>
   import router, { curRoute, curId } from "./router.js";
-  import OmoNavbar from "./quants/Omo-Navbar.svelte";
+  import OmoNavbar from "./quanta/1-views/2-molecules/OmoNavbar.svelte";
   import { onMount } from "svelte";
-  import db from './db.js';
+  import db from "./db.js";
 
   let currentId;
 
@@ -25,8 +25,6 @@
   function handlerBackNavigation(event) {
     curRoute.set(event.state.path);
   }
-
-  
 </script>
 
 <style>
