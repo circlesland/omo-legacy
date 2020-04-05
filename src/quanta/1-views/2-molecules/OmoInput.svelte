@@ -1,4 +1,35 @@
 <script>
+  export let type;
+  export let id;
+  export let label;
+  export let rows;
+  export let value;
+</script>
+
+<div class="">
+  {#if label}
+    <label class="label" for={id}>{label}</label>
+  {/if}
+  {#if type === 'textarea'}
+    <textarea
+      class="block w-full text-gray-700 border bg-white rounded py-3 px-4
+      leading-tight outline-none focus:bg-white"
+      {id}
+      {rows}
+      {value}
+      on:input />
+  {:else}
+    <input
+      class="w-full text-gray-700 border bg-white rounded py-2 px-3
+      leading-tight outline-none focus:bg-white"
+      {id}
+      {value}
+      {type}
+      on:input />
+  {/if}
+</div>
+
+<!-- <script>
   import OmoCard from "./../3-organisms/OmoCard.svelte";
 
   let name = "Samuel";
@@ -36,9 +67,7 @@
   function deleteLast() {
     contacts = contacts.slice(0, -1);
   }
-</script>
-
-<div class="py-24 px-16 flex">
+</script><div class="py-24 px-16 flex">
   <form class="w-2/3 pr-8">
     <div class="flex flex-wrap -mx-3 mb-6">
       <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
@@ -141,4 +170,4 @@
       </div>
     {:else}no contacts yet{/each}
   </div>
-</div>
+</div> -->

@@ -5,12 +5,6 @@
   export let description;
 </script>
 
-<style>
-  .placeholder {
-    background-color: yellowgreen;
-  }
-</style>
-
 <div class="max-w-md w-full lg:flex">
   <div
     class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none

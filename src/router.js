@@ -5,7 +5,7 @@ import GraphQl from './quanta/1-views/5-pages/Graphql.svelte';
 import Enkel from './quanta/1-views/5-pages/Enkel.svelte';
 import Chat from './quanta/1-views/5-pages/Chat.svelte';
 import Leidenschaft from './quanta/1-views/5-pages/Leidenschaft.svelte';
-import Tutorial from './quanta/1-views/5-pages/Tutorial.svelte';
+import MeetMe from './quanta/1-views/5-pages/MeetMe.svelte';
 import {
     writable
 } from 'svelte/store';
@@ -18,7 +18,7 @@ const router = {
     '/enkel': Enkel,
     '/chat': Chat,
     '/leidenschaft': Leidenschaft,
-    '/tutorial': Tutorial,
+    '/meetme': MeetMe,
 }
 export default router;
 export const curRoute = writable('/home');
