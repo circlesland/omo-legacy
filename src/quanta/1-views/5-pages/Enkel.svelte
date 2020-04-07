@@ -18,26 +18,27 @@
   title="dream" />
 
 <div
-  class="text-4xl text-center px-4 py-16 text-gray-200 bg-ci-2 flex flex-wrap
+  class="text-3xl text-center px-4 py-16 text-white bg-blue-800 flex flex-wrap
   justify-center content-center">
-  <p style="font-family: 'Indie Flower'!important;">"{enkel.story}"</p>
+  <div style="font-family: 'Permanent Marker', cursive !important">
+    {enkel.story}
+  </div>
 </div>
 
 <div class="flex justify-center my-10">
   <div class="w-5/6 xl:w-4/6">
     <img src="/images/divider-1.png" alt="divider" class="px-48 mt-8" />
     <h2
-      class="text-center text-5xl text-ci mt-10 mb-6"
-      style="font-family: 'Indie Flower'!important;">
+      class="text-center text-5xl text-green-400 mt-10 mb-6"
+      style=" font-family: 'Permanent Marker', cursive !important;">
       Meine schöne Heimatstadt
     </h2>
     <div class="flex justify-center">
       <OmoCity {city} {db} />
     </div>
-
   </div>
-
 </div>
+
 <div class="flex justify-center my-10">
   <OmoLeidenschaften {leidenschaften} />
 </div>

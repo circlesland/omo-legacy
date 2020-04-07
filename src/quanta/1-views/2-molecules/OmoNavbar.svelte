@@ -1,8 +1,8 @@
 <script>
   import OmoButton from "./../1-atoms/OmoButton.svelte";
   export let chat = {
-    text: "Jetzt Lebensträume erfüllen",
-    link: "/chat"
+    text: "CALL TO ACTION",
+    link: "/"
   };
 </script>
 

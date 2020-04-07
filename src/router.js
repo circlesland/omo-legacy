@@ -1,11 +1,9 @@
 import Home from './quanta/1-views/5-pages/Home.svelte';
 import Dream from './quanta/1-views/5-pages/Dream.svelte';
 import City from './quanta/1-views/5-pages/City.svelte';
-import GraphQl from './quanta/1-views/5-pages/Graphql.svelte';
 import Enkel from './quanta/1-views/5-pages/Enkel.svelte';
 import Chat from './quanta/1-views/5-pages/Chat.svelte';
 import Leidenschaft from './quanta/1-views/5-pages/Leidenschaft.svelte';
-import MeetMe from './quanta/1-views/5-pages/MeetMe.svelte';
 import {
     writable
 } from 'svelte/store';
@@ -14,11 +12,9 @@ const router = {
     '/home': Home,
     '/dream': Dream,
     '/city': City,
-    '/graphql': GraphQl,
     '/enkel': Enkel,
     '/chat': Chat,
-    '/leidenschaft': Leidenschaft,
-    '/meetme': MeetMe,
+    '/leidenschaft': Leidenschaft
 }
 export default router;
 export const curRoute = writable('/home');
