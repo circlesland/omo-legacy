@@ -1,10 +1,9 @@
 <script>
-  import OmoCounter from "./../2-molecules/OmoCounter.svelte";
-  // import OmoForm from "./../2-molecules/OmoForm.svelte";
-  // import OmoList from "./../3-organisms/OmoList.svelte";
+  import Products from "./../3-organisms/Products.svelte";
+  import Cart from "./../3-organisms/Cart.svelte";
 </script>
 
-<!-- <OmoList /> -->
-
-<OmoCounter />
-<!-- <OmoForm /> -->
+<div class="flex flex-wrap p-4">
+  <Products class="w-1/2" />
+  <Cart class="w-1/2" />
+</div>

@@ -1,16 +1,15 @@
 <script>
-  export let type = "";
-  export let text = "button";
-  export let link = "";
-  export let theme = "";
+  export let button = {
+    text: "button",
+    link: "",
+    theme: ""
+  };
 </script>
 
-<a href={link}>
+<a href={button.link}>
   <button
-    {type}
-    class="{theme} bg-blue-800 hover:bg-pink-800 text-white px-3 py-1
-    rounded-full font-bolt"
-    style="font-family: 'Indie Flower'!important;">
-    {text}
+    class="{button.theme} bg-blue-800 hover:bg-green-500 text-white px-3 py-1
+    rounded-full font-bolt">
+    {button.text}
   </button>
 </a>
