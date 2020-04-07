@@ -30,15 +30,14 @@ const db = {
     {
       id: 2,
       name: "Adele",
-      dream: "noch einmal an die Nordsee zu fahren",
+      dream: "liebt es Nachts durch die Stadt von München zu düsen",
       city: 2,
       image: "https://source.unsplash.com/xe68QiMaDrQ"
     },
-
     {
       id: 3,
       name: "Lisa",
-      dream: "ins Stadion des Champions League Finales gehen",
+      dream: "liebt die Herausforderung mit der Rikscha der Berg hochzustrampeln",
       city: 3,
       image: "https://source.unsplash.com/rDEOVtE7vOs"
     }

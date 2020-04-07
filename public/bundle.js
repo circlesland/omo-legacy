@@ -4080,9 +4080,9 @@ var app = (function () {
     			t = text(t_value);
     			attr_dev(button_1, "class", button_1_class_value = "" + (/*button*/ ctx[0].theme + " bg-blue-800 hover:bg-green-500 text-white px-3 py-1\n    rounded-full font-bolt"));
     			set_style(button_1, "font-family", "'Permanent Marker', cursive", 1);
-    			add_location(button_1, file$a, 9, 2, 122);
+    			add_location(button_1, file$a, 9, 2, 124);
     			attr_dev(a, "href", a_href_value = /*button*/ ctx[0].link);
-    			add_location(a, file$a, 8, 0, 97);
+    			add_location(a, file$a, 8, 0, 99);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -4092,17 +4092,7 @@ var app = (function () {
     			append_dev(a, button_1);
     			append_dev(button_1, t);
     		},
-    		p: function update(ctx, [dirty]) {
-    			if (dirty & /*button*/ 1 && t_value !== (t_value = /*button*/ ctx[0].text + "")) set_data_dev(t, t_value);
-
-    			if (dirty & /*button*/ 1 && button_1_class_value !== (button_1_class_value = "" + (/*button*/ ctx[0].theme + " bg-blue-800 hover:bg-green-500 text-white px-3 py-1\n    rounded-full font-bolt"))) {
-    				attr_dev(button_1, "class", button_1_class_value);
-    			}
-
-    			if (dirty & /*button*/ 1 && a_href_value !== (a_href_value = /*button*/ ctx[0].link)) {
-    				attr_dev(a, "href", a_href_value);
-    			}
-    		},
+    		p: noop,
     		i: noop,
     		o: noop,
     		d: function destroy(detaching) {
@@ -4122,8 +4112,8 @@ var app = (function () {
     }
 
     function instance$e($$self, $$props, $$invalidate) {
-    	let { button = { text: "button", link: "", theme: "" } } = $$props;
-    	const writable_props = ["button"];
+    	const button = { text: "button", link: "", theme: "" };
+    	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<OmoButton> was created with unknown prop '${key}'`);
@@ -4131,21 +4121,7 @@ var app = (function () {
 
     	let { $$slots = {}, $$scope } = $$props;
     	validate_slots("OmoButton", $$slots, []);
-
-    	$$self.$set = $$props => {
-    		if ("button" in $$props) $$invalidate(0, button = $$props.button);
-    	};
-
     	$$self.$capture_state = () => ({ button });
-
-    	$$self.$inject_state = $$props => {
-    		if ("button" in $$props) $$invalidate(0, button = $$props.button);
-    	};
-
-    	if ($$props && "$$inject" in $$props) {
-    		$$self.$inject_state($$props.$$inject);
-    	}
-
     	return [button];
     }
 
@@ -4163,7 +4139,7 @@ var app = (function () {
     	}
 
     	get button() {
-    		throw new Error("<OmoButton>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    		return this.$$.ctx[0];
     	}
 
     	set button(value) {
@@ -4348,15 +4324,14 @@ var app = (function () {
         {
           id: 2,
           name: "Adele",
-          dream: "noch einmal an die Nordsee zu fahren",
+          dream: "liebt es Nachts durch die Stadt von München zu düsen",
           city: 2,
           image: "https://source.unsplash.com/xe68QiMaDrQ"
         },
-
         {
           id: 3,
           name: "Lisa",
-          dream: "ins Stadion des Champions League Finales gehen",
+          dream: "liebt die Herausforderung mit der Rikscha der Berg hochzustrampeln",
           city: 3,
           image: "https://source.unsplash.com/rDEOVtE7vOs"
         }
