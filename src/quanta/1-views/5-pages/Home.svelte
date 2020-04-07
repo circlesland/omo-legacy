@@ -1,18 +1,15 @@
 <script>
   export let db;
   export let currentId;
-  import OmoThemeLight from "../../../design/Omo-Theme-Light.svelte";
   import OmoHeader from "./../2-molecules/OmoHeader.svelte";
   import OmoVideo from "./../2-molecules/OmoVideo.svelte";
   import OmoSteps from "./../3-organisms/OmoSteps.svelte";
-  import OmoCities from "../../../quants/Omo-Cities.svelte";
-
-  import OmoDreams from "../../../quants/Omo-Dreams.svelte";
-  import OmoEnkels from "../../../quants/Omo-Enkels.svelte";
+  import OmoCities from "./../3-organisms/OmoCities.svelte";
+  import OmoUsers from "./../3-organisms/OmoUsers.svelte";
 
   export let dreamheader = {
     title: "Wir haben einen Traum...",
-    subtitle: "{...... dass wir .......}"
+    subtitle: "...stell dir vor du stehts auf und alles läuft"
   };
   export let omovideo = {
     link: "https://www.youtube.com/embed/HfzZQvoJATA"
@@ -39,6 +36,5 @@
 <OmoHeader omoheader={dreamheader} />
 <OmoVideo {omovideo} />
 <OmoSteps {omosteps} />
-<OmoDreams {db} {currentId} />
-<OmoEnkels {db} {currentId} />
+<OmoUsers {db} {currentId} />
 <OmoCities {db} {currentId} />

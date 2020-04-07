@@ -5,7 +5,7 @@
   };
 </script>
 
-<div class="flex justify-center">
+<div class="flex justify-center pb-20">
   <div class="w-5/6 xl:w-4/6">
     <div
       class="embed-responsive aspect-ratio-16/9 rounded-lg omo-shadow omo-border
@@ -15,6 +15,5 @@
         src={omovideo.link}
         title={omovideo.title} />
     </div>
-
   </div>
 </div>

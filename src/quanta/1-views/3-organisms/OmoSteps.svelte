@@ -23,14 +23,14 @@
   ];
 </script>
 
-<div class="bg-white py-20 flex justify-center my-12">
+<div class="bg-white flex justify-center pt-20 pb-40">
   <div class="w-5/6 xl:w-4/6">
     <OmoHeader {omoheader} />
     <div class="flex content-start flex-wrap">
       {#each omosteps as step}
         <div class="w-1/3 p-2">
           <a href="chat">
-            <div class=" overflow-hidden ">
+            <div class="text-center overflow-hidden ">
               <img
                 src={step.image}
                 class="px-16 py-8 object-cover object-center"
@@ -41,7 +41,7 @@
                 style="font-family: 'Permanent Marker', cursive !important;">
                 {step.title}
               </div>
-              <div class={step.description} />
+              <div class="text-gray-600">{step.description}</div>
             </div>
           </a>
         </div>

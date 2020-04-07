@@ -1,8 +1,9 @@
 <script>
   import router, { curRoute, curId } from "./router.js";
+  import OmoThemeLight from "./quanta/1-views/0-themes/OmoThemeLight.svelte";
   import OmoNavbar from "./quanta/1-views/2-molecules/OmoNavbar.svelte";
   import { onMount } from "svelte";
-  import db from "./db.js";
+  import db from "./quanta/4-data/db.js";
 
   let currentId;
 
