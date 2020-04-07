@@ -18,9 +18,8 @@
         class="primary h-64 w-full rounded-t-lg object-cover object-center"
         alt="image" />
       <div
-        class="text-2xl text-center p-4 text-gray-200 bg-blue-800 flex flex-wrap
-        justify-center content-center h-48"
-        style="font-family: 'Permanent Marker', cursive !important;">
+        class="text-xl text-center p-4 text-gray-200 bg-blue-800 flex flex-wrap
+        justify-center content-center h-48">
         "{user.name} {user.dream}"
       </div>
       <!-- <div

@@ -1,10 +1,10 @@
 <script>
-  import OmoCity from "./../2-molecules/OmoCity.svelte";
-  // import OmoUsers from "./../3-organisms/OmoUsers.svelte";
+  import OmoCard from "./../2-molecules/OmoCard.svelte";
+  import OmoUsers from "./../3-organisms/OmoUsers.svelte";
   export let db;
   export let currentId;
   let city = db.cities.find(item => item.id == currentId);
-  // let users = db.users.filter(item => item.user == user.id);
+  let users = db.users;
 </script>
 
 <div
@@ -15,5 +15,5 @@
   title={city.name}>
   {city.name}
 </div>
-<!-- 
-<OmoUsers {users} {db} /> -->
+
+<OmoUsers {users} {db} />

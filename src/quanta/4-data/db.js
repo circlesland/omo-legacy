@@ -1,22 +1,21 @@
 const db = {
   cities: [{
       id: 1,
-      name: "Heidelberg",
-      image: "https://source.unsplash.com/Yfo3qWK2pjY"
-    },
-    {
-      id: 2,
       name: "Berlin",
       image: "https://source.unsplash.com/TK5I5L5JGxY"
     },
     {
-      id: 3,
+      id: 2,
       name: "München",
       image: "https://source.unsplash.com/8QJSi37vhms "
+    }, {
+      id: 3,
+      name: "Heidelberg",
+      image: "https://source.unsplash.com/Yfo3qWK2pjY"
     },
     {
       id: 4,
-      name: "Neue Stadt gründen",
+      name: "Neue Stadt",
       image: "/images/addcity.jpg"
     }
   ],

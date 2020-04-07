@@ -1,7 +1,10 @@
 import Home from './quanta/1-views/5-pages/Home.svelte';
 import User from './quanta/1-views/5-pages/user.svelte';
 import City from './quanta/1-views/5-pages/City.svelte';
-import Chat from './quanta/1-views/5-pages/Chat.svelte';
+import Cities from './quanta/1-views/5-pages/Cities.svelte';
+import Drivers from './quanta/1-views/5-pages/Drivers.svelte';
+import Pricing from './quanta/1-views/5-pages/Pricing.svelte';
+import FAQ from './quanta/1-views/5-pages/FAQ.svelte';
 
 import {
     writable
@@ -11,7 +14,10 @@ const router = {
     '/home': Home,
     '/user': User,
     '/city': City,
-    '/chat': Chat,
+    '/cities': Cities,
+    '/drivers': Drivers,
+    '/pricing': Pricing,
+    "/faq": FAQ,
 }
 export default router;
 export const curRoute = writable('/home');

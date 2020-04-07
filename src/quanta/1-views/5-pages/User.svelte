@@ -1,5 +1,5 @@
 <script>
-  import OmoCity from "./../2-molecules/OmoCity.svelte";
+  import OmoCard from "./../2-molecules/OmoCard.svelte";
   export let db;
   export let user;
   export let currentId;
@@ -8,9 +8,9 @@
 </script>
 
 <div
-  class="py-64 text-4xl text-gray-700 w-full flex content-center flex-wrap
-  bg-cover bg-center justify-center overflow-hidden"
-  style="background-image: url('{user.image}')"
+  class="text-4xl text-gray-700 w-full flex content-center flex-wrap bg-cover
+  bg-center justify-center overflow-hidden"
+  style="background-image: url('{user.image}'); padding: 30rem"
   title="user" />
 <div
   class="text-5xl text-center px-4 py-16 text-gray-200 bg-blue-800 flex
@@ -22,7 +22,7 @@
 <div class="flex justify-center my-10">
   <div class="w-5/6 xl:w-4/6">
     <div class="flex justify-center">
-      <OmoCity {city} {db} />
+      <OmoCard {city} {db} />
     </div>
   </div>
 </div>
