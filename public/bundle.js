@@ -3491,7 +3491,7 @@ var app = (function () {
     	return child_ctx;
     }
 
-    // (94:6) {#each comments as comment}
+    // (83:6) {#each comments as comment}
     function create_each_block$3(ctx) {
     	let article;
     	let span;
@@ -3508,10 +3508,10 @@ var app = (function () {
     			attr_dev(span, "class", "text-ci text-xl p-2 text-lg rounded");
     			set_style(span, "font-family", "'Indie Flower'", 1);
     			toggle_class(span, "text-ci-2", /*comment*/ ctx[8].author === "eliza");
-    			add_location(span, file$9, 95, 10, 4242);
+    			add_location(span, file$9, 84, 10, 3868);
     			attr_dev(article, "class", "m-1  svelte-14e6lzm");
     			toggle_class(article, "left", /*comment*/ ctx[8].author != "");
-    			add_location(article, file$9, 94, 8, 4175);
+    			add_location(article, file$9, 83, 8, 3801);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, article, anchor);
@@ -3539,7 +3539,7 @@ var app = (function () {
     		block,
     		id: create_each_block$3.name,
     		type: "each",
-    		source: "(94:6) {#each comments as comment}",
+    		source: "(83:6) {#each comments as comment}",
     		ctx
     	});
 
@@ -3547,18 +3547,13 @@ var app = (function () {
     }
 
     function create_fragment$a(ctx) {
-    	let div3;
     	let div2;
-    	let h2;
-    	let t1;
-    	let div0;
-    	let p;
-    	let t3;
     	let div1;
-    	let t4;
+    	let div0;
+    	let t;
     	let footer;
-    	let div5;
     	let div4;
+    	let div3;
     	let input;
     	let dispose;
     	let each_value = /*comments*/ ctx[1];
@@ -3571,79 +3566,60 @@ var app = (function () {
 
     	const block = {
     		c: function create() {
-    			div3 = element("div");
     			div2 = element("div");
-    			h2 = element("h2");
-    			h2.textContent = "Willkommen";
-    			t1 = space();
-    			div0 = element("div");
-    			p = element("p");
-    			p.textContent = "Ich bin dein persönlicher Assistent Robin und führe dich durch alle\n        Prozesse";
-    			t3 = space();
     			div1 = element("div");
+    			div0 = element("div");
 
     			for (let i = 0; i < each_blocks.length; i += 1) {
     				each_blocks[i].c();
     			}
 
-    			t4 = space();
+    			t = space();
     			footer = element("footer");
-    			div5 = element("div");
     			div4 = element("div");
+    			div3 = element("div");
     			input = element("input");
-    			attr_dev(h2, "class", "text-center text-5xl text-ci mt-10 mb-6");
-    			set_style(h2, "font-family", "'Indie Flower'", 1);
-    			add_location(h2, file$9, 78, 4, 3635);
-    			set_style(p, "font-family", "'Indie Flower'", 1);
-    			add_location(p, file$9, 84, 6, 3839);
-    			attr_dev(div0, "class", "text-2xl text-gray-600 text-center mb-16");
-    			add_location(div0, file$9, 83, 4, 3778);
-    			attr_dev(div1, "class", "scrollable");
-    			set_style(div1, "display", "flex");
-    			set_style(div1, "flex-direction", "column");
-    			set_style(div1, "align-items", "flex-end");
-    			add_location(div1, file$9, 89, 4, 4009);
-    			attr_dev(div2, "class", "w-5/6 xl:w-4/6");
-    			add_location(div2, file$9, 77, 2, 3602);
-    			attr_dev(div3, "class", "flex flex-1 justify-center ");
-    			set_style(div3, "height", "calc('100%-100px')");
-    			add_location(div3, file$9, 76, 0, 3524);
+    			attr_dev(div0, "class", "scrollable");
+    			set_style(div0, "display", "flex");
+    			set_style(div0, "flex-direction", "column");
+    			set_style(div0, "align-items", "flex-end");
+    			add_location(div0, file$9, 78, 4, 3635);
+    			attr_dev(div1, "class", "w-5/6 xl:w-4/6");
+    			add_location(div1, file$9, 77, 2, 3602);
+    			attr_dev(div2, "class", "flex flex-1 justify-center ");
+    			set_style(div2, "height", "calc('100%-100px')");
+    			add_location(div2, file$9, 76, 0, 3524);
     			attr_dev(input, "class", "block w-full text-gray-700 border border-gray-500 rounded py-2\n        px-4 leading-tight focus:outline-none focus:bg-white\n        focus:border-gray-500");
     			attr_dev(input, "id", "chat-text");
     			attr_dev(input, "type", "text");
     			attr_dev(input, "placeholder", "Gebe hier deine Antwort ein");
     			set_style(input, "font-family", "'Indie Flower'", 1);
-    			add_location(input, file$9, 111, 6, 4714);
-    			attr_dev(div4, "class", "w-5/6 xl:w-4/6 px-3");
-    			add_location(div4, file$9, 110, 4, 4674);
-    			attr_dev(div5, "class", "flex flex-wrap -mx-3 justify-center");
-    			add_location(div5, file$9, 109, 2, 4620);
+    			add_location(input, file$9, 100, 6, 4340);
+    			attr_dev(div3, "class", "w-5/6 xl:w-4/6 px-3");
+    			add_location(div3, file$9, 99, 4, 4300);
+    			attr_dev(div4, "class", "flex flex-wrap -mx-3 justify-center");
+    			add_location(div4, file$9, 98, 2, 4246);
     			attr_dev(footer, "class", "w-full text-center border-t border-grey bg-gray-300 p-4 sticky bottom-0");
-    			add_location(footer, file$9, 107, 0, 4527);
+    			add_location(footer, file$9, 96, 0, 4153);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
     		m: function mount(target, anchor, remount) {
-    			insert_dev(target, div3, anchor);
-    			append_dev(div3, div2);
-    			append_dev(div2, h2);
-    			append_dev(div2, t1);
-    			append_dev(div2, div0);
-    			append_dev(div0, p);
-    			append_dev(div2, t3);
+    			insert_dev(target, div2, anchor);
     			append_dev(div2, div1);
+    			append_dev(div1, div0);
 
     			for (let i = 0; i < each_blocks.length; i += 1) {
-    				each_blocks[i].m(div1, null);
+    				each_blocks[i].m(div0, null);
     			}
 
-    			/*div1_binding*/ ctx[7](div1);
-    			insert_dev(target, t4, anchor);
+    			/*div0_binding*/ ctx[7](div0);
+    			insert_dev(target, t, anchor);
     			insert_dev(target, footer, anchor);
-    			append_dev(footer, div5);
-    			append_dev(div5, div4);
-    			append_dev(div4, input);
+    			append_dev(footer, div4);
+    			append_dev(div4, div3);
+    			append_dev(div3, input);
     			if (remount) dispose();
     			dispose = listen_dev(input, "keydown", /*handleKeydown*/ ctx[2], false, false, false);
     		},
@@ -3661,7 +3637,7 @@ var app = (function () {
     					} else {
     						each_blocks[i] = create_each_block$3(child_ctx);
     						each_blocks[i].c();
-    						each_blocks[i].m(div1, null);
+    						each_blocks[i].m(div0, null);
     					}
     				}
 
@@ -3675,10 +3651,10 @@ var app = (function () {
     		i: noop,
     		o: noop,
     		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div3);
+    			if (detaching) detach_dev(div2);
     			destroy_each(each_blocks, detaching);
-    			/*div1_binding*/ ctx[7](null);
-    			if (detaching) detach_dev(t4);
+    			/*div0_binding*/ ctx[7](null);
+    			if (detaching) detach_dev(t);
     			if (detaching) detach_dev(footer);
     			dispose();
     		}
@@ -3697,7 +3673,7 @@ var app = (function () {
 
     function instance$a($$self, $$props, $$invalidate) {
     	let chat = [
-    		"Hi schön das du an diesem tollen Projekt interessiert bist, ich heiße Robin und wie heißt du?",
+    		"Hi schön das du an diesem tollen Projekt interessiert bist, ich heiße James und wie heißt du?",
     		"Cool, woher kommst du denn?",
     		"Möchtest du einen Opa kennenlernen, oder möchtest du dich oder einen deiner Bewohner registrieren?",
     		"Das ist ja Klasse, wir werden bestimmt den richtigen Enkel für dich finden. Bitte sage mir zuerst in welcher Kategorie du dich registrieren möchtest. Ich hätte folgende zur Auswahl: " + "1-Persönliches treffen 2-Reden (Telefon/Internet) 3-Schreiben (Briefe, Emails, etc.) 4-Unternehmungen",
@@ -3767,7 +3743,7 @@ var app = (function () {
     	let { $$slots = {}, $$scope } = $$props;
     	validate_slots("Chat", $$slots, []);
 
-    	function div1_binding($$value) {
+    	function div0_binding($$value) {
     		binding_callbacks[$$value ? "unshift" : "push"](() => {
     			$$invalidate(0, div = $$value);
     		});
@@ -3798,7 +3774,7 @@ var app = (function () {
     		$$self.$inject_state($$props.$$inject);
     	}
 
-    	return [div, comments, handleKeydown, autoscroll, i, chat, eliza, div1_binding];
+    	return [div, comments, handleKeydown, autoscroll, i, chat, eliza, div0_binding];
     }
 
     class Chat extends SvelteComponentDev {
@@ -4080,9 +4056,9 @@ var app = (function () {
     			t = text(t_value);
     			attr_dev(button_1, "class", button_1_class_value = "" + (/*button*/ ctx[0].theme + " bg-blue-800 hover:bg-green-500 text-white px-3 py-1\n    rounded-full font-bolt"));
     			set_style(button_1, "font-family", "'Permanent Marker', cursive", 1);
-    			add_location(button_1, file$a, 9, 2, 124);
+    			add_location(button_1, file$a, 9, 2, 122);
     			attr_dev(a, "href", a_href_value = /*button*/ ctx[0].link);
-    			add_location(a, file$a, 8, 0, 99);
+    			add_location(a, file$a, 8, 0, 97);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -4092,7 +4068,17 @@ var app = (function () {
     			append_dev(a, button_1);
     			append_dev(button_1, t);
     		},
-    		p: noop,
+    		p: function update(ctx, [dirty]) {
+    			if (dirty & /*button*/ 1 && t_value !== (t_value = /*button*/ ctx[0].text + "")) set_data_dev(t, t_value);
+
+    			if (dirty & /*button*/ 1 && button_1_class_value !== (button_1_class_value = "" + (/*button*/ ctx[0].theme + " bg-blue-800 hover:bg-green-500 text-white px-3 py-1\n    rounded-full font-bolt"))) {
+    				attr_dev(button_1, "class", button_1_class_value);
+    			}
+
+    			if (dirty & /*button*/ 1 && a_href_value !== (a_href_value = /*button*/ ctx[0].link)) {
+    				attr_dev(a, "href", a_href_value);
+    			}
+    		},
     		i: noop,
     		o: noop,
     		d: function destroy(detaching) {
@@ -4112,8 +4098,8 @@ var app = (function () {
     }
 
     function instance$e($$self, $$props, $$invalidate) {
-    	const button = { text: "button", link: "", theme: "" };
-    	const writable_props = [];
+    	let { button = { text: "button", link: "", theme: "" } } = $$props;
+    	const writable_props = ["button"];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<OmoButton> was created with unknown prop '${key}'`);
@@ -4121,7 +4107,21 @@ var app = (function () {
 
     	let { $$slots = {}, $$scope } = $$props;
     	validate_slots("OmoButton", $$slots, []);
+
+    	$$self.$set = $$props => {
+    		if ("button" in $$props) $$invalidate(0, button = $$props.button);
+    	};
+
     	$$self.$capture_state = () => ({ button });
+
+    	$$self.$inject_state = $$props => {
+    		if ("button" in $$props) $$invalidate(0, button = $$props.button);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
     	return [button];
     }
 
@@ -4139,7 +4139,7 @@ var app = (function () {
     	}
 
     	get button() {
-    		return this.$$.ctx[0];
+    		throw new Error("<OmoButton>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
 
     	set button(value) {
@@ -4331,7 +4331,7 @@ var app = (function () {
         {
           id: 3,
           name: "Lisa",
-          dream: "liebt die Herausforderung mit der Rikscha der Berg hochzustrampeln",
+          dream: "liebt es mit der Rikscha den Berg hochzustrampeln",
           city: 3,
           image: "https://source.unsplash.com/rDEOVtE7vOs"
         }

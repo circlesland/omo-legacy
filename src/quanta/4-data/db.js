@@ -37,7 +37,7 @@ const db = {
     {
       id: 3,
       name: "Lisa",
-      dream: "liebt die Herausforderung mit der Rikscha der Berg hochzustrampeln",
+      dream: "liebt es mit der Rikscha den Berg hochzustrampeln",
       city: 3,
       image: "https://source.unsplash.com/rDEOVtE7vOs"
     }

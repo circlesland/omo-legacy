@@ -1,5 +1,5 @@
 <script>
-  export const button = {
+  export let button = {
     text: "button",
     link: "",
     theme: ""

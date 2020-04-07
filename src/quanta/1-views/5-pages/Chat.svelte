@@ -2,7 +2,7 @@
   import Eliza from "elizabot";
   import { beforeUpdate, afterUpdate } from "svelte";
   let chat = [
-    "Hi schön das du an diesem tollen Projekt interessiert bist, ich heiße Robin und wie heißt du?",
+    "Hi schön das du an diesem tollen Projekt interessiert bist, ich heiße James und wie heißt du?",
     "Cool, woher kommst du denn?",
     "Möchtest du einen Opa kennenlernen, oder möchtest du dich oder einen deiner Bewohner registrieren?",
     "Das ist ja Klasse, wir werden bestimmt den richtigen Enkel für dich finden. Bitte sage mir zuerst in welcher Kategorie du dich registrieren möchtest. Ich hätte folgende zur Auswahl: " +
@@ -76,17 +76,6 @@
 
 <div class="flex flex-1 justify-center " style="height:calc('100%-100px')">
   <div class="w-5/6 xl:w-4/6">
-    <h2
-      class="text-center text-5xl text-ci mt-10 mb-6"
-      style="font-family: 'Indie Flower'!important;">
-      Willkommen
-    </h2>
-    <div class="text-2xl text-gray-600 text-center mb-16">
-      <p style="font-family: 'Indie Flower'!important;">
-        Ich bin dein persönlicher Assistent Robin und führe dich durch alle
-        Prozesse
-      </p>
-    </div>
     <div
       class="scrollable"
       style="display:flex;flex-direction:column;align-items:flex-end;"
