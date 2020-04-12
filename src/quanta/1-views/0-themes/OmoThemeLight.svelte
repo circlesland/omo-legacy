@@ -4,7 +4,16 @@
 </script>
 
 <style global>
+  @import url("https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@700");
+  @import url("https://fonts.googleapis.com/css2?family=Work+Sans:ital");
+
   @tailwind components;
+  .font-title {
+    font-family: "Josefin Sans", sans-serif !important;
+  }
+  .font-subline {
+    font-family: "Work Sans", sans-serif !important;
+  }
   .text-ci {
     color: #ee9590;
   }

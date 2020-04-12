@@ -1,8 +1,7 @@
 <script>
   import OmoButton from "./../1-atoms/OmoButton.svelte";
   export let chat = {
-    text: "JETZT STADT FREISCHALTEN",
-    link: "/chat"
+    text: "Call to Action"
   };
 </script>
 
@@ -16,34 +15,26 @@
     <div class="content-center flex">
       <div class="flex">
         <a
-          href="drivers"
-          class="uppercase text-green-400 hover:text-white pt-1 font-bolt
-          font-mono mx-4">
-          Fahrer werden
-        </a>
-        <a
           href="pricing"
           class="hover:text-green-400 text-white pt-1 font-bolt font-mono mx-4 ">
           Preise
         </a>
         <a
-          href="faq"
+          href="cities"
           class="hover:text-green-400 text-white pt-1 font-bolt font-mono mx-4 ">
-          FAQ
+          Städte
         </a>
         <a
-          href="cities"
+          href="team"
+          class="hover:text-green-400 text-white pt-1 font-bolt font-mono mx-4 ">
+          Team
+        </a>
+        <a
+          href="faq"
           class="hover:text-green-400 text-white pt-1 font-bolt font-mono mx-4
           mr-8">
-          Städtekampagne
+          FAQ
         </a>
-        <!-- <a
-          href="Profil"
-          class="uppercase hover:text-green-400 text-white pt-1 font-bolt
-          font-mono mx-4 mr-8"
-          style="font-family: 'Permanent Marker', cursive !important;">
-          Mein Profil
-        </a> -->
         <OmoButton button={chat} />
       </div>
     </div>

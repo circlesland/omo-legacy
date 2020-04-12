@@ -10,12 +10,11 @@
         class="primary h-64 w-full rounded-t-lg object-cover object-center"
         alt="image" />
       <div
-        class="w-full px-4 py-2 text-center hover:bg-green-400 bg-blue-800
+        class="w-full px-4 pb-2 pt-3 text-center hover:bg-green-400 bg-blue-800
         text-white">
         <a
           href="city?id={city.id}"
-          class="text-2xl font-semibold"
-          style="font-family: 'Permanent Marker', cursive !important;">
+          class="text-xl font-bold font-title uppercase">
           {city.name}
         </a>
       </div>

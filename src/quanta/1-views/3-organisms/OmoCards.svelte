@@ -5,11 +5,11 @@
   let cities = db.cities;
   export let omoheader = {
     title: "cities",
-    subtitle: "about the city campaign"
+    subline: "about the city campaign"
   };
 </script>
 
-<div class="primary flex justify-center pt-20 pb-40">
+<div class="primary flex justify-center pt-10 pb-40">
   <div class="w-5/6 xl:w-4/6">
     <OmoHeader {omoheader} />
     <div class="flex content-start flex-wrap">

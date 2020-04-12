@@ -1,20 +1,22 @@
 <script>
   export let omoheader = {
     title: "",
-    subtitle: "",
+    subline: "",
     illustration: ""
   };
 </script>
 
 <div class="flex justify-center my-20">
   <div class="w-5/6 xl:w-4/6 text-center">
-    <h2
-      class="text-6xl text-green-400 mb-6"
-      style="font-family: 'Permanent Marker', cursive !important;">
+    <h2 class="text-5xl text-green-400 font-bold font-title uppercase">
       {omoheader.title}
     </h2>
-    {#if omoheader.subtitle}
-      <h3 class="text-xl text-gray-700">{omoheader.subtitle}</h3>
+    {#if omoheader.subline}
+      <div
+        class="text-3xl text-gray-500 italic font-light font-sans tracking-wide
+        mb-6">
+        {omoheader.subline}
+      </div>
     {/if}
   </div>
 </div>

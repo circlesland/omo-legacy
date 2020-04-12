@@ -1,10 +1,5 @@
 <script>
-  import OmoHeader from "./../2-molecules/OmoHeader.svelte";
-
-  export let omoheader = {
-    title: "Preisliste",
-    subtitle: "subttile"
-  };
+  import OmoPricing from "./../2-molecules/OmoPricing.svelte";
 </script>
 
-<OmoHeader {omoheader} />
+<OmoPricing />

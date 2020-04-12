@@ -4,7 +4,7 @@
 
   export let omoheader = {
     title: "Über uns",
-    subtitle: "und das ganze Team"
+    subline: "und das ganze Team"
   };
   export let db;
   export let users;
@@ -13,8 +13,6 @@
 </script>
 
 <OmoHeader {omoheader} />
-
-<div class="text-center py-20 ">Unsere Gründergeschichte</div>
 
 <div class="flex justify-center pb-40">
   <div class="w-5/6 xl:w-4/6">

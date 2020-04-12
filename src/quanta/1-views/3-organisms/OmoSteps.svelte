@@ -2,7 +2,7 @@
   import OmoHeader from "./../2-molecules/OmoHeader.svelte";
   export let omoheader = {
     title: "So gehts",
-    subtitle: "Ganz einfach in 3 Schritten"
+    subline: "ganz einfach in 3 Schritten"
   };
   export let omosteps = [
     {
@@ -35,9 +35,8 @@
             style="height: 20rem"
             alt="image" />
           <div
-            class="text-3xl text-center text-blue-800 mb-2 flex flex-wrap
-            justify-center content-center"
-            style="font-family: 'Permanent Marker', cursive !important;">
+            class="text-2xl text-center text-blue-800 mb-2 flex flex-wrap
+            justify-center content-center font-title uppercase font-bold">
             {i + 1}. {step.title}
           </div>
           <div class="text-gray-600">{step.description}</div>
