@@ -8,10 +8,8 @@
 </script>
 
 <div
-  class="py-64 text-6xl w-full flex content-center flex-wrap bg-cover bg-center
-  justify-center overflow-hidden uppercase font-bolt text-white"
-  style="background-image: url('{city.image}'); font-family: 'Permanent Marker',
-  cursive !important;"
+  class="py-40 text-6xl w-full flex content-center flex-wrap bg-cover bg-center
+  justify-center overflow-hidden uppercase font-bold text-white font-title"
   title={city.name}>
   {city.name}
 </div>

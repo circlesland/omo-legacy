@@ -2779,9 +2779,7 @@ var app = (function () {
     			t0 = text(t0_value);
     			t1 = space();
     			create_component(omousers.$$.fragment);
-    			attr_dev(div, "class", "py-64 text-6xl w-full flex content-center flex-wrap bg-cover bg-center\n  justify-center overflow-hidden uppercase font-bolt text-white");
-    			set_style(div, "background-image", "url('" + /*city*/ ctx[1].image + "')");
-    			set_style(div, "font-family", "'Permanent Marker',\n  cursive", 1);
+    			attr_dev(div, "class", "py-40 text-6xl w-full flex content-center flex-wrap bg-cover bg-center\n  justify-center overflow-hidden uppercase font-bold text-white font-title");
     			attr_dev(div, "title", div_title_value = /*city*/ ctx[1].name);
     			add_location(div, file$a, 9, 0, 260);
     		},
