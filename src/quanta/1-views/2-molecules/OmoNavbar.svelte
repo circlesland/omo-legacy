@@ -1,6 +1,6 @@
 <script>
   import OmoButton from "./../1-atoms/OmoButton.svelte";
-  export let chat = {
+  export let button = {
     text: "Call to Action"
   };
 </script>
@@ -15,27 +15,11 @@
     <div class="content-center flex">
       <div class="flex">
         <a
-          href="pricing"
+          href="/"
           class="hover:text-green-400 text-white pt-1 font-bolt font-mono mx-4 ">
           Preise
         </a>
-        <a
-          href="cities"
-          class="hover:text-green-400 text-white pt-1 font-bolt font-mono mx-4 ">
-          Städte
-        </a>
-        <a
-          href="team"
-          class="hover:text-green-400 text-white pt-1 font-bolt font-mono mx-4 ">
-          Team
-        </a>
-        <a
-          href="faq"
-          class="hover:text-green-400 text-white pt-1 font-bolt font-mono mx-4
-          mr-8">
-          FAQ
-        </a>
-        <OmoButton button={chat} />
+        <OmoButton {button} />
       </div>
     </div>
   </nav>

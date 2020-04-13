@@ -30,19 +30,20 @@
 
 <div class="h-full flex flex-col">
   <header>
-    <div class="bg-gray-900 p-2 text-gray-300">omo-home {currentId}</div>
+    <div class="bg-gray-300 py-2 px-4 text-blue-900">context: {currentId}</div>
   </header>
-  <div class="flex flex-1 overflow-hidden">
-    <div class="overflow-y-scroll bg-gray-200 w-1/4 border-r border-gray-300">
+  <div class="h-full flex overflow-hidden">
+    <div
+      class="overflow-y-scroll bg-gray-200 border-r border-gray-300"
+      style="width: 300px">
       <OmoQuantaList />
     </div>
-    <div class="overflow-y-scroll w-3/4">
+    <div class="h-full flex-1 overflow-y-scroll">
       <div class="h-full">
         <svelte:component this={router[$curRoute]} {db} {currentId} />
       </div>
     </div>
   </div>
-
   <footer>
     <OmoMenuHorizontal />
   </footer>

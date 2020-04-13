@@ -12,18 +12,21 @@
           class="h-8 -mt-1 inline mx-auto" />
       </span>
     </a>
-    <a href="/">
+    <!-- <a href="/">
       <span class="px-1 hover:text-white cursor-pointer">
         <i class="fas fa-stream p-2 bg-gray-800 rounded" />
       </span>
     </a>
     <span class="px-1 hover:text-white cursor-pointer">
       <i class="fas fa-search p-2 bg-gray-800 rounded" />
-    </span>
-    <span class="px-1 hover:text-white cursor-pointer">
-      <i class="fas fa-th p-2 bg-gray-800 rounded" />
-    </span>
-    <span class="px-1 hover:text-white cursor-pointer">
+    </span> -->
+
+    <a href="/quanta">
+      <span class="px-1 hover:text-white cursor-pointer">
+        <i class="fas fa-th p-2 bg-gray-800 rounded" />
+      </span>
+    </a>
+    <!-- <span class="px-1 hover:text-white cursor-pointer">
       <i class="w-8 fas fa-calendar-alt p-2 bg-gray-800 rounded" />
     </span>
     <span class="px-1 hover:text-white cursor-pointer">
@@ -36,7 +39,7 @@
         font-medium px-2 shadow-lg rounded-full">
         3
       </span>
-    </span>
+    </span> -->
 
     <span class="cursor-pointer relative float-right">
       <img

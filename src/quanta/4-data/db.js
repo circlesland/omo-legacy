@@ -41,23 +41,6 @@
        city: 3,
        image: "https://source.unsplash.com/rDEOVtE7vOs"
      }
-   ],
-   blog: [{
-       id: 1,
-       title: "Alf und Emmy,",
-       subtitle: "eine wundersame Begegnung",
-       excerpt: "Letzte Woche haben sich zum ersten mal zwicshen Alf und Emmy ein Generationen Tandem gebildet. Sie waren gemeinam auf dem Weg zum Schachspielen als es geschah...",
-       image: "https://source.unsplash.com/random?sig=123/800x800/",
-       cities: [1, 3]
-     },
-     {
-       id: 2,
-       title: "Wie alles began,",
-       subtitle: "die ersten Tage von Opa Franz",
-       excerpt: "Peter, Philipp und Samuel hatten eines Tages den Geistesblitz Opa Franz für Memmingen zu entwickeln. Innerhalb von 24 Stunden bauten sie gemeinsam den ersten...",
-       image: "https://source.unsplash.com/random?sig=321/800x800/",
-       cities: [2]
-     }
    ]
  };
 

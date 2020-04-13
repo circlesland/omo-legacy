@@ -2,15 +2,12 @@
   export let db;
   export let currentId;
   import OmoNavbar from "./../2-molecules/OmoNavbar.svelte";
-  import OmoHero from "./../2-molecules/OmoHero.svelte";
-  import OmoHeader from "./../2-molecules/OmoHeader.svelte";
-  import OmoVideo from "./../2-molecules/OmoVideo.svelte";
   import OmoSteps from "./../3-organisms/OmoSteps.svelte";
-  import OmoCards from "./../3-organisms/OmoCards.svelte";
+  import OmoCities from "./../3-organisms/OmoCities.svelte";
   import OmoUsers from "./../3-organisms/OmoUsers.svelte";
   import OmoSubscribe from "./../2-molecules/OmoSubscribe.svelte";
 
-  import OmoQuanta from "./../../4-data/OmoQuanta.js";
+  import quanta from "./../../4-data/quanta.js";
 
   //   export let omosteps = [
   //     {
@@ -34,16 +31,12 @@
   //   ];
 </script>
 
-{#each $OmoQuanta as item}
-  <svelte:component
-    this={item.model.component}
-    model={item.model}
-    data={item.data}
-    design={item.design} />
+{#each $quanta as quant}
+  <svelte:component this={quant.component} {quant} />
 {/each}
+
 <!-- 
-<OmoVideo {omovideo} />
 <OmoSteps {omosteps} />
-<OmoCards {db} {currentId} />
+
 <OmoUsers {db} {currentId} />
 <OmoSubscribe /> -->

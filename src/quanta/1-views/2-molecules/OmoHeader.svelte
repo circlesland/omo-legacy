@@ -1,33 +1,41 @@
 <script>
-  export let model = {
-    name: "Omo Header",
-    image: "/images/samuel.jpg",
-    author: "Samuel Andert",
-    type: "omo/views/molecules"
-  };
-  export let data = {
+  export let quant = {
     id: "",
-    title: "",
-    subline: ""
-  };
-  export const design = {
-    bg: "bg-gray-400",
-    p: "py-20"
+    model: {
+      id: "",
+      name: "",
+      image: "",
+      author: "",
+      type: ""
+    },
+    data: {
+      id: "",
+      title: "",
+      subline: "",
+      illustration: ""
+    },
+    design: {
+      layout: "py-20 bg-gray-100",
+      title: "text-gray-800 font-bold font-title",
+      subline: "text-gray-500 italic font-light font-sans tracking-wide",
+      illustration: "w-1/2"
+    }
   };
 </script>
 
 <div
-  class="{design.bg}
-  {design.p} m-auto flex flex-col justify-center text-center">
-  <h2 class="flex-wrap text-5xl text-gray-800 font-bold font-title uppercase">
-    {data.title}
+  class="m-auto flex flex-col justify-center text-center {quant.design.layout}">
+  <h2 class="flex-wrap uppercase text-4xl {quant.design.title}">
+    {quant.data.title}
   </h2>
-  <br />
-  {#if data.subline}
-    <div
-      class="flex-wrap text-3xl text-gray-500 italic font-light font-sans
-      tracking-wide mb-6">
-      {data.subline}
+  {#if quant.data.subline}
+    <div class="flex-wrap text-2xl {quant.design.subline}">
+      {quant.data.subline}
+    </div>
+  {/if}
+  {#if quant.data.illustration}
+    <div class="mt-16 mb-10 m-auto {quant.design.illustration}">
+      <img src={quant.data.illustration} alt={quant.data.title} />
     </div>
   {/if}
 </div>

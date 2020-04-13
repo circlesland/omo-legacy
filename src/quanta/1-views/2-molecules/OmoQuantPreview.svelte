@@ -1,12 +1,10 @@
 <script>
-  export let model;
-  export let data;
-  export let design;
+  export let quant;
 </script>
 
 <style>
   .preview {
-    transform: scale(0.22);
+    transform: scale(0.2);
     height: 20px;
     width: 100vw;
     position: relative;
@@ -17,8 +15,8 @@
   }
 </style>
 
-<div class="w-100 bg-green-300 overflow-hidden h-48 overflow-y-scroll">
+<div class="w-100 bg-green-200 overflow-hidden h-48 overflow-y-scroll">
   <div class="preview">
-    <svelte:component this={model.component} {model} {data} {design} />
+    <svelte:component this={quant.component} {quant} />
   </div>
 </div>

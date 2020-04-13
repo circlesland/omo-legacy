@@ -2,7 +2,7 @@
   export let city;
 </script>
 
-<div class="w-1/4 p-2">
+<div class="min-w-100">
   <a href="city?id={city.id}">
     <div class="primary omo-border overflow-hidden omo-shadow">
       <img
