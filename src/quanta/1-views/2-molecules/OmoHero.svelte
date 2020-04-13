@@ -1,7 +1,15 @@
 <script>
-  export let omohero = {
+  export let model = {
+    name: "Omo Hero",
+    image: "/images/samuel.jpg",
+    author: "Samuel Andert",
+    type: "omo/views/molecules"
+  };
+  export let design = {};
+  export let data = {
+    id: "",
     title: "hero title",
-    subline: "hero subtitle a",
+    subline: "hero subtitle message",
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing. Vestibulum rutrum metus at enim congue scelerisque. Sed suscipit metu non iaculis semper consectetur adipiscing elit.",
     illustration: "/images/progressive_app.svg",
@@ -10,6 +18,7 @@
 </script>
 
 <div class="bg-white flex flex-col font-sans">
+
   <div class="container mx-auto py-16">
     <main
       class="flex flex-col-reverse sm:flex-row jusitfy-between items-center ">
@@ -19,23 +28,23 @@
         <h1
           class="uppercase text-5xl text-blue-900 font-bold font-title
           leading-none tracking-tight mb-2">
-          {omohero.title}
+          {data.title}
         </h1>
         <div
           class="text-3xl text-gray-600 font-subtitle italic font-light
           tracking-wide mb-6">
-          {omohero.subline}
+          {data.subline}
         </div>
-        <p class="text-gray-500 leading-relaxed mb-12">{omohero.description}</p>
+        <p class="text-gray-500 leading-relaxed mb-12">{data.description}</p>
         <a
-          href="#"
+          href="/"
           class="bg-green-400 hover:bg-blue-800 py-2 px-4 text-lg font-bold
           text-white rounded">
-          {omohero.button}
+          {data.button}
         </a>
       </div>
       <div class="lg:px-20 w-2/5">
-        <img class="" src={omohero.illustration} alt={omohero.title} />
+        <img class="" src={data.illustration} alt={data.title} />
       </div>
     </main>
   </div>

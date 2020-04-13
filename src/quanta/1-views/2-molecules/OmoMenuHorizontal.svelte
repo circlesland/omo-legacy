@@ -2,17 +2,21 @@
   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css"
   rel="stylesheet" />
 
-<div class="pb-0 w-full flex flex-wrap ">
+<div class="pb-0 w-full flex flex-wrap">
   <div class="p-3 w-full text-gray-700 bg-gray-900 shadow-lg ">
-    <span class="pr-3 mr-2 border-r border-gray-800">
-      <img
-        src="/images/logo_single.png"
-        alt="alt placeholder"
-        class="h-8 -mt-1 inline mx-auto" />
-    </span>
-    <span class="px-1 hover:text-white cursor-pointer">
-      <i class="fas fa-stream p-2 bg-gray-800 rounded" />
-    </span>
+    <a href="/home">
+      <span class="pr-3 mr-2 border-r border-gray-800">
+        <img
+          src="/images/logo_single.png"
+          alt="alt placeholder"
+          class="h-8 -mt-1 inline mx-auto" />
+      </span>
+    </a>
+    <a href="/">
+      <span class="px-1 hover:text-white cursor-pointer">
+        <i class="fas fa-stream p-2 bg-gray-800 rounded" />
+      </span>
+    </a>
     <span class="px-1 hover:text-white cursor-pointer">
       <i class="fas fa-search p-2 bg-gray-800 rounded" />
     </span>

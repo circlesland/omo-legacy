@@ -13,8 +13,8 @@
   style="background-image: url({omosubscribe.image})">
   <div class="p-10 py-20 flex flex-col flex-wrap justify-center content-center">
     <div
-      class="m-0 p-0 text-5xl font-title uppercase text-white antialiased
-      text-center">
+      class="m-0 p-0 text-5xl font-title font-bold uppercase text-white
+      antialiased text-center">
       {omosubscribe.title}
     </div>
     <div

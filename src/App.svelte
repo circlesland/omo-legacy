@@ -1,9 +1,8 @@
 <script>
   import router, { curRoute, curId } from "./router.js";
   import OmoThemeLight from "./quanta/1-views/0-themes/OmoThemeLight.svelte";
-  import OmoNavbar from "./quanta/1-views/2-molecules/OmoNavbar.svelte";
+  import OmoLayoutEditor from "./quanta/1-views/4-layouts/OmoLayoutEditor.svelte";
   import { onMount } from "svelte";
-  import db from "./quanta/4-data/db.js";
 
   let currentId;
 
@@ -28,14 +27,8 @@
   }
 </script>
 
-<style>
-
-</style>
-
 <svelte:window on:popstate={handlerBackNavigation} />
-<div id="pageContent" class="app flex flex-col overflow-y-scroll">
-  <div class="sticky top-0" style="z-index:100000">
-    <OmoNavbar />
-  </div>
-  <svelte:component this={router[$curRoute]} {db} {currentId} />
+
+<div class="h-screen w-screen">
+  <OmoLayoutEditor />
 </div>
