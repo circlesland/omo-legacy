@@ -15,9 +15,9 @@
   };
 </script>
 
-<div class="max-w-sm bg-white shadow-lg rounded-lg">
+<div class="m-auto max-w-sm bg-white shadow-lg rounded-lg">
   <img
-    class="w-full h-56 object-cover object-center"
+    class="rounded-t w-full h-56 object-cover object-center"
     src="https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80"
     alt="avatar" />
   <div class="flex items-center px-6 py-3 bg-gray-900">
@@ -31,9 +31,11 @@
     <h1 class="mx-3 text-white font-semibold text-lg">Focusing</h1>
   </div>
   <div class="py-4 px-6">
-    <h1 class="text-2xl font-semibold text-gray-800">Patterson johnson</h1>
-    <p class="py-2 text-lg text-gray-700">
-      Full Stack maker & UI / UX Designer , love hip hop music Author of
+    <h1 class="text-xl font-title uppercase text-blue-900 font-bold">
+      Laura Johnson
+    </h1>
+    <p class="py-2 text-md text-gray-700">
+      Full Stack Maker & UI / UX Designer, love hip hop music and Author of
       Building UI.
     </p>
     <div class="flex items-center mt-4 text-gray-700">
