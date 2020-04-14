@@ -10,7 +10,7 @@ const cities = writable(
         },
         {
             id: 2,
-            name: "München",
+            name: "Munich",
             image: "https://source.unsplash.com/8QJSi37vhms "
         },
         {

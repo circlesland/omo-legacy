@@ -2,6 +2,7 @@ import Home from './quanta/1-views/5-pages/Home.svelte';
 import User from './quanta/1-views/5-pages/User.svelte';
 import City from './quanta/1-views/5-pages/City.svelte';
 import Quanta from './quanta/1-views/5-pages/Quanta.svelte';
+import Quant from './quanta/1-views/5-pages/Quant.svelte';
 
 import {
     writable
@@ -11,6 +12,7 @@ const router = {
     '/home': Home,
     '/user': User,
     '/city': City,
+    '/quant': Quant,
     '/quanta': Quanta,
 }
 export default router;

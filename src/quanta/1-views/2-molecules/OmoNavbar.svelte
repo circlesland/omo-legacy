@@ -5,7 +5,7 @@
   };
 </script>
 
-<header class="bg-gray-900">
+<header class="bg-gray-800">
   <nav class="flex justify-between w-full px-3 py-3">
     <div class="flex">
       <a href="/" class="mr-4">
@@ -17,7 +17,17 @@
         <a
           href="/"
           class="hover:text-green-400 text-white pt-1 font-bolt font-mono mx-4 ">
-          Preise
+          Link 1
+        </a>
+        <a
+          href="/"
+          class="hover:text-green-400 text-white pt-1 font-bolt font-mono mx-4 ">
+          Link 2
+        </a>
+        <a
+          href="/"
+          class="hover:text-green-400 text-white pt-1 font-bolt font-mono mx-4 ">
+          Link 3
         </a>
         <OmoButton {button} />
       </div>

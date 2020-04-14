@@ -31,23 +31,21 @@
 
 <div class="h-full flex flex-col">
   <header>
-    <div
-      class="bg-gray-300 text-sm font-semibold py-1 px-3 text-blue-900 border-b
-      border-gray-300">
+    <div class="bg-gray-200 text-sm font-semibold py-1 px-3 text-blue-900">
       context: (title of page, group, user, city, view, data or quant etc)
     </div>
   </header>
   <div class="h-full flex overflow-hidden">
-    <div class="">
+    <div class="border-r border-gray-200">
       <OmoMenuVertical />
     </div>
     <div
-      class="overflow-y-scroll bg-gray-200 border-r border-gray-300"
-      style="width: 250px">
+      class="overflow-y-scroll bg-gray-100 border-t border-r border-gray-200"
+      style="width: 220px">
       <OmoQuantaList />
     </div>
     <div class="h-full flex-1 overflow-y-scroll">
-      <div class="h-full">
+      <div class="h-full w-full">
         <svelte:component this={router[$curRoute]} {db} {currentId} />
       </div>
     </div>

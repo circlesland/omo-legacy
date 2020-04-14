@@ -1,4 +1,6 @@
 <script>
+  import OmoIconsFA from "./../1-atoms/OmoIconsFA.svelte";
+
   export let quant = {
     id: "q6",
     model: {
@@ -15,15 +17,13 @@
   };
 </script>
 
-<link
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css"
-  rel="stylesheet" />
+<OmoIconsFA />
 <div
   class="w-16 h-full pt-4 pb-4 bg-gray-200 text-blue-900 text-center shadow-lg">
   <span class="cursor-pointer hover:text-gray-500 px-1 block mb-2">
     <i class="fas fa-dna p-2 bg-gray-300 rounded" />
   </span>
-  <span class="cursor-pointer hover:text-gray-500 px-1 block mb-2">
+  <span class="cursor-pointer hover:text-gray-500 px-1 block">
     <i class="fas fa-search p-2 bg-gray-300 rounded" />
   </span>
   <!-- <span class="cursor-pointer hover:text-gray-500 px-2 block mb-5 relative">

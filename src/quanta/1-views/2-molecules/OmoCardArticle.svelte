@@ -35,7 +35,7 @@
     <div class="flex items-center">
       <img
         src={quant.data.image}
-        class="w-8 h-8 object-cover rounded-full"
+        class="w-8 h-8 object-cover rounded"
         alt="avatar" />
       <a class="text-gray-700 text-sm mx-3" href="/">{quant.data.author}</a>
     </div>

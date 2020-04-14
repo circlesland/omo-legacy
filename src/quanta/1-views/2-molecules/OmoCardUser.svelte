@@ -1,3 +1,20 @@
+<script>
+  export let quant = {
+    model: {
+      name: "",
+      image: "",
+      author: "",
+      type: "",
+      group: "",
+      tags: ""
+    },
+    design: {},
+    data: {
+      id: ""
+    }
+  };
+</script>
+
 <div class="max-w-sm bg-white shadow-lg rounded-lg">
   <img
     class="w-full h-56 object-cover object-center"

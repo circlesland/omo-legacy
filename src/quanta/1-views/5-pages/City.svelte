@@ -1,17 +1,21 @@
 <script>
   import OmoCard from "./../2-molecules/OmoCard.svelte";
-  import OmoUsers from "./../3-organisms/OmoUsers.svelte";
-  export let db;
+  import cities from "./../../4-data/cities.js";
+
   export let currentId;
-  let city = db.cities.find(item => item.id == currentId);
-  let users = db.users;
+  let city = $cities.find(item => item.id == currentId);
 </script>
 
-<div
-  class="py-40 text-6xl w-full flex content-center flex-wrap bg-cover bg-center
-  justify-center overflow-hidden uppercase font-bold text-white font-title"
-  title={city.name}>
-  {city.name}
+<div class="">
+  <img
+    src={city.image}
+    alt={city.name}
+    class="w-full object-cover object-center"
+    style="height: 30rem" />
 </div>
 
-<OmoUsers {users} {db} />
+<div
+  class="text-4xl text-center px-4 py-12 text-gray-200 bg-blue-800 flex
+  flex-wrap justify-center content-center">
+  <p class="font-title uppercase font-bold">{city.name}</p>
+</div>

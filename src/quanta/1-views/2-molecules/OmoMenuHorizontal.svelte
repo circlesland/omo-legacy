@@ -3,14 +3,15 @@
 </script>
 
 <OmoIconsFA />
+
 <div class="pb-0 w-full flex flex-wrap">
-  <div class="p-3 w-full text-gray-700 bg-gray-900 shadow-lg ">
+  <div class="p-2 w-full text-gray-600 bg-gray-900 shadow-lg ">
     <a href="/home">
-      <span class="pr-3 mr-2 border-r border-gray-800">
+      <span class="pl-1 pr-3 mr-2 border-r border-gray-800">
         <img
           src="/images/logo_single.png"
           alt="alt placeholder"
-          class="h-8 -mt-1 inline mx-auto" />
+          class="h-8 -my-1 inline mx-auto" />
       </span>
     </a>
     <!-- <a href="/">
@@ -47,7 +48,7 @@
       <img
         src="/images/samuel.jpg"
         alt="alt placeholder"
-        class="h-8 inline mx-auto rounded" />
+        class="h-8 inline mx-auto rounded border border-gray-600" />
     </span>
   </div>
 </div>
