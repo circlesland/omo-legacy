@@ -2,10 +2,11 @@ import {
     writable
 } from "svelte/store"
 import OmoCardArticle from "./../1-views/2-molecules/OmoCardArticle.svelte";
-// import OmoPricing from "./../1-views/2-molecules/OmoPricing.svelte";
+import OmoPricing from "./../1-views/2-molecules/OmoPricing.svelte";
 import OmoVideo from "./../1-views/2-molecules/OmoVideo.svelte";
 import OmoHero from "./../1-views/2-molecules/OmoHero.svelte";
 import OmoHeader from "./../1-views/2-molecules/OmoHeader.svelte";
+import OmoMenuVertical from "./../1-views/2-molecules/OmoMenuVertical.svelte";
 import OmoCities from "./../1-views/3-organisms/OmoCities.svelte";
 
 const quanta = writable(
@@ -66,7 +67,7 @@ const quanta = writable(
                 tags: "molecule"
             },
             design: {
-                layout: "bg-gray-100 p-16"
+                layout: "bg-gray-100 p-20"
             },
             data: {
                 id: "d3",
@@ -110,11 +111,26 @@ const quanta = writable(
                 author: "Samuel Andert",
                 type: "view",
                 group: "omo",
-                tags: "molecule"
+                tags: "organism"
             },
             design: {
                 grid: "md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
             },
+            data: []
+        },
+        {
+            id: "q6",
+            component: OmoMenuVertical,
+            model: {
+                id: "m6",
+                name: "Omo Menu Vertical",
+                image: "/images/samuel.jpg",
+                author: "Samuel Andert",
+                type: "view",
+                group: "omo",
+                tags: "molecule"
+            },
+            design: {},
             data: []
         }
     ]);

@@ -17,7 +17,7 @@
       button: ""
     },
     design: {
-      layout: "py-16 bg-white"
+      layout: ""
     }
   };
 </script>

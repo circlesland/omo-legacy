@@ -1,5 +1,6 @@
 <script>
   import OmoMenuHorizontal from "./../2-molecules/OmoMenuHorizontal.svelte";
+  import OmoMenuVertical from "./../2-molecules/OmoMenuVertical.svelte";
   import OmoQuantaList from "./../2-molecules/OmoQuantaList.svelte";
   import router, { curRoute, curId } from "./../../../router.js";
   import { onMount } from "svelte";
@@ -30,12 +31,19 @@
 
 <div class="h-full flex flex-col">
   <header>
-    <div class="bg-gray-300 py-2 px-4 text-blue-900">context: {currentId}</div>
+    <div
+      class="bg-gray-300 text-sm font-semibold py-1 px-3 text-blue-900 border-b
+      border-gray-300">
+      context: (title of page, group, user, city, view, data or quant etc)
+    </div>
   </header>
   <div class="h-full flex overflow-hidden">
+    <div class="">
+      <OmoMenuVertical />
+    </div>
     <div
       class="overflow-y-scroll bg-gray-200 border-r border-gray-300"
-      style="width: 300px">
+      style="width: 250px">
       <OmoQuantaList />
     </div>
     <div class="h-full flex-1 overflow-y-scroll">

@@ -3,7 +3,7 @@
   export let quant;
 </script>
 
-<div class="bg-white max-w-sm rounded shadow-md">
+<div class="bg-white max-w-sm rounded shadow-md border">
   <OmoQuantPreview {quant} />
   <div class="py-2 px-3 bg-gray-100">
     <a class="text-md font-semibold text-gray-700 font-medium " href="/">
@@ -14,7 +14,7 @@
     <div class="flex items-center">
       <img
         src={quant.model.image}
-        class="w-8 h-8 object-cover rounded-full"
+        class="w-10 h-10 object-cover rounded"
         alt="avatar" />
       <a class="text-gray-700 text-sm mx-3" href="/">
         {quant.model.author}

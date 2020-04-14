@@ -1,7 +1,8 @@
-<link
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css"
-  rel="stylesheet" />
+<script>
+  import OmoIconsFA from "./../1-atoms/OmoIconsFA.svelte";
+</script>
 
+<OmoIconsFA />
 <div class="pb-0 w-full flex flex-wrap">
   <div class="p-3 w-full text-gray-700 bg-gray-900 shadow-lg ">
     <a href="/home">
@@ -24,6 +25,7 @@
     <a href="/quanta">
       <span class="px-1 hover:text-white cursor-pointer">
         <i class="fas fa-th p-2 bg-gray-800 rounded" />
+        <span class="mx-1">Quanta</span>
       </span>
     </a>
     <!-- <span class="px-1 hover:text-white cursor-pointer">
@@ -43,7 +45,7 @@
 
     <span class="cursor-pointer relative float-right">
       <img
-        src="https://randomuser.me/api/portraits/women/21.jpg"
+        src="/images/samuel.jpg"
         alt="alt placeholder"
         class="h-8 inline mx-auto rounded" />
     </span>
