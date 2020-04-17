@@ -1,4 +1,16 @@
 <script>
+  import { onMount } from "svelte";
+  // All providers are named {ProviderName}Provider.
+  import { Player, VimeoProvider } from "@vime-js/standard";
+
+  let player;
+
+  const providers = [VimeoProvider];
+
+  onMount(() => {
+    player.src = data.video_id;
+  });
+
   export const model = {
     name: "Omo Video",
     author: "Samuel Andert",
@@ -9,18 +21,11 @@
   export const data = {
     id: "",
     title: "video",
-    link: "https://player.vimeo.com/video/349650067"
+    link: "https://player.vimeo.com/video/349650067",
+    video_id: "vimeo/349650067"
   };
 </script>
 
-<div class="bg-blue-800 w-full flex justify-center rounded-lg">
-  <div class="w-full">
-    <div
-      class="embed-responsive aspect-ratio-16/9 rounded-lg omo-shadow omo-border">
-      <iframe
-        class="embed-responsive-item "
-        src={data.link}
-        title={data.title} />
-    </div>
-  </div>
+<div class="bg-blue-900 w-full">
+  <Player {providers} bind:this={player} />
 </div>

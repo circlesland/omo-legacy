@@ -4,6 +4,12 @@ var app = (function () {
     'use strict';
 
     function noop() { }
+    function assign(tar, src) {
+        // @ts-ignore
+        for (const k in src)
+            tar[k] = src[k];
+        return tar;
+    }
     function add_location(element, file, line, column, char) {
         element.__svelte_meta = {
             loc: { file, line, column, char }
@@ -24,6 +30,9 @@ var app = (function () {
     function safe_not_equal(a, b) {
         return a != a ? b == b : a !== b || ((a && typeof a === 'object') || typeof a === 'function');
     }
+    function not_equal(a, b) {
+        return a != a ? b == b : a !== b;
+    }
     function validate_store(store, name) {
         if (store != null && typeof store.subscribe !== 'function') {
             throw new Error(`'${name}' is not a store with a 'subscribe' method`);
@@ -36,9 +45,60 @@ var app = (function () {
         const unsub = store.subscribe(...callbacks);
         return unsub.unsubscribe ? () => unsub.unsubscribe() : unsub;
     }
+    function get_store_value(store) {
+        let value;
+        subscribe(store, _ => value = _)();
+        return value;
+    }
     function component_subscribe(component, store, callback) {
         component.$$.on_destroy.push(subscribe(store, callback));
     }
+    function create_slot(definition, ctx, $$scope, fn) {
+        if (definition) {
+            const slot_ctx = get_slot_context(definition, ctx, $$scope, fn);
+            return definition[0](slot_ctx);
+        }
+    }
+    function get_slot_context(definition, ctx, $$scope, fn) {
+        return definition[1] && fn
+            ? assign($$scope.ctx.slice(), definition[1](fn(ctx)))
+            : $$scope.ctx;
+    }
+    function get_slot_changes(definition, $$scope, dirty, fn) {
+        if (definition[2] && fn) {
+            const lets = definition[2](fn(dirty));
+            if ($$scope.dirty === undefined) {
+                return lets;
+            }
+            if (typeof lets === 'object') {
+                const merged = [];
+                const len = Math.max($$scope.dirty.length, lets.length);
+                for (let i = 0; i < len; i += 1) {
+                    merged[i] = $$scope.dirty[i] | lets[i];
+                }
+                return merged;
+            }
+            return $$scope.dirty | lets;
+        }
+        return $$scope.dirty;
+    }
+    function exclude_internal_props(props) {
+        const result = {};
+        for (const k in props)
+            if (k[0] !== '$')
+                result[k] = props[k];
+        return result;
+    }
+    function set_store_value(store, ret, value = ret) {
+        store.set(value);
+        return ret;
+    }
+    function action_destroyer(action_result) {
+        return action_result && is_function(action_result.destroy) ? action_result.destroy : noop;
+    }
+
+    const is_client = typeof window !== 'undefined';
+    let raf = is_client ? cb => requestAnimationFrame(cb) : noop;
 
     function append(target, node) {
         target.appendChild(node);
@@ -86,6 +146,9 @@ var app = (function () {
     function set_style(node, key, value, important) {
         node.style.setProperty(key, value, important ? 'important' : '');
     }
+    function toggle_class(element, name, toggle) {
+        element.classList[toggle ? 'add' : 'remove'](name);
+    }
     function custom_event(type, detail) {
         const e = document.createEvent('CustomEvent');
         e.initCustomEvent(type, false, false, detail);
@@ -104,6 +167,35 @@ var app = (function () {
     function onMount(fn) {
         get_current_component().$$.on_mount.push(fn);
     }
+    function afterUpdate(fn) {
+        get_current_component().$$.after_update.push(fn);
+    }
+    function onDestroy(fn) {
+        get_current_component().$$.on_destroy.push(fn);
+    }
+    function createEventDispatcher() {
+        const component = get_current_component();
+        return (type, detail) => {
+            const callbacks = component.$$.callbacks[type];
+            if (callbacks) {
+                // TODO are there situations where events could be dispatched
+                // in a server (non-DOM) environment?
+                const event = custom_event(type, detail);
+                callbacks.slice().forEach(fn => {
+                    fn.call(component, event);
+                });
+            }
+        };
+    }
+    // TODO figure out if we still want to support
+    // shorthand events, or if we want to implement
+    // a real bubbling mechanism
+    function bubble(component, event) {
+        const callbacks = component.$$.callbacks[event.type];
+        if (callbacks) {
+            callbacks.slice().forEach(fn => fn(event));
+        }
+    }
 
     const dirty_components = [];
     const binding_callbacks = [];
@@ -116,6 +208,10 @@ var app = (function () {
             update_scheduled = true;
             resolved_promise.then(flush);
         }
+    }
+    function tick() {
+        schedule_update();
+        return resolved_promise;
     }
     function add_render_callback(fn) {
         render_callbacks.push(fn);
@@ -295,6 +391,43 @@ var app = (function () {
             }
             keys.add(key);
         }
+    }
+
+    function get_spread_update(levels, updates) {
+        const update = {};
+        const to_null_out = {};
+        const accounted_for = { $$scope: 1 };
+        let i = levels.length;
+        while (i--) {
+            const o = levels[i];
+            const n = updates[i];
+            if (n) {
+                for (const key in o) {
+                    if (!(key in n))
+                        to_null_out[key] = 1;
+                }
+                for (const key in n) {
+                    if (!accounted_for[key]) {
+                        update[key] = n[key];
+                        accounted_for[key] = 1;
+                    }
+                }
+                levels[i] = n;
+            }
+            else {
+                for (const key in o) {
+                    accounted_for[key] = 1;
+                }
+            }
+        }
+        for (const key in to_null_out) {
+            if (!(key in update))
+                update[key] = undefined;
+        }
+        return update;
+    }
+    function get_spread_object(spread_props) {
+        return typeof spread_props === 'object' && spread_props !== null ? spread_props : {};
     }
     function create_component(block) {
         block && block.c();
@@ -490,6 +623,16 @@ var app = (function () {
 
     const subscriber_queue = [];
     /**
+     * Creates a `Readable` store that allows reading by subscription.
+     * @param value initial value
+     * @param {StartStopNotifier}start start and stop notifications for subscriptions
+     */
+    function readable(value, start) {
+        return {
+            subscribe: writable(value, start).subscribe,
+        };
+    }
+    /**
      * Create a `Writable` store that allows both updating and reading by subscription.
      * @param {*=}value initial value
      * @param {StartStopNotifier=}start start and stop notifications for subscriptions
@@ -538,6 +681,47 @@ var app = (function () {
             };
         }
         return { set, update, subscribe };
+    }
+    function derived(stores, fn, initial_value) {
+        const single = !Array.isArray(stores);
+        const stores_array = single
+            ? [stores]
+            : stores;
+        const auto = fn.length < 2;
+        return readable(initial_value, (set) => {
+            let inited = false;
+            const values = [];
+            let pending = 0;
+            let cleanup = noop;
+            const sync = () => {
+                if (pending) {
+                    return;
+                }
+                cleanup();
+                const result = fn(single ? values[0] : values, set);
+                if (auto) {
+                    set(result);
+                }
+                else {
+                    cleanup = is_function(result) ? result : noop;
+                }
+            };
+            const unsubscribers = stores_array.map((store, i) => subscribe(store, (value) => {
+                values[i] = value;
+                pending &= ~(1 << i);
+                if (inited) {
+                    sync();
+                }
+            }, () => {
+                pending |= (1 << i);
+            }));
+            inited = true;
+            sync();
+            return function stop() {
+                run_all(unsubscribers);
+                cleanup();
+            };
+        });
     }
 
     /* src/quanta/1-views/2-molecules/OmoCardArticle.svelte generated by Svelte v3.20.1 */
@@ -1181,49 +1365,655 @@ var app = (function () {
     	}
     }
 
-    /* src/quanta/1-views/2-molecules/OmoVideo.svelte generated by Svelte v3.20.1 */
+    // Treeshaking safe.
+    const MediaType = function MediaType() {};
+    MediaType.NONE = 0;
+    MediaType.AUDIO = 1;
+    MediaType.VIDEO = 2;
 
-    const file$4 = "src/quanta/1-views/2-molecules/OmoVideo.svelte";
+    // Treeshaking safe.
+    const PlayerState = function PlayerState() {};
+    PlayerState.IDLE = 1;
+    PlayerState.CUED = 2;
+    PlayerState.PLAYING = 3;
+    PlayerState.PAUSED = 4;
+    PlayerState.BUFFERING = 5;
+    PlayerState.ENDED = 6;
+
+    // Treeshaking safe.
+    const VideoQuality = function VideoQuality() {};
+    VideoQuality.UNKNOWN = 0;
+    VideoQuality.XXS = 144;
+    VideoQuality.XS = 240;
+    VideoQuality.S = 360;
+    VideoQuality.M = 480;
+    VideoQuality.L = 720;
+    VideoQuality.XL = 1080;
+    VideoQuality.XXL = 1440;
+    VideoQuality.MAX = 2160;
+
+    const currentPlayer = writable(null);
+
+    // eslint-disable-next-line no-param-reassign
+    const set_style$1 = (el, prop, value = null) => { if (el) el.style[prop] = value; };
+
+    const is_null = (input) => input === null;
+    const is_undefined = (input) => typeof input === 'undefined';
+    const is_null_or_undefined = (input) => is_null(input) || is_undefined(input);
+
+    const get_constructor = (input) => (
+      !is_null_or_undefined(input) ? input.constructor : null
+    );
+
+    const is_object = (input) => get_constructor(input) === Object;
+    const is_number = (input) => get_constructor(input) === Number && !Number.isNaN(input);
+    const is_string = (input) => get_constructor(input) === String;
+    const is_boolean = (input) => get_constructor(input) === Boolean;
+    const is_function$1 = (input) => get_constructor(input) === Function;
+    const is_array = (input) => Array.isArray(input);
+
+    function try_parse_json(json, onFail) {
+      try {
+        return JSON.parse(json);
+      } catch (e) {
+        if (onFail) onFail(e);
+        return null;
+      }
+    }
+
+    const is_json_or_obj = (input) => {
+      if (!input) return false;
+      return is_object(input) || input.startsWith('{');
+    };
+
+    const obj_or_try_parse_json = (input) => {
+      if (is_object(input)) return input;
+      return try_parse_json(input);
+    };
+
+    /* eslint-disable max-len */
+
+    const IS_CLIENT = typeof window !== 'undefined';
+    const UA = (IS_CLIENT && window.navigator.userAgent.toLowerCase());
+    const IS_IE = (UA && /msie|trident/.test(UA));
+    const IS_IOS = (UA && /iphone|ipad|ipod|ios/.test(UA));
+    const IS_ANDROID = (UA && /android/.test(UA));
+    const IS_EDGE = (UA && UA.indexOf('edge/') > 0);
+    const IS_CHROME = (UA && /chrome\/\d+/.test(UA) && !IS_EDGE);
+    const IS_IPHONE = (IS_CLIENT && /(iPhone|iPod)/gi.test(navigator.platform));
+    const IS_MOBILE = (IS_IOS || IS_ANDROID);
+
+    /**
+     * To detect autoplay, we create a video element and call play on it, if it is `paused` after
+     * a `play()` call, autoplay is supported. Although this unintuitive, it works across browsers
+     * and is currently the lightest way to detect autoplay without using a data source.
+     *
+     * @see https://github.com/ampproject/amphtml/blob/9bc8756536956780e249d895f3e1001acdee0bc0/src/utils/video.js#L25
+     */
+    const can_autoplay = (muted = true, playsinline = true) => {
+      if (!IS_CLIENT) return false;
+
+      const video = element('video');
+
+      if (muted) {
+        video.setAttribute('muted', '');
+        video.muted = true;
+      }
+
+      if (playsinline) {
+        video.setAttribute('playsinline', '');
+        video.setAttribute('webkit-playsinline', '');
+        video.playsinline = true;
+        video.webkitPlaysinline = true;
+      }
+
+      video.setAttribute('height', '0');
+      video.setAttribute('width', '0');
+
+      video.style.position = 'fixed';
+      video.style.top = 0;
+      video.style.width = 0;
+      video.style.height = 0;
+      video.style.opacity = 0;
+
+      // Promise wrapped this way to catch both sync throws and async rejections.
+      // More info: https://github.com/tc39/proposal-promise-try
+      new Promise((resolve) => resolve(video.play())).catch(noop);
+
+      return Promise.resolve(!video.paused);
+    };
+
+    const serialize_query_string = (params) => {
+      const qs = [];
+      const appendQueryParam = (param, v) => {
+        qs.push(`${encodeURIComponent(param)}=${encodeURIComponent(v)}`);
+      };
+      Object.keys(params).forEach((param) => {
+        const value = params[param];
+        if (is_null_or_undefined(value)) return;
+        if (is_array(value)) {
+          value.forEach((v) => appendQueryParam(param, v));
+        } else {
+          appendQueryParam(param, value);
+        }
+      });
+      return qs.join('&');
+    };
+
+    const apppend_querystring_to_url = (url, qs) => {
+      if (!qs) return url;
+      const mainAndQuery = url.split('?', 2);
+      return mainAndQuery[0] + (mainAndQuery[1] ? `?${mainAndQuery[1]}&${qs}` : `?${qs}`);
+    };
+
+    const add_params_to_url = (
+      url,
+      params,
+    ) => apppend_querystring_to_url(url, serialize_query_string(params));
+
+    const prefetch = (rel, url, as) => {
+      if (!IS_CLIENT) return false;
+      const link = element('link');
+      link.rel = rel;
+      link.href = url;
+      if (as) link.as = as;
+      link.crossorigin = true;
+      document.head.append(link);
+      return true;
+    };
+
+    const decode_json = (data) => is_json_or_obj(data) && obj_or_try_parse_json(data);
+
+    const create_prop = (
+      object,
+      key,
+      descriptor,
+    ) => Object.defineProperty(object, key, descriptor);
+
+    const deferred = () => {
+      let resolve;
+      let reject;
+      const promise = new Promise((res, rej) => {
+        resolve = res;
+        reject = rej;
+      });
+      return { promise, resolve, reject };
+    };
+
+    const is_store = (store) => store && is_function$1(store.subscribe);
+
+    const safe_get = (v) => (is_store(v) ? get_store_value(v) : v);
+
+    // Private is "private" to the component who instantiates it, when it is exposed publically
+    // the set method should be removed. The utility `make_private_stores_readonly` does exactly
+    // this. This is also what `map_store_to_component` below uses.
+    const make_store_private = (store) => ({
+      ...store,
+      private: true,
+    });
+
+    const add_condition_to_store = (store, condition) => ({
+      ...store,
+      set: (value) => { if (safe_get(condition)) store.set(value); },
+      forceSet: store.set,
+    });
+
+    const private_writable = (initialValue) => make_store_private(writable(initialValue));
+
+    const writable_if = (
+      initialValue,
+      condition,
+    ) => add_condition_to_store(writable(initialValue), condition);
+
+    const private_writable_if = (
+      initialValue,
+      condition,
+    ) => make_store_private(writable_if(initialValue, condition));
+
+    const indexable = (bounds) => {
+      const store = writable(-1);
+      return {
+        ...store,
+        subscribe: derived([store, bounds], ([$value, $bounds]) => {
+          if (!$bounds || $bounds.length === 0) return -1;
+          if ($value >= 0 && $value < $bounds.length) return $value;
+          return -1;
+        }).subscribe,
+      };
+    };
+
+    const rangeable = (initialValue, lowerBound, upperBound) => {
+      const store = writable(initialValue);
+      return {
+        ...store,
+        set: (value) => {
+          store.set(Math.max(safe_get(lowerBound), Math.min(value, safe_get(upperBound))));
+        },
+      };
+    };
+
+    const rangeable_if = (
+      initialValue,
+      lowerBound,
+      upperBound,
+      condition,
+    ) => add_condition_to_store(rangeable(initialValue, lowerBound, upperBound), condition);
+
+    const selectable = (initialValue, values) => {
+      let newValue;
+      const store = writable(initialValue);
+      return {
+        ...store,
+        subscribe: derived([store, values], ([$value, $values]) => {
+          if (!$values) { newValue = null; }
+          if ($values.includes($value)) { newValue = $value; }
+          return newValue;
+        }).subscribe,
+      };
+    };
+
+    const selectable_if = (
+      initialValue,
+      values,
+      condition,
+    ) => add_condition_to_store(selectable(initialValue, values), condition);
+
+    const make_store_readonly = (store) => ({ subscribe: store.subscribe });
+
+    const make_private_stores_readonly = (stores) => {
+      const result = {};
+      Object.keys(stores).forEach((name) => {
+        const store = stores[name];
+        result[name] = store.private ? make_store_readonly(store) : store;
+      });
+      return result;
+    };
+
+    const map_store_to_component = (comp, stores) => {
+      let canWrite = {};
+      const component = comp || get_current_component();
+
+      create_prop(component, 'getStore', {
+        get: () => () => make_private_stores_readonly(stores),
+        configurable: true,
+      });
+
+      component.$$.on_destroy.push(() => {
+        Object.keys(stores).forEach((prop) => { delete component[prop]; });
+        delete component.getStore;
+        canWrite = {};
+      });
+
+      const onUpdateProp = (prop, newValue, shouldFlush = false) => {
+        if (!canWrite[prop] || !not_equal(get_store_value(stores[prop]), newValue)) return;
+        stores[prop].set(newValue);
+        if (shouldFlush) flush();
+      };
+
+      Object.keys(stores).forEach((prop) => {
+        const store = stores[prop];
+        canWrite[prop] = !!store.set && !store.private;
+        create_prop(component, prop, {
+          get: () => get_store_value(store),
+          set: canWrite[prop] ? ((v) => { onUpdateProp(prop, v, true); }) : undefined,
+          configurable: true,
+        });
+      });
+
+      // onPropsChange
+      return (props) => Object.keys(props).forEach((prop) => { onUpdateProp(prop, props[prop]); });
+    };
+
+    function vAspectRatio(node, initialAspectRatio) {
+      const update = (newAspectRatio) => {
+        if (!newAspectRatio) {
+          set_style$1(node, 'paddingBottom');
+          return;
+        }
+        const [width, height] = newAspectRatio.split(':');
+        set_style$1(node, 'paddingBottom', `${(100 / width) * height}%`);
+      };
+
+      update(initialAspectRatio);
+
+      return {
+        update,
+        destroy() {
+          update(null);
+        },
+      };
+    }
+
+    // Player defaults used when the `src` changes or `resetStore` is called.
+    const playerDefaults = () => ({
+      paused: true,
+      playing: false,
+      seeking: false,
+      rebuilding: false,
+      internalTime: 0,
+      currentTime: 0,
+      title: '',
+      duration: 0,
+      buffered: 0,
+      mediaId: null,
+      currentSrc: null,
+      buffering: false,
+      videoQuality: VideoQuality.UNKNOWN,
+      videoQualities: [],
+      playbackRate: 1,
+      playbackRates: [1],
+      playbackStarted: false,
+      playbackEnded: false,
+      playbackReady: false,
+      isLive: false,
+      nativePoster: null,
+      isControlsActive: true,
+    });
+
+    const resetStore = (store) => {
+      const defaults = playerDefaults();
+      Object.keys(defaults)
+        .forEach((prop) => store[prop] && store[prop].set(defaults[prop]));
+    };
+
+    const fillStore = async (store) => {
+      store.canAutoplay.set(await can_autoplay(false));
+      store.canMutedAutoplay.set(await can_autoplay(true));
+    };
+
+    const buildStandardStore = (player) => {
+      const store = {};
+      const defaults = playerDefaults();
+
+      store.playbackReady = private_writable(defaults.playbackReady);
+      store.rebuilding = private_writable_if(defaults.rebuilding, store.playbackReady);
+      store.canAutoplay = private_writable(false);
+      store.canMutedAutoplay = private_writable(false);
+      store.canInteract = derived(
+        [store.playbackReady, store.rebuilding],
+        ([$playbackReady, $rebuilding]) => $playbackReady && !$rebuilding,
+      );
+
+      // --------------------------------------------------------------
+      // Native
+      // --------------------------------------------------------------
+
+      store.useNativeView = writable(true);
+      store.useNativeControls = writable(true);
+      store.useNativeCaptions = writable(true);
+      store.nativePoster = private_writable(defaults.nativePoster);
+
+      // --------------------------------------------------------------
+      // Src
+      // --------------------------------------------------------------
+
+      store.src = writable(null);
+      store.mediaId = private_writable(defaults.mediaId);
+      store.poster = writable(null);
+      store.provider = private_writable(null);
+      store.providers = writable([]);
+      store.providerConfig = writable({});
+      store.providerVersion = writable('latest');
+      store.origin = private_writable(null);
+      store.title = private_writable(defaults.title);
+      store.currentSrc = private_writable(defaults.currentSrc);
+
+      store.Provider = derived(
+        [store.src, store.providers],
+        ([$src, $providers]) => $providers.find((p) => p.canPlay($src)),
+      );
+
+      store.canSetPoster = derived(
+        store.provider,
+        ($provider) => $provider && is_function$1($provider.setPoster),
+      );
+
+      // --------------------------------------------------------------
+      // Metadata
+      // --------------------------------------------------------------
+
+      store.mediaType = private_writable(MediaType.NONE);
+      store.isAudio = derived(store.mediaType, ($mediaType) => $mediaType === MediaType.AUDIO);
+      store.isVideo = derived(store.mediaType, ($mediaType) => $mediaType === MediaType.VIDEO);
+      store.isLive = private_writable(false);
+      store.playbackRates = private_writable(defaults.playbackRates);
+      store.videoQualities = private_writable(defaults.videoQualities);
+      store.duration = private_writable(defaults.duration);
+
+      // Used by @vime-js/complete.
+      // eslint-disable-next-line no-underscore-dangle
+      store._posterPlugin = writable(false);
+      store.isVideoView = derived(
+        // eslint-disable-next-line no-underscore-dangle
+        [store.poster, store.nativePoster, store.canSetPoster, store._posterPlugin, store.isVideo],
+        ([
+          $poster,
+          $nativePoster,
+          $canSetPoster,
+          $plugin,
+          $isVideo,
+        ]) => !!(($canSetPoster || $plugin) && ($poster || $nativePoster)) || $isVideo,
+      );
+
+      store.isVideoReady = derived(
+        [store.playbackReady, store.isVideoView],
+        ([$playbackReady, $isVideoView]) => $playbackReady && $isVideoView,
+      );
+
+      // --------------------------------------------------------------
+      // Playback
+      // --------------------------------------------------------------
+
+      store.canSetPlaybackRate = derived(
+        [store.provider, store.playbackRates],
+        ([
+          $provider,
+          $playbackRates,
+        ]) => $provider && $playbackRates.length > 1 && is_function$1($provider.setPlaybackRate),
+      );
+
+      store.canSetVideoQuality = derived(
+        [store.provider, store.isVideo, store.videoQualities],
+        ([$provider, $isVideo, $videoQualities]) => $provider
+          && $isVideo
+          && $videoQualities.length > 0
+          && is_function$1($provider.setVideoQuality),
+      );
+
+      store.paused = writable(defaults.paused);
+      store.playbackRate = selectable_if(
+        defaults.playbackRate,
+        store.playbackRates,
+        store.canSetPlaybackRate,
+      );
+      store.videoQuality = selectable_if(
+        defaults.videoQuality,
+        store.videoQualities,
+        store.canSetVideoQuality,
+      );
+      store.currentTime = rangeable(defaults.currentTime, 0, store.duration);
+      store.internalTime = private_writable(defaults.internalTime);
+      store.muted = writable(false);
+      store.volume = rangeable_if(30, 0, 100, !IS_MOBILE);
+      store.buffered = private_writable(defaults.buffered);
+      store.isControlsEnabled = writable(true);
+      store.isControlsActive = private_writable(defaults.isControlsActive);
+
+      store.progress = derived(
+        [store.currentTime, store.duration, store.buffered],
+        ([$currentTime, $duration, $buffered]) => ({
+          played: {
+            seconds: $currentTime,
+            percent: ($currentTime / $duration) * 100,
+          },
+          buffered: {
+            seconds: $buffered,
+            percent: ($buffered / $duration) * 100,
+          },
+        }),
+      );
+
+      // --------------------------------------------------------------
+      // State
+      // --------------------------------------------------------------
+
+      store.playing = private_writable(defaults.playing);
+      store.buffering = private_writable(defaults.buffering);
+      store.playbackEnded = private_writable(defaults.playbackEnded);
+      store.playbackStarted = private_writable(defaults.playbackStarted);
+      store.seeking = private_writable(defaults.seeking);
+      store.isPlayerActive = private_writable(false);
+
+      store.state = derived(
+        [
+          store.playbackStarted,
+          store.playbackEnded,
+          store.paused,
+          store.buffering,
+          store.playbackReady,
+        ],
+        ([$playbackStarted, $playbackEnded, $paused, $buffering, $playbackReady]) => {
+          if ($playbackEnded) {
+            return PlayerState.ENDED;
+          } if ($buffering) {
+            return PlayerState.BUFFERING;
+          } if ($playbackStarted && $paused) {
+            return PlayerState.PAUSED;
+          } if ($playbackStarted) {
+            return PlayerState.PLAYING;
+          } if ($playbackReady) {
+            return PlayerState.CUED;
+          }
+          return PlayerState.IDLE;
+        },
+      );
+
+      // --------------------------------------------------------------
+      // Tracks
+      // --------------------------------------------------------------
+
+      store.canSetTracks = derived(
+        store.provider,
+        ($provider) => $provider && is_function$1($provider.setTracks),
+      );
+
+      // Don't block writing of `tracks` as it might be stored and used by a provider when possible.
+      store.tracks = writable([]);
+
+      store.canSetTrack = derived(
+        [store.provider, store.tracks],
+        ([$provider, $tracks]) => $provider
+          && $tracks
+          && $tracks.length > 0
+          && is_function$1($provider.setTrack),
+      );
+
+      // Can't block current track with `canSetTrack` because it'll stop @vime-js/complete from updating
+      // the value when a plugin is managing captions.
+      store.currentTrackIndex = indexable(store.tracks);
+
+      store.currentTrack = derived(
+        [store.tracks, store.currentTrackIndex],
+        ([$tracks, $index]) => (($index >= 0) ? $tracks[$index] : null),
+      );
+
+      store.isCaptionsActive = derived(
+        [store.playbackReady, store.isAudio, store.currentTrackIndex],
+        ([$playbackReady, $isAudio, $currentTrackIndex]) => $playbackReady
+          && !$isAudio
+          && ($currentTrackIndex !== -1),
+      );
+
+      // TODO: add cues support (cues, currentCueIndex, currentCue, activeCues).
+
+      // --------------------------------------------------------------
+      // Picture in Picture
+      // --------------------------------------------------------------
+
+      store.canSetPiP = derived(
+        [store.isVideoReady, store.provider],
+        ([$isVideoReady, $provider]) => $isVideoReady
+          && $provider
+          && $provider.supportsPiP()
+          && is_function$1($provider.setPiP),
+      );
+
+      store.isPiPActive = private_writable(false);
+
+      // --------------------------------------------------------------
+      // Fullscreen
+      // --------------------------------------------------------------
+
+      // Set in the Player.
+      store.canSetFullscreen = private_writable(false);
+      store.isFullscreenActive = private_writable(false);
+
+      // --------------------------------------------------------------
+      // Options
+      // --------------------------------------------------------------
+
+      store.autopause = writable(true);
+      store.aspectRatio = writable('16:9');
+      store.playsinline = writable(true);
+      store.autoplay = writable(false);
+      store.loop = writable(false);
+
+      fillStore(store);
+
+      return {
+        store,
+        onPropsChange: map_store_to_component(player, store),
+        resetStore: () => resetStore(store),
+      };
+    };
+
+    /* node_modules/@vime-js/lite/src/Embed.svelte generated by Svelte v3.20.1 */
+    const file$4 = "node_modules/@vime-js/lite/src/Embed.svelte";
 
     function create_fragment$4(ctx) {
-    	let div2;
-    	let div1;
-    	let div0;
-    	let iframe;
-    	let iframe_src_value;
-    	let iframe_title_value;
+    	let iframe_1;
+    	let iframe_1_src_value;
+    	let dispose;
 
     	const block = {
     		c: function create() {
-    			div2 = element("div");
-    			div1 = element("div");
-    			div0 = element("div");
-    			iframe = element("iframe");
-    			attr_dev(iframe, "class", "embed-responsive-item ");
-    			if (iframe.src !== (iframe_src_value = /*data*/ ctx[0].link)) attr_dev(iframe, "src", iframe_src_value);
-    			attr_dev(iframe, "title", iframe_title_value = /*data*/ ctx[0].title);
-    			add_location(iframe, file$4, 19, 6, 493);
-    			attr_dev(div0, "class", "embed-responsive aspect-ratio-16/9 rounded-lg omo-shadow omo-border");
-    			add_location(div0, file$4, 17, 4, 399);
-    			attr_dev(div1, "class", "w-full");
-    			add_location(div1, file$4, 16, 2, 374);
-    			attr_dev(div2, "class", "bg-blue-800 w-full flex justify-center rounded-lg");
-    			add_location(div2, file$4, 15, 0, 308);
+    			iframe_1 = element("iframe");
+    			attr_dev(iframe_1, "id", /*id*/ ctx[3]);
+    			attr_dev(iframe_1, "title", /*title*/ ctx[0]);
+    			if (iframe_1.src !== (iframe_1_src_value = /*srcWithParams*/ ctx[2])) attr_dev(iframe_1, "src", iframe_1_src_value);
+    			iframe_1.allowFullscreen = "1";
+    			attr_dev(iframe_1, "allow", "accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture");
+    			attr_dev(iframe_1, "class", "svelte-jism0y");
+    			add_location(iframe_1, file$4, 2, 0, 42);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div2, anchor);
-    			append_dev(div2, div1);
-    			append_dev(div1, div0);
-    			append_dev(div0, iframe);
+    		m: function mount(target, anchor, remount) {
+    			insert_dev(target, iframe_1, anchor);
+    			/*iframe_1_binding*/ ctx[18](iframe_1);
+    			if (remount) run_all(dispose);
+
+    			dispose = [
+    				listen_dev(window, "message", /*onMessage*/ ctx[4], false, false, false),
+    				listen_dev(iframe_1, "load", /*load_handler*/ ctx[17], false, false, false)
+    			];
     		},
-    		p: noop,
+    		p: function update(ctx, [dirty]) {
+    			if (dirty & /*title*/ 1) {
+    				attr_dev(iframe_1, "title", /*title*/ ctx[0]);
+    			}
+
+    			if (dirty & /*srcWithParams*/ 4 && iframe_1.src !== (iframe_1_src_value = /*srcWithParams*/ ctx[2])) {
+    				attr_dev(iframe_1, "src", iframe_1_src_value);
+    			}
+    		},
     		i: noop,
     		o: noop,
     		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div2);
+    			if (detaching) detach_dev(iframe_1);
+    			/*iframe_1_binding*/ ctx[18](null);
+    			run_all(dispose);
     		}
     	};
 
@@ -1238,7 +2028,3550 @@ var app = (function () {
     	return block;
     }
 
+    let idCount = 0;
+    const PRECONNECTED = [];
+
     function instance$4($$self, $$props, $$invalidate) {
+    	let iframe = null;
+    	let srcWithParams = null;
+
+    	// eslint-disable-next-line prefer-const
+    	idCount += 1;
+
+    	const id = `vime-embed-${idCount}`;
+    	const dispatch = createEventDispatcher();
+
+    	const Event = {
+    		SRC_CHANGE: "srcchange",
+    		MESSAGE: "message",
+    		DATA: "data",
+    		REBUILD: "rebuild"
+    	};
+
+    	let { src = null } = $$props;
+    	let { title = null } = $$props;
+    	let { params = {} } = $$props;
+    	let { origin = null } = $$props;
+    	let { preconnections = [] } = $$props;
+    	let { decoder = null } = $$props;
+    	const getId = () => id;
+    	const getIframe = () => iframe;
+    	const getSrc = () => srcWithParams;
+
+    	const postMessage = (message, target) => {
+    		if (!iframe || !iframe.contentWindow) return;
+    		iframe.contentWindow.postMessage(JSON.stringify(message), target || origin || "*");
+    	};
+
+    	const originMatches = e => {
+    		if (!iframe || e.source !== iframe.contentWindow) return false;
+    		return is_string(origin) && origin === e.origin;
+    	};
+
+    	const onMessage = e => {
+    		if (!originMatches(e)) return;
+    		dispatch(Event.MESSAGE, e);
+    		const data = decoder ? decoder(e.data) : null;
+    		if (data) dispatch(Event.DATA, data);
+    	};
+
+    	const writable_props = ["src", "title", "params", "origin", "preconnections", "decoder"];
+
+    	Object.keys($$props).forEach(key => {
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<Embed> was created with unknown prop '${key}'`);
+    	});
+
+    	let { $$slots = {}, $$scope } = $$props;
+    	validate_slots("Embed", $$slots, []);
+
+    	function load_handler(event) {
+    		bubble($$self, event);
+    	}
+
+    	function iframe_1_binding($$value) {
+    		binding_callbacks[$$value ? "unshift" : "push"](() => {
+    			$$invalidate(1, iframe = $$value);
+    		});
+    	}
+
+    	$$self.$set = $$props => {
+    		if ("src" in $$props) $$invalidate(5, src = $$props.src);
+    		if ("title" in $$props) $$invalidate(0, title = $$props.title);
+    		if ("params" in $$props) $$invalidate(6, params = $$props.params);
+    		if ("origin" in $$props) $$invalidate(7, origin = $$props.origin);
+    		if ("preconnections" in $$props) $$invalidate(8, preconnections = $$props.preconnections);
+    		if ("decoder" in $$props) $$invalidate(9, decoder = $$props.decoder);
+    	};
+
+    	$$self.$capture_state = () => ({
+    		idCount,
+    		PRECONNECTED,
+    		createEventDispatcher,
+    		is_string,
+    		prefetch,
+    		add_params_to_url,
+    		iframe,
+    		srcWithParams,
+    		id,
+    		dispatch,
+    		Event,
+    		src,
+    		title,
+    		params,
+    		origin,
+    		preconnections,
+    		decoder,
+    		getId,
+    		getIframe,
+    		getSrc,
+    		postMessage,
+    		originMatches,
+    		onMessage
+    	});
+
+    	$$self.$inject_state = $$props => {
+    		if ("iframe" in $$props) $$invalidate(1, iframe = $$props.iframe);
+    		if ("srcWithParams" in $$props) $$invalidate(2, srcWithParams = $$props.srcWithParams);
+    		if ("src" in $$props) $$invalidate(5, src = $$props.src);
+    		if ("title" in $$props) $$invalidate(0, title = $$props.title);
+    		if ("params" in $$props) $$invalidate(6, params = $$props.params);
+    		if ("origin" in $$props) $$invalidate(7, origin = $$props.origin);
+    		if ("preconnections" in $$props) $$invalidate(8, preconnections = $$props.preconnections);
+    		if ("decoder" in $$props) $$invalidate(9, decoder = $$props.decoder);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	$$self.$$.update = () => {
+    		if ($$self.$$.dirty & /*src, params*/ 96) {
+    			 $$invalidate(2, srcWithParams = src ? add_params_to_url(src, params) : null);
+    		}
+
+    		if ($$self.$$.dirty & /*srcWithParams*/ 4) {
+    			 dispatch(Event.SRC_CHANGE, srcWithParams);
+    		}
+
+    		if ($$self.$$.dirty & /*srcWithParams*/ 4) {
+    			 if (srcWithParams) dispatch(Event.REBUILD);
+    		}
+
+    		if ($$self.$$.dirty & /*srcWithParams, iframe*/ 6) {
+    			 if (srcWithParams && !iframe && !PRECONNECTED.includes(srcWithParams)) {
+    				if (prefetch("preconnect", srcWithParams)) PRECONNECTED.push(srcWithParams);
+    			}
+    		}
+
+    		if ($$self.$$.dirty & /*preconnections*/ 256) {
+    			// TODO: improve preconnections
+    			// @see https://github.com/ampproject/amphtml/blob/master/src/preconnect.js
+    			 preconnections.filter(p => !PRECONNECTED.includes(p)).forEach(url => {
+    				if (prefetch("preconnect", url)) PRECONNECTED.push(url);
+    			});
+    		}
+    	};
+
+    	return [
+    		title,
+    		iframe,
+    		srcWithParams,
+    		id,
+    		onMessage,
+    		src,
+    		params,
+    		origin,
+    		preconnections,
+    		decoder,
+    		getId,
+    		getIframe,
+    		getSrc,
+    		postMessage,
+    		dispatch,
+    		Event,
+    		originMatches,
+    		load_handler,
+    		iframe_1_binding
+    	];
+    }
+
+    class Embed extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+
+    		init(this, options, instance$4, create_fragment$4, safe_not_equal, {
+    			src: 5,
+    			title: 0,
+    			params: 6,
+    			origin: 7,
+    			preconnections: 8,
+    			decoder: 9,
+    			getId: 10,
+    			getIframe: 11,
+    			getSrc: 12,
+    			postMessage: 13
+    		});
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "Embed",
+    			options,
+    			id: create_fragment$4.name
+    		});
+    	}
+
+    	get src() {
+    		throw new Error("<Embed>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set src(value) {
+    		throw new Error("<Embed>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get title() {
+    		throw new Error("<Embed>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set title(value) {
+    		throw new Error("<Embed>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get params() {
+    		throw new Error("<Embed>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set params(value) {
+    		throw new Error("<Embed>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get origin() {
+    		throw new Error("<Embed>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set origin(value) {
+    		throw new Error("<Embed>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get preconnections() {
+    		throw new Error("<Embed>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set preconnections(value) {
+    		throw new Error("<Embed>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get decoder() {
+    		throw new Error("<Embed>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set decoder(value) {
+    		throw new Error("<Embed>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get getId() {
+    		return this.$$.ctx[10];
+    	}
+
+    	set getId(value) {
+    		throw new Error("<Embed>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get getIframe() {
+    		return this.$$.ctx[11];
+    	}
+
+    	set getIframe(value) {
+    		throw new Error("<Embed>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get getSrc() {
+    		return this.$$.ctx[12];
+    	}
+
+    	set getSrc(value) {
+    		throw new Error("<Embed>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get postMessage() {
+    		return this.$$.ctx[13];
+    	}
+
+    	set postMessage(value) {
+    		throw new Error("<Embed>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+    }
+
+    /* node_modules/@vime-js/lite/src/Lazy.svelte generated by Svelte v3.20.1 */
+    const file$5 = "node_modules/@vime-js/lite/src/Lazy.svelte";
+    const get_default_slot_changes = dirty => ({ intersecting: dirty & /*intersecting*/ 2 });
+    const get_default_slot_context = ctx => ({ intersecting: /*intersecting*/ ctx[1] });
+
+    function create_fragment$5(ctx) {
+    	let div;
+    	let current;
+    	const default_slot_template = /*$$slots*/ ctx[4].default;
+    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[3], get_default_slot_context);
+
+    	const block = {
+    		c: function create() {
+    			div = element("div");
+    			if (default_slot) default_slot.c();
+    			attr_dev(div, "class", "svelte-1eigdsz");
+    			add_location(div, file$5, 0, 0, 0);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, div, anchor);
+
+    			if (default_slot) {
+    				default_slot.m(div, null);
+    			}
+
+    			/*div_binding*/ ctx[5](div);
+    			current = true;
+    		},
+    		p: function update(ctx, [dirty]) {
+    			if (default_slot) {
+    				if (default_slot.p && dirty & /*$$scope, intersecting*/ 10) {
+    					default_slot.p(get_slot_context(default_slot_template, ctx, /*$$scope*/ ctx[3], get_default_slot_context), get_slot_changes(default_slot_template, /*$$scope*/ ctx[3], dirty, get_default_slot_changes));
+    				}
+    			}
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(default_slot, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(default_slot, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(div);
+    			if (default_slot) default_slot.d(detaching);
+    			/*div_binding*/ ctx[5](null);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$5.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance$5($$self, $$props, $$invalidate) {
+    	let el;
+    	let intersecting = false;
+    	let { threshold = 0.75 } = $$props;
+
+    	onMount(() => {
+    		if (typeof IntersectionObserver !== "undefined") {
+    			const observer = new IntersectionObserver(entries => {
+    					$$invalidate(1, intersecting = entries[0].isIntersecting);
+    					if (intersecting) observer.unobserve(el);
+    				},
+    			{ threshold });
+
+    			observer.observe(el);
+    			return () => observer.unobserve(el);
+    		}
+
+    		function onScroll() {
+    			const rect = el.getBoundingClientRect();
+    			$$invalidate(1, intersecting = rect.bottom > 0 && rect.right > 0 && rect.top * (1 + threshold) < window.innerHeight && rect.left < window.innerWidth);
+    			if (intersecting) window.removeEventListener("scroll", onScroll);
+    		}
+
+    		window.addEventListener("scroll", onScroll);
+    		return () => window.removeEventListener("scroll", onScroll);
+    	});
+
+    	const writable_props = ["threshold"];
+
+    	Object.keys($$props).forEach(key => {
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<Lazy> was created with unknown prop '${key}'`);
+    	});
+
+    	let { $$slots = {}, $$scope } = $$props;
+    	validate_slots("Lazy", $$slots, ['default']);
+
+    	function div_binding($$value) {
+    		binding_callbacks[$$value ? "unshift" : "push"](() => {
+    			$$invalidate(0, el = $$value);
+    		});
+    	}
+
+    	$$self.$set = $$props => {
+    		if ("threshold" in $$props) $$invalidate(2, threshold = $$props.threshold);
+    		if ("$$scope" in $$props) $$invalidate(3, $$scope = $$props.$$scope);
+    	};
+
+    	$$self.$capture_state = () => ({ onMount, el, intersecting, threshold });
+
+    	$$self.$inject_state = $$props => {
+    		if ("el" in $$props) $$invalidate(0, el = $$props.el);
+    		if ("intersecting" in $$props) $$invalidate(1, intersecting = $$props.intersecting);
+    		if ("threshold" in $$props) $$invalidate(2, threshold = $$props.threshold);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	return [el, intersecting, threshold, $$scope, $$slots, div_binding];
+    }
+
+    class Lazy extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+    		init(this, options, instance$5, create_fragment$5, safe_not_equal, { threshold: 2 });
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "Lazy",
+    			options,
+    			id: create_fragment$5.name
+    		});
+    	}
+
+    	get threshold() {
+    		throw new Error("<Lazy>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set threshold(value) {
+    		throw new Error("<Lazy>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+    }
+
+    /* node_modules/@vime-js/lite/src/PlayerWrapper.svelte generated by Svelte v3.20.1 */
+    const file$6 = "node_modules/@vime-js/lite/src/PlayerWrapper.svelte";
+
+    // (13:0) {:else}
+    function create_else_block(ctx) {
+    	let current;
+    	const default_slot_template = /*$$slots*/ ctx[4].default;
+    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[6], null);
+
+    	const block = {
+    		c: function create() {
+    			if (default_slot) default_slot.c();
+    		},
+    		m: function mount(target, anchor) {
+    			if (default_slot) {
+    				default_slot.m(target, anchor);
+    			}
+
+    			current = true;
+    		},
+    		p: function update(ctx, dirty) {
+    			if (default_slot) {
+    				if (default_slot.p && dirty & /*$$scope*/ 64) {
+    					default_slot.p(get_slot_context(default_slot_template, ctx, /*$$scope*/ ctx[6], null), get_slot_changes(default_slot_template, /*$$scope*/ ctx[6], dirty, null));
+    				}
+    			}
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(default_slot, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(default_slot, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			if (default_slot) default_slot.d(detaching);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_else_block.name,
+    		type: "else",
+    		source: "(13:0) {:else}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (1:0) {#if isEnabled}
+    function create_if_block(ctx) {
+    	let current;
+
+    	const lazy = new Lazy({
+    			props: {
+    				$$slots: {
+    					default: [
+    						create_default_slot,
+    						({ intersecting }) => ({ 7: intersecting }),
+    						({ intersecting }) => intersecting ? 128 : 0
+    					]
+    				},
+    				$$scope: { ctx }
+    			},
+    			$$inline: true
+    		});
+
+    	const block = {
+    		c: function create() {
+    			create_component(lazy.$$.fragment);
+    		},
+    		m: function mount(target, anchor) {
+    			mount_component(lazy, target, anchor);
+    			current = true;
+    		},
+    		p: function update(ctx, dirty) {
+    			const lazy_changes = {};
+
+    			if (dirty & /*$$scope, el, isEnabled, aspectRatio, intersecting*/ 199) {
+    				lazy_changes.$$scope = { dirty, ctx };
+    			}
+
+    			lazy.$set(lazy_changes);
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(lazy.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(lazy.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			destroy_component(lazy, detaching);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_if_block.name,
+    		type: "if",
+    		source: "(1:0) {#if isEnabled}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (3:4) {#if intersecting}
+    function create_if_block_1(ctx) {
+    	let div;
+    	let vAspectRatio_action;
+    	let current;
+    	let dispose;
+    	const default_slot_template = /*$$slots*/ ctx[4].default;
+    	const default_slot = create_slot(default_slot_template, ctx, /*$$scope*/ ctx[6], null);
+
+    	const block = {
+    		c: function create() {
+    			div = element("div");
+    			if (default_slot) default_slot.c();
+    			attr_dev(div, "class", "svelte-rcny3m");
+    			toggle_class(div, "bg", !is_null(/*aspectRatio*/ ctx[0]));
+    			add_location(div, file$6, 3, 6, 71);
+    		},
+    		m: function mount(target, anchor, remount) {
+    			insert_dev(target, div, anchor);
+
+    			if (default_slot) {
+    				default_slot.m(div, null);
+    			}
+
+    			/*div_binding*/ ctx[5](div);
+    			current = true;
+    			if (remount) dispose();
+    			dispose = action_destroyer(vAspectRatio_action = vAspectRatio.call(null, div, /*isEnabled*/ ctx[1] ? /*aspectRatio*/ ctx[0] : null));
+    		},
+    		p: function update(ctx, dirty) {
+    			if (default_slot) {
+    				if (default_slot.p && dirty & /*$$scope*/ 64) {
+    					default_slot.p(get_slot_context(default_slot_template, ctx, /*$$scope*/ ctx[6], null), get_slot_changes(default_slot_template, /*$$scope*/ ctx[6], dirty, null));
+    				}
+    			}
+
+    			if (vAspectRatio_action && is_function(vAspectRatio_action.update) && dirty & /*isEnabled, aspectRatio*/ 3) vAspectRatio_action.update.call(null, /*isEnabled*/ ctx[1] ? /*aspectRatio*/ ctx[0] : null);
+
+    			if (dirty & /*is_null, aspectRatio*/ 1) {
+    				toggle_class(div, "bg", !is_null(/*aspectRatio*/ ctx[0]));
+    			}
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(default_slot, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(default_slot, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(div);
+    			if (default_slot) default_slot.d(detaching);
+    			/*div_binding*/ ctx[5](null);
+    			dispose();
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_if_block_1.name,
+    		type: "if",
+    		source: "(3:4) {#if intersecting}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (2:2) <Lazy let:intersecting>
+    function create_default_slot(ctx) {
+    	let if_block_anchor;
+    	let current;
+    	let if_block = /*intersecting*/ ctx[7] && create_if_block_1(ctx);
+
+    	const block = {
+    		c: function create() {
+    			if (if_block) if_block.c();
+    			if_block_anchor = empty();
+    		},
+    		m: function mount(target, anchor) {
+    			if (if_block) if_block.m(target, anchor);
+    			insert_dev(target, if_block_anchor, anchor);
+    			current = true;
+    		},
+    		p: function update(ctx, dirty) {
+    			if (/*intersecting*/ ctx[7]) {
+    				if (if_block) {
+    					if_block.p(ctx, dirty);
+    					transition_in(if_block, 1);
+    				} else {
+    					if_block = create_if_block_1(ctx);
+    					if_block.c();
+    					transition_in(if_block, 1);
+    					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+    				}
+    			} else if (if_block) {
+    				group_outros();
+
+    				transition_out(if_block, 1, 1, () => {
+    					if_block = null;
+    				});
+
+    				check_outros();
+    			}
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(if_block);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(if_block);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			if (if_block) if_block.d(detaching);
+    			if (detaching) detach_dev(if_block_anchor);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_default_slot.name,
+    		type: "slot",
+    		source: "(2:2) <Lazy let:intersecting>",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function create_fragment$6(ctx) {
+    	let current_block_type_index;
+    	let if_block;
+    	let if_block_anchor;
+    	let current;
+    	const if_block_creators = [create_if_block, create_else_block];
+    	const if_blocks = [];
+
+    	function select_block_type(ctx, dirty) {
+    		if (/*isEnabled*/ ctx[1]) return 0;
+    		return 1;
+    	}
+
+    	current_block_type_index = select_block_type(ctx);
+    	if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+
+    	const block = {
+    		c: function create() {
+    			if_block.c();
+    			if_block_anchor = empty();
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			if_blocks[current_block_type_index].m(target, anchor);
+    			insert_dev(target, if_block_anchor, anchor);
+    			current = true;
+    		},
+    		p: function update(ctx, [dirty]) {
+    			let previous_block_index = current_block_type_index;
+    			current_block_type_index = select_block_type(ctx);
+
+    			if (current_block_type_index === previous_block_index) {
+    				if_blocks[current_block_type_index].p(ctx, dirty);
+    			} else {
+    				group_outros();
+
+    				transition_out(if_blocks[previous_block_index], 1, 1, () => {
+    					if_blocks[previous_block_index] = null;
+    				});
+
+    				check_outros();
+    				if_block = if_blocks[current_block_type_index];
+
+    				if (!if_block) {
+    					if_block = if_blocks[current_block_type_index] = if_block_creators[current_block_type_index](ctx);
+    					if_block.c();
+    				}
+
+    				transition_in(if_block, 1);
+    				if_block.m(if_block_anchor.parentNode, if_block_anchor);
+    			}
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(if_block);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(if_block);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			if_blocks[current_block_type_index].d(detaching);
+    			if (detaching) detach_dev(if_block_anchor);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$6.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance$6($$self, $$props, $$invalidate) {
+    	const dispatch = createEventDispatcher();
+    	let el;
+    	let { aspectRatio = null } = $$props;
+    	let { isEnabled = true } = $$props;
+    	const writable_props = ["aspectRatio", "isEnabled"];
+
+    	Object.keys($$props).forEach(key => {
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<PlayerWrapper> was created with unknown prop '${key}'`);
+    	});
+
+    	let { $$slots = {}, $$scope } = $$props;
+    	validate_slots("PlayerWrapper", $$slots, ['default']);
+
+    	function div_binding($$value) {
+    		binding_callbacks[$$value ? "unshift" : "push"](() => {
+    			$$invalidate(2, el = $$value);
+    		});
+    	}
+
+    	$$self.$set = $$props => {
+    		if ("aspectRatio" in $$props) $$invalidate(0, aspectRatio = $$props.aspectRatio);
+    		if ("isEnabled" in $$props) $$invalidate(1, isEnabled = $$props.isEnabled);
+    		if ("$$scope" in $$props) $$invalidate(6, $$scope = $$props.$$scope);
+    	};
+
+    	$$self.$capture_state = () => ({
+    		createEventDispatcher,
+    		is_null,
+    		vAspectRatio,
+    		Lazy,
+    		dispatch,
+    		el,
+    		aspectRatio,
+    		isEnabled
+    	});
+
+    	$$self.$inject_state = $$props => {
+    		if ("el" in $$props) $$invalidate(2, el = $$props.el);
+    		if ("aspectRatio" in $$props) $$invalidate(0, aspectRatio = $$props.aspectRatio);
+    		if ("isEnabled" in $$props) $$invalidate(1, isEnabled = $$props.isEnabled);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	$$self.$$.update = () => {
+    		if ($$self.$$.dirty & /*el*/ 4) {
+    			 if (el) dispatch("mount", el);
+    		}
+    	};
+
+    	return [aspectRatio, isEnabled, el, dispatch, $$slots, div_binding, $$scope];
+    }
+
+    class PlayerWrapper extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+    		init(this, options, instance$6, create_fragment$6, safe_not_equal, { aspectRatio: 0, isEnabled: 1 });
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "PlayerWrapper",
+    			options,
+    			id: create_fragment$6.name
+    		});
+    	}
+
+    	get aspectRatio() {
+    		throw new Error("<PlayerWrapper>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set aspectRatio(value) {
+    		throw new Error("<PlayerWrapper>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get isEnabled() {
+    		throw new Error("<PlayerWrapper>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set isEnabled(value) {
+    		throw new Error("<PlayerWrapper>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+    }
+
+    /* node_modules/@vime-js/lite/src/LitePlayer.svelte generated by Svelte v3.20.1 */
+
+    // (3:0) <PlayerWrapper    {aspectRatio}    isEnabled={hasWrapper}  >
+    function create_default_slot$1(ctx) {
+    	let current;
+
+    	let embed_1_props = {
+    		params: /*params*/ ctx[0],
+    		decoder: /*decoder*/ ctx[7],
+    		preconnections: /*preconnections*/ ctx[8],
+    		src: /*embedURL*/ ctx[5],
+    		title: /*iframeTitle*/ ctx[6],
+    		origin: /*origin*/ ctx[4]
+    	};
+
+    	const embed_1 = new Embed({ props: embed_1_props, $$inline: true });
+    	/*embed_1_binding*/ ctx[30](embed_1);
+    	embed_1.$on("load", /*load_handler*/ ctx[31]);
+    	embed_1.$on("data", /*data_handler*/ ctx[32]);
+    	embed_1.$on("message", /*message_handler*/ ctx[33]);
+    	embed_1.$on("rebuild", /*rebuild_handler*/ ctx[34]);
+    	embed_1.$on("load", /*onLoad*/ ctx[11]);
+
+    	embed_1.$on("data", function () {
+    		if (is_function(/*onData*/ ctx[9])) /*onData*/ ctx[9].apply(this, arguments);
+    	});
+
+    	embed_1.$on("srcchange", /*onReload*/ ctx[10]);
+
+    	const block = {
+    		c: function create() {
+    			create_component(embed_1.$$.fragment);
+    		},
+    		m: function mount(target, anchor) {
+    			mount_component(embed_1, target, anchor);
+    			current = true;
+    		},
+    		p: function update(new_ctx, dirty) {
+    			ctx = new_ctx;
+    			const embed_1_changes = {};
+    			if (dirty[0] & /*params*/ 1) embed_1_changes.params = /*params*/ ctx[0];
+    			if (dirty[0] & /*decoder*/ 128) embed_1_changes.decoder = /*decoder*/ ctx[7];
+    			if (dirty[0] & /*preconnections*/ 256) embed_1_changes.preconnections = /*preconnections*/ ctx[8];
+    			if (dirty[0] & /*embedURL*/ 32) embed_1_changes.src = /*embedURL*/ ctx[5];
+    			if (dirty[0] & /*iframeTitle*/ 64) embed_1_changes.title = /*iframeTitle*/ ctx[6];
+    			if (dirty[0] & /*origin*/ 16) embed_1_changes.origin = /*origin*/ ctx[4];
+    			embed_1.$set(embed_1_changes);
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(embed_1.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(embed_1.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			/*embed_1_binding*/ ctx[30](null);
+    			destroy_component(embed_1, detaching);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_default_slot$1.name,
+    		type: "slot",
+    		source: "(3:0) <PlayerWrapper    {aspectRatio}    isEnabled={hasWrapper}  >",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function create_fragment$7(ctx) {
+    	let current;
+
+    	const playerwrapper = new PlayerWrapper({
+    			props: {
+    				aspectRatio: /*aspectRatio*/ ctx[2],
+    				isEnabled: /*hasWrapper*/ ctx[1],
+    				$$slots: { default: [create_default_slot$1] },
+    				$$scope: { ctx }
+    			},
+    			$$inline: true
+    		});
+
+    	const block = {
+    		c: function create() {
+    			create_component(playerwrapper.$$.fragment);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			mount_component(playerwrapper, target, anchor);
+    			current = true;
+    		},
+    		p: function update(ctx, dirty) {
+    			const playerwrapper_changes = {};
+    			if (dirty[0] & /*aspectRatio*/ 4) playerwrapper_changes.aspectRatio = /*aspectRatio*/ ctx[2];
+    			if (dirty[0] & /*hasWrapper*/ 2) playerwrapper_changes.isEnabled = /*hasWrapper*/ ctx[1];
+
+    			if (dirty[0] & /*params, decoder, preconnections, embedURL, iframeTitle, origin, embed, onData*/ 1017 | dirty[1] & /*$$scope*/ 16) {
+    				playerwrapper_changes.$$scope = { dirty, ctx };
+    			}
+
+    			playerwrapper.$set(playerwrapper_changes);
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(playerwrapper.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(playerwrapper.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			destroy_component(playerwrapper, detaching);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$7.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance$7($$self, $$props, $$invalidate) {
+    	const dispatch = createEventDispatcher();
+
+    	const Event = {
+    		READY: "ready",
+    		TITLE_CHANGE: "titlechange",
+    		ORIGIN_CHANGE: "originchange",
+    		EMBED_URL_CHANGE: "embedurlchange",
+    		ERROR: "error"
+    	};
+
+    	let embed;
+    	let mediaTitle = null;
+    	let ready = deferred();
+    	let initialized = false;
+    	let { src = null } = $$props;
+    	let { params = {} } = $$props;
+    	let { providers = [] } = $$props;
+    	let { cookies = false } = $$props;
+    	let { hasWrapper = true } = $$props;
+    	let { aspectRatio = "16:9" } = $$props;
+    	const getOrigin = () => origin;
+    	const getEmbed = () => embed;
+    	const getEmbedURL = () => embedURL;
+    	const getTitle = () => mediaTitle;
+    	const getProvider = () => Provider;
+    	const getMediaId = () => Provider ? Provider.extractMediaId(src) : null;
+
+    	const sendCommand = async (command, args, force) => {
+    		if (!Provider) return;
+
+    		try {
+    			if (!force) {
+    				await tick();
+    				await ready.promise;
+    			}
+
+    			embed.postMessage(Provider.buildPostMessage(command, args));
+    		} catch(e) {
+    			
+    		} /** noop */
+    	};
+
+    	const onReload = () => {
+    		ready.promise.catch(noop);
+    		ready.reject();
+    		ready = deferred();
+    		$$invalidate(24, initialized = false);
+
+    		ready.promise.then(() => {
+    			$$invalidate(24, initialized = true);
+    			dispatch(Event.READY);
+    		}).catch(e => {
+    			dispatch(Event.ERROR, e);
+    		});
+    	};
+
+    	const onSrcChange = () => {
+    		$$invalidate(22, mediaTitle = null);
+    	};
+
+    	const onLoad = () => {
+    		if (Provider) Provider.onLoad(embed);
+    	};
+
+    	const onDataHandler = e => {
+    		const data = e.detail;
+    		if (!data || !Provider) return;
+    		Provider.resolveReadyState(data, ready, sendCommand);
+    		if (!mediaTitle) $$invalidate(22, mediaTitle = Provider.extractMediaTitle(data));
+    	};
+
+    	onReload();
+    	const writable_props = ["src", "params", "providers", "cookies", "hasWrapper", "aspectRatio"];
+
+    	Object.keys($$props).forEach(key => {
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<LitePlayer> was created with unknown prop '${key}'`);
+    	});
+
+    	let { $$slots = {}, $$scope } = $$props;
+    	validate_slots("LitePlayer", $$slots, []);
+
+    	function embed_1_binding($$value) {
+    		binding_callbacks[$$value ? "unshift" : "push"](() => {
+    			$$invalidate(3, embed = $$value);
+    		});
+    	}
+
+    	function load_handler(event) {
+    		bubble($$self, event);
+    	}
+
+    	function data_handler(event) {
+    		bubble($$self, event);
+    	}
+
+    	function message_handler(event) {
+    		bubble($$self, event);
+    	}
+
+    	function rebuild_handler(event) {
+    		bubble($$self, event);
+    	}
+
+    	$$self.$set = $$props => {
+    		if ("src" in $$props) $$invalidate(12, src = $$props.src);
+    		if ("params" in $$props) $$invalidate(0, params = $$props.params);
+    		if ("providers" in $$props) $$invalidate(13, providers = $$props.providers);
+    		if ("cookies" in $$props) $$invalidate(14, cookies = $$props.cookies);
+    		if ("hasWrapper" in $$props) $$invalidate(1, hasWrapper = $$props.hasWrapper);
+    		if ("aspectRatio" in $$props) $$invalidate(2, aspectRatio = $$props.aspectRatio);
+    	};
+
+    	$$self.$capture_state = () => ({
+    		tick,
+    		createEventDispatcher,
+    		noop,
+    		deferred,
+    		Embed,
+    		PlayerWrapper,
+    		dispatch,
+    		Event,
+    		embed,
+    		mediaTitle,
+    		ready,
+    		initialized,
+    		src,
+    		params,
+    		providers,
+    		cookies,
+    		hasWrapper,
+    		aspectRatio,
+    		getOrigin,
+    		getEmbed,
+    		getEmbedURL,
+    		getTitle,
+    		getProvider,
+    		getMediaId,
+    		sendCommand,
+    		onReload,
+    		onSrcChange,
+    		onLoad,
+    		onDataHandler,
+    		origin,
+    		embedURL,
+    		Provider,
+    		iframeTitle,
+    		decoder,
+    		preconnections,
+    		onData
+    	});
+
+    	$$self.$inject_state = $$props => {
+    		if ("embed" in $$props) $$invalidate(3, embed = $$props.embed);
+    		if ("mediaTitle" in $$props) $$invalidate(22, mediaTitle = $$props.mediaTitle);
+    		if ("ready" in $$props) ready = $$props.ready;
+    		if ("initialized" in $$props) $$invalidate(24, initialized = $$props.initialized);
+    		if ("src" in $$props) $$invalidate(12, src = $$props.src);
+    		if ("params" in $$props) $$invalidate(0, params = $$props.params);
+    		if ("providers" in $$props) $$invalidate(13, providers = $$props.providers);
+    		if ("cookies" in $$props) $$invalidate(14, cookies = $$props.cookies);
+    		if ("hasWrapper" in $$props) $$invalidate(1, hasWrapper = $$props.hasWrapper);
+    		if ("aspectRatio" in $$props) $$invalidate(2, aspectRatio = $$props.aspectRatio);
+    		if ("origin" in $$props) $$invalidate(4, origin = $$props.origin);
+    		if ("embedURL" in $$props) $$invalidate(5, embedURL = $$props.embedURL);
+    		if ("Provider" in $$props) $$invalidate(25, Provider = $$props.Provider);
+    		if ("iframeTitle" in $$props) $$invalidate(6, iframeTitle = $$props.iframeTitle);
+    		if ("decoder" in $$props) $$invalidate(7, decoder = $$props.decoder);
+    		if ("preconnections" in $$props) $$invalidate(8, preconnections = $$props.preconnections);
+    		if ("onData" in $$props) $$invalidate(9, onData = $$props.onData);
+    	};
+
+    	let origin;
+    	let embedURL;
+    	let Provider;
+    	let iframeTitle;
+    	let decoder;
+    	let preconnections;
+    	let onData;
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	$$self.$$.update = () => {
+    		if ($$self.$$.dirty[0] & /*src*/ 4096) {
+    			 onSrcChange();
+    		}
+
+    		if ($$self.$$.dirty[0] & /*providers, src*/ 12288) {
+    			 $$invalidate(25, Provider = providers.find(p => p.canPlay(src)));
+    		}
+
+    		if ($$self.$$.dirty[0] & /*Provider, cookies*/ 33570816) {
+    			 $$invalidate(4, origin = Provider ? Provider.buildOrigin(cookies) : null);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*Provider, src, cookies*/ 33574912) {
+    			 $$invalidate(5, embedURL = Provider ? Provider.buildEmbedURL(src, cookies) : null);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*Provider, mediaTitle*/ 37748736) {
+    			 $$invalidate(6, iframeTitle = Provider && mediaTitle
+    			? `${Provider.name} - ${mediaTitle || "Video Player"}`
+    			: null);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*Provider*/ 33554432) {
+    			 $$invalidate(7, decoder = Provider ? Provider.decoder : null);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*Provider*/ 33554432) {
+    			 $$invalidate(8, preconnections = Provider ? Provider.preconnections : []);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*initialized, mediaTitle*/ 20971520) {
+    			 $$invalidate(9, onData = !initialized || !mediaTitle ? onDataHandler : null);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*src*/ 4096) {
+    			 dispatch(Event.SRC_CHANGE, src);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*mediaTitle*/ 4194304) {
+    			 dispatch(Event.TITLE_CHANGE, mediaTitle);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*origin*/ 16) {
+    			 dispatch(Event.ORIGIN_CHANGE, origin);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*embedURL*/ 32) {
+    			 dispatch(Event.EMBED_URL_CHANGE, embedURL);
+    		}
+    	};
+
+    	return [
+    		params,
+    		hasWrapper,
+    		aspectRatio,
+    		embed,
+    		origin,
+    		embedURL,
+    		iframeTitle,
+    		decoder,
+    		preconnections,
+    		onData,
+    		onReload,
+    		onLoad,
+    		src,
+    		providers,
+    		cookies,
+    		getOrigin,
+    		getEmbed,
+    		getEmbedURL,
+    		getTitle,
+    		getProvider,
+    		getMediaId,
+    		sendCommand,
+    		mediaTitle,
+    		ready,
+    		initialized,
+    		Provider,
+    		dispatch,
+    		Event,
+    		onSrcChange,
+    		onDataHandler,
+    		embed_1_binding,
+    		load_handler,
+    		data_handler,
+    		message_handler,
+    		rebuild_handler
+    	];
+    }
+
+    class LitePlayer extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+
+    		init(
+    			this,
+    			options,
+    			instance$7,
+    			create_fragment$7,
+    			safe_not_equal,
+    			{
+    				src: 12,
+    				params: 0,
+    				providers: 13,
+    				cookies: 14,
+    				hasWrapper: 1,
+    				aspectRatio: 2,
+    				getOrigin: 15,
+    				getEmbed: 16,
+    				getEmbedURL: 17,
+    				getTitle: 18,
+    				getProvider: 19,
+    				getMediaId: 20,
+    				sendCommand: 21
+    			},
+    			[-1, -1]
+    		);
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "LitePlayer",
+    			options,
+    			id: create_fragment$7.name
+    		});
+    	}
+
+    	get src() {
+    		return this.$$.ctx[12];
+    	}
+
+    	set src(src) {
+    		this.$set({ src });
+    		flush();
+    	}
+
+    	get params() {
+    		return this.$$.ctx[0];
+    	}
+
+    	set params(params) {
+    		this.$set({ params });
+    		flush();
+    	}
+
+    	get providers() {
+    		return this.$$.ctx[13];
+    	}
+
+    	set providers(providers) {
+    		this.$set({ providers });
+    		flush();
+    	}
+
+    	get cookies() {
+    		return this.$$.ctx[14];
+    	}
+
+    	set cookies(cookies) {
+    		this.$set({ cookies });
+    		flush();
+    	}
+
+    	get hasWrapper() {
+    		return this.$$.ctx[1];
+    	}
+
+    	set hasWrapper(hasWrapper) {
+    		this.$set({ hasWrapper });
+    		flush();
+    	}
+
+    	get aspectRatio() {
+    		return this.$$.ctx[2];
+    	}
+
+    	set aspectRatio(aspectRatio) {
+    		this.$set({ aspectRatio });
+    		flush();
+    	}
+
+    	get getOrigin() {
+    		return this.$$.ctx[15];
+    	}
+
+    	set getOrigin(value) {
+    		throw new Error("<LitePlayer>: Cannot set read-only property 'getOrigin'");
+    	}
+
+    	get getEmbed() {
+    		return this.$$.ctx[16];
+    	}
+
+    	set getEmbed(value) {
+    		throw new Error("<LitePlayer>: Cannot set read-only property 'getEmbed'");
+    	}
+
+    	get getEmbedURL() {
+    		return this.$$.ctx[17];
+    	}
+
+    	set getEmbedURL(value) {
+    		throw new Error("<LitePlayer>: Cannot set read-only property 'getEmbedURL'");
+    	}
+
+    	get getTitle() {
+    		return this.$$.ctx[18];
+    	}
+
+    	set getTitle(value) {
+    		throw new Error("<LitePlayer>: Cannot set read-only property 'getTitle'");
+    	}
+
+    	get getProvider() {
+    		return this.$$.ctx[19];
+    	}
+
+    	set getProvider(value) {
+    		throw new Error("<LitePlayer>: Cannot set read-only property 'getProvider'");
+    	}
+
+    	get getMediaId() {
+    		return this.$$.ctx[20];
+    	}
+
+    	set getMediaId(value) {
+    		throw new Error("<LitePlayer>: Cannot set read-only property 'getMediaId'");
+    	}
+
+    	get sendCommand() {
+    		return this.$$.ctx[21];
+    	}
+
+    	set sendCommand(value) {
+    		throw new Error("<LitePlayer>: Cannot set read-only property 'sendCommand'");
+    	}
+    }
+
+    const NAME = 'Vimeo';
+    const ORIGIN = 'https://www.vimeo.com';
+    const EMBED_ORIGIN = 'https://player.vimeo.com';
+    const SRC = /vimeo(?:\.com|)\/([0-9]{9,})/;
+    const FILE_URL = /vimeo\.com\/external\/[0-9]+\..+/;
+    const THUMBNAIL_URL = /vimeocdn\.com\/video\/([0-9]+)/;
+    const BLANK_SRC_ID = '390460225';
+
+    const PRECONNECTIONS = [
+      ORIGIN,
+      'https://i.vimeocdn.com',
+      'https://f.vimeocdn.com',
+      'https://fresnel.vimeocdn.com',
+    ];
+
+    const DECODER = decode_json;
+
+    const can_play = (src) => is_string(src) && !FILE_URL.test(src) && SRC.test(src);
+
+    const extract_media_id = (src) => {
+      const match = src ? src.match(SRC) : null;
+      return match ? match[1] : null;
+    };
+
+    const build_embed_url = (src) => {
+      const mediaId = extract_media_id(src);
+      return `${EMBED_ORIGIN}/video/${mediaId || BLANK_SRC_ID}`;
+    };
+
+    const fetch_poster = (src) => {
+      const url = build_embed_url(src);
+      if (!url) return Promise.resolve(null);
+      return window.fetch(`https://noembed.com/embed?url=${url}`)
+        .then((response) => response.json())
+        .then((data) => {
+          const thumbnailId = data.thumbnail_url.match(THUMBNAIL_URL)[1];
+          return `https://i.vimeocdn.com/video/${thumbnailId}_1920x1080.jpg`;
+        });
+    };
+
+    var VimeoProvider = {
+      name: NAME,
+      decoder: DECODER,
+      preconnections: PRECONNECTIONS,
+      canPlay: can_play,
+      buildEmbedURL: build_embed_url,
+      extractMediaId: extract_media_id,
+      onLoad: () => {},
+      buildOrigin: () => EMBED_ORIGIN,
+      buildPostMessage: (command, args) => ({
+        method: command,
+        value: args || '',
+      }),
+      resolveReadyState: (data, ready, sendCommand) => {
+        const { event, data: payload } = data;
+        if ((event === 'error') && payload && payload.method === 'ready') {
+          const error = new Error(payload.message);
+          error.name = payload.name;
+          ready.reject(error);
+        }
+        if (event === 'ready') sendCommand('addEventListener', 'loaded', true);
+        if (event === 'loaded') {
+          ready.resolve();
+          sendCommand('getVideoTitle', [], true);
+        }
+      },
+      extractMediaTitle: (data) => {
+        if (data.method === 'getVideoTitle') return data.value;
+        return null;
+      },
+    };
+
+    // @see https://github.com/videojs/video.js/blob/7.6.x/src/js/fullscreen-api.js
+
+    const FullscreenApi = {
+      prefixed: true,
+    };
+
+    const apiMap = [
+      [
+        'requestFullscreen',
+        'exitFullscreen',
+        'fullscreenElement',
+        'fullscreenEnabled',
+        'fullscreenchange',
+        'fullscreenerror',
+        'fullscreen',
+      ],
+      // WebKit
+      [
+        'webkitRequestFullscreen',
+        'webkitExitFullscreen',
+        'webkitFullscreenElement',
+        'webkitFullscreenEnabled',
+        'webkitfullscreenchange',
+        'webkitfullscreenerror',
+        '-webkit-full-screen',
+      ],
+      // Mozilla
+      [
+        'mozRequestFullScreen',
+        'mozCancelFullScreen',
+        'mozFullScreenElement',
+        'mozFullScreenEnabled',
+        'mozfullscreenchange',
+        'mozfullscreenerror',
+        '-moz-full-screen',
+      ],
+      // Microsoft
+      [
+        'msRequestFullscreen',
+        'msExitFullscreen',
+        'msFullscreenElement',
+        'msFullscreenEnabled',
+        'MSFullscreenChange',
+        'MSFullscreenError',
+        '-ms-fullscreen',
+      ],
+    ];
+
+    const specApi = apiMap[0];
+    let browserApi;
+
+    // Determine the supported set of functions.
+    for (let i = 0; i < apiMap.length; i += 1) {
+      // Check for exitFullscreen function.
+      if (apiMap[i][1] in document) {
+        browserApi = apiMap[i];
+        break;
+      }
+    }
+
+    // Map the browser API names to the spec API names.
+    if (browserApi) {
+      for (let i = 0; i < browserApi.length; i += 1) {
+        FullscreenApi[specApi[i]] = browserApi[i];
+      }
+
+      FullscreenApi.prefixed = browserApi[0] !== specApi[0];
+    }
+
+    /* node_modules/@vime-js/standard/src/StandardPlayer.svelte generated by Svelte v3.20.1 */
+
+    // (3:0) <PlayerWrapper   isEnabled={hasWrapper}   aspectRatio={($isVideoView && !$isFullscreenActive) ? $aspectRatio : null}   on:mount="{(e) => { playerWrapper = e.detail; }}" >
+    function create_default_slot$2(ctx) {
+    	let switch_instance_anchor;
+    	let current;
+
+    	const switch_instance_spread_levels = [
+    		/*props*/ ctx[2],
+    		{ src: /*$src*/ ctx[5] },
+    		{ config: /*$providerConfig*/ ctx[9] },
+    		{ version: /*$providerVersion*/ ctx[10] }
+    	];
+
+    	var switch_value = /*$Provider*/ ctx[6] && /*$Provider*/ ctx[6].default;
+
+    	function switch_props(ctx) {
+    		let switch_instance_props = {};
+
+    		for (let i = 0; i < switch_instance_spread_levels.length; i += 1) {
+    			switch_instance_props = assign(switch_instance_props, switch_instance_spread_levels[i]);
+    		}
+
+    		return {
+    			props: switch_instance_props,
+    			$$inline: true
+    		};
+    	}
+
+    	if (switch_value) {
+    		var switch_instance = new switch_value(switch_props());
+    		/*switch_instance_binding*/ ctx[150](switch_instance);
+    		switch_instance.$on("update", /*onUpdate*/ ctx[57]);
+    		switch_instance.$on("error", /*error_handler*/ ctx[151]);
+    	}
+
+    	const block = {
+    		c: function create() {
+    			if (switch_instance) create_component(switch_instance.$$.fragment);
+    			switch_instance_anchor = empty();
+    		},
+    		m: function mount(target, anchor) {
+    			if (switch_instance) {
+    				mount_component(switch_instance, target, anchor);
+    			}
+
+    			insert_dev(target, switch_instance_anchor, anchor);
+    			current = true;
+    		},
+    		p: function update(ctx, dirty) {
+    			const switch_instance_changes = (dirty[0] & /*props, $src, $providerConfig, $providerVersion*/ 1572)
+    			? get_spread_update(switch_instance_spread_levels, [
+    					dirty[0] & /*props*/ 4 && get_spread_object(/*props*/ ctx[2]),
+    					dirty[0] & /*$src*/ 32 && { src: /*$src*/ ctx[5] },
+    					dirty[0] & /*$providerConfig*/ 512 && { config: /*$providerConfig*/ ctx[9] },
+    					dirty[0] & /*$providerVersion*/ 1024 && { version: /*$providerVersion*/ ctx[10] }
+    				])
+    			: {};
+
+    			if (switch_value !== (switch_value = /*$Provider*/ ctx[6] && /*$Provider*/ ctx[6].default)) {
+    				if (switch_instance) {
+    					group_outros();
+    					const old_component = switch_instance;
+
+    					transition_out(old_component.$$.fragment, 1, 0, () => {
+    						destroy_component(old_component, 1);
+    					});
+
+    					check_outros();
+    				}
+
+    				if (switch_value) {
+    					switch_instance = new switch_value(switch_props());
+    					/*switch_instance_binding*/ ctx[150](switch_instance);
+    					switch_instance.$on("update", /*onUpdate*/ ctx[57]);
+    					switch_instance.$on("error", /*error_handler*/ ctx[151]);
+    					create_component(switch_instance.$$.fragment);
+    					transition_in(switch_instance.$$.fragment, 1);
+    					mount_component(switch_instance, switch_instance_anchor.parentNode, switch_instance_anchor);
+    				} else {
+    					switch_instance = null;
+    				}
+    			} else if (switch_value) {
+    				switch_instance.$set(switch_instance_changes);
+    			}
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			if (switch_instance) transition_in(switch_instance.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			if (switch_instance) transition_out(switch_instance.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			/*switch_instance_binding*/ ctx[150](null);
+    			if (detaching) detach_dev(switch_instance_anchor);
+    			if (switch_instance) destroy_component(switch_instance, detaching);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_default_slot$2.name,
+    		type: "slot",
+    		source: "(3:0) <PlayerWrapper   isEnabled={hasWrapper}   aspectRatio={($isVideoView && !$isFullscreenActive) ? $aspectRatio : null}   on:mount=\\\"{(e) => { playerWrapper = e.detail; }}\\\" >",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function create_fragment$8(ctx) {
+    	let current;
+
+    	const playerwrapper = new PlayerWrapper({
+    			props: {
+    				isEnabled: /*hasWrapper*/ ctx[0],
+    				aspectRatio: /*$isVideoView*/ ctx[8] && !/*$isFullscreenActive*/ ctx[4]
+    				? /*$aspectRatio*/ ctx[7]
+    				: null,
+    				$$slots: { default: [create_default_slot$2] },
+    				$$scope: { ctx }
+    			},
+    			$$inline: true
+    		});
+
+    	playerwrapper.$on("mount", /*mount_handler*/ ctx[152]);
+
+    	const block = {
+    		c: function create() {
+    			create_component(playerwrapper.$$.fragment);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			mount_component(playerwrapper, target, anchor);
+    			current = true;
+    		},
+    		p: function update(ctx, dirty) {
+    			const playerwrapper_changes = {};
+    			if (dirty[0] & /*hasWrapper*/ 1) playerwrapper_changes.isEnabled = /*hasWrapper*/ ctx[0];
+
+    			if (dirty[0] & /*$isVideoView, $isFullscreenActive, $aspectRatio*/ 400) playerwrapper_changes.aspectRatio = /*$isVideoView*/ ctx[8] && !/*$isFullscreenActive*/ ctx[4]
+    			? /*$aspectRatio*/ ctx[7]
+    			: null;
+
+    			if (dirty[0] & /*$Provider, props, $src, $providerConfig, $providerVersion, $provider*/ 1644 | dirty[4] & /*$$scope*/ 536870912) {
+    				playerwrapper_changes.$$scope = { dirty, ctx };
+    			}
+
+    			playerwrapper.$set(playerwrapper_changes);
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(playerwrapper.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(playerwrapper.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			destroy_component(playerwrapper, detaching);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$8.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    const NO_PIP_SUPPORT_ERROR_MSG = "Provider does not support PiP.";
+    const VIDEO_NOT_READY_ERROR_MSG = "Action not supported, must be a video that is ready for playback.";
+    const FULLSCREEN_NOT_SUPPORTED_ERROR_MSG = "Fullscreen not supported.";
+
+    function instance$8($$self, $$props, $$invalidate) {
+    	let $currentPlayer;
+    	let $isPlayerActive;
+    	let $playbackReady;
+    	let $canMutedAutoplay;
+    	let $playsinline;
+    	let $playbackEnded;
+    	let $internalTime;
+    	let $currentTime;
+    	let $provider;
+    	let $paused;
+    	let $seeking;
+    	let $canInteract;
+    	let $buffered;
+    	let $playbackStarted;
+    	let $buffering;
+    	let $duration;
+    	let $autoplay;
+    	let $rebuilding;
+    	let $canAutoplay;
+    	let $muted;
+    	let $isFullscreenActive;
+    	let $autopause;
+    	let $playing;
+    	let $volume;
+    	let $useNativeCaptions;
+    	let $tracks;
+    	let $currentTrackIndex;
+    	let $isPiPActive;
+    	let $src;
+    	let $Provider;
+    	let $canSetPoster;
+    	let $useNativeControls;
+    	let $poster;
+    	let $aspectRatio;
+    	let $useNativeView;
+    	let $isControlsEnabled;
+    	let $canSetPlaybackRate;
+    	let $playbackRate;
+    	let $canSetVideoQuality;
+    	let $videoQuality;
+    	let $canSetTracks;
+    	let $canSetTrack;
+    	let $isVideoReady;
+    	let $canSetPiP;
+    	let $isVideoView;
+    	let $providerConfig;
+    	let $providerVersion;
+    	validate_store(currentPlayer, "currentPlayer");
+    	component_subscribe($$self, currentPlayer, $$value => $$invalidate(75, $currentPlayer = $$value));
+    	let self = get_current_component();
+    	let { _standardStore = null } = $$props;
+    	let onPropsChange = noop;
+
+    	if (is_null(_standardStore)) {
+    		_standardStore = buildStandardStore(self);
+    		({ onPropsChange } = _standardStore);
+    	}
+
+    	const { store, resetStore } = _standardStore;
+    	const { playsinline, paused, muted, playbackEnded, volume, seeking, internalTime, currentTime, isPiPActive, playbackRate, videoQuality, src, isControlsEnabled, aspectRatio, buffering, buffered, autopause, autoplay, playing, playbackStarted, poster, playbackReady, isVideoView, tracks, currentTrackIndex, provider, rebuilding, isVideoReady, canInteract, isFullscreenActive, useNativeView, useNativeControls, useNativeCaptions, duration, Provider, isPlayerActive, providerConfig, providerVersion } = store;
+    	validate_store(playsinline, "playsinline");
+    	component_subscribe($$self, playsinline, value => $$invalidate(79, $playsinline = value));
+    	validate_store(paused, "paused");
+    	component_subscribe($$self, paused, value => $$invalidate(83, $paused = value));
+    	validate_store(muted, "muted");
+    	component_subscribe($$self, muted, value => $$invalidate(93, $muted = value));
+    	validate_store(playbackEnded, "playbackEnded");
+    	component_subscribe($$self, playbackEnded, value => $$invalidate(80, $playbackEnded = value));
+    	validate_store(volume, "volume");
+    	component_subscribe($$self, volume, value => $$invalidate(96, $volume = value));
+    	validate_store(seeking, "seeking");
+    	component_subscribe($$self, seeking, value => $$invalidate(84, $seeking = value));
+    	validate_store(internalTime, "internalTime");
+    	component_subscribe($$self, internalTime, value => $$invalidate(81, $internalTime = value));
+    	validate_store(currentTime, "currentTime");
+    	component_subscribe($$self, currentTime, value => $$invalidate(82, $currentTime = value));
+    	validate_store(isPiPActive, "isPiPActive");
+    	component_subscribe($$self, isPiPActive, value => $$invalidate(100, $isPiPActive = value));
+    	validate_store(playbackRate, "playbackRate");
+    	component_subscribe($$self, playbackRate, value => $$invalidate(107, $playbackRate = value));
+    	validate_store(videoQuality, "videoQuality");
+    	component_subscribe($$self, videoQuality, value => $$invalidate(109, $videoQuality = value));
+    	validate_store(src, "src");
+    	component_subscribe($$self, src, value => $$invalidate(5, $src = value));
+    	validate_store(isControlsEnabled, "isControlsEnabled");
+    	component_subscribe($$self, isControlsEnabled, value => $$invalidate(105, $isControlsEnabled = value));
+    	validate_store(aspectRatio, "aspectRatio");
+    	component_subscribe($$self, aspectRatio, value => $$invalidate(7, $aspectRatio = value));
+    	validate_store(buffering, "buffering");
+    	component_subscribe($$self, buffering, value => $$invalidate(88, $buffering = value));
+    	validate_store(buffered, "buffered");
+    	component_subscribe($$self, buffered, value => $$invalidate(86, $buffered = value));
+    	validate_store(autopause, "autopause");
+    	component_subscribe($$self, autopause, value => $$invalidate(94, $autopause = value));
+    	validate_store(autoplay, "autoplay");
+    	component_subscribe($$self, autoplay, value => $$invalidate(90, $autoplay = value));
+    	validate_store(playing, "playing");
+    	component_subscribe($$self, playing, value => $$invalidate(95, $playing = value));
+    	validate_store(playbackStarted, "playbackStarted");
+    	component_subscribe($$self, playbackStarted, value => $$invalidate(87, $playbackStarted = value));
+    	validate_store(poster, "poster");
+    	component_subscribe($$self, poster, value => $$invalidate(103, $poster = value));
+    	validate_store(playbackReady, "playbackReady");
+    	component_subscribe($$self, playbackReady, value => $$invalidate(77, $playbackReady = value));
+    	validate_store(isVideoView, "isVideoView");
+    	component_subscribe($$self, isVideoView, value => $$invalidate(8, $isVideoView = value));
+    	validate_store(tracks, "tracks");
+    	component_subscribe($$self, tracks, value => $$invalidate(98, $tracks = value));
+    	validate_store(currentTrackIndex, "currentTrackIndex");
+    	component_subscribe($$self, currentTrackIndex, value => $$invalidate(99, $currentTrackIndex = value));
+    	validate_store(provider, "provider");
+    	component_subscribe($$self, provider, value => $$invalidate(3, $provider = value));
+    	validate_store(rebuilding, "rebuilding");
+    	component_subscribe($$self, rebuilding, value => $$invalidate(91, $rebuilding = value));
+    	validate_store(isVideoReady, "isVideoReady");
+    	component_subscribe($$self, isVideoReady, value => $$invalidate(112, $isVideoReady = value));
+    	validate_store(canInteract, "canInteract");
+    	component_subscribe($$self, canInteract, value => $$invalidate(85, $canInteract = value));
+    	validate_store(isFullscreenActive, "isFullscreenActive");
+    	component_subscribe($$self, isFullscreenActive, value => $$invalidate(4, $isFullscreenActive = value));
+    	validate_store(useNativeView, "useNativeView");
+    	component_subscribe($$self, useNativeView, value => $$invalidate(104, $useNativeView = value));
+    	validate_store(useNativeControls, "useNativeControls");
+    	component_subscribe($$self, useNativeControls, value => $$invalidate(102, $useNativeControls = value));
+    	validate_store(useNativeCaptions, "useNativeCaptions");
+    	component_subscribe($$self, useNativeCaptions, value => $$invalidate(97, $useNativeCaptions = value));
+    	validate_store(duration, "duration");
+    	component_subscribe($$self, duration, value => $$invalidate(89, $duration = value));
+    	validate_store(Provider, "Provider");
+    	component_subscribe($$self, Provider, value => $$invalidate(6, $Provider = value));
+    	validate_store(isPlayerActive, "isPlayerActive");
+    	component_subscribe($$self, isPlayerActive, value => $$invalidate(76, $isPlayerActive = value));
+    	validate_store(providerConfig, "providerConfig");
+    	component_subscribe($$self, providerConfig, value => $$invalidate(9, $providerConfig = value));
+    	validate_store(providerVersion, "providerVersion");
+    	component_subscribe($$self, providerVersion, value => $$invalidate(10, $providerVersion = value));
+    	const { canSetPiP, canSetTracks, canSetTrack, canAutoplay, canMutedAutoplay, canSetPoster, canSetPlaybackRate, canSetVideoQuality } = store;
+    	validate_store(canSetPiP, "canSetPiP");
+    	component_subscribe($$self, canSetPiP, value => $$invalidate(113, $canSetPiP = value));
+    	validate_store(canSetTracks, "canSetTracks");
+    	component_subscribe($$self, canSetTracks, value => $$invalidate(110, $canSetTracks = value));
+    	validate_store(canSetTrack, "canSetTrack");
+    	component_subscribe($$self, canSetTrack, value => $$invalidate(111, $canSetTrack = value));
+    	validate_store(canAutoplay, "canAutoplay");
+    	component_subscribe($$self, canAutoplay, value => $$invalidate(92, $canAutoplay = value));
+    	validate_store(canMutedAutoplay, "canMutedAutoplay");
+    	component_subscribe($$self, canMutedAutoplay, value => $$invalidate(78, $canMutedAutoplay = value));
+    	validate_store(canSetPoster, "canSetPoster");
+    	component_subscribe($$self, canSetPoster, value => $$invalidate(101, $canSetPoster = value));
+    	validate_store(canSetPlaybackRate, "canSetPlaybackRate");
+    	component_subscribe($$self, canSetPlaybackRate, value => $$invalidate(106, $canSetPlaybackRate = value));
+    	validate_store(canSetVideoQuality, "canSetVideoQuality");
+    	component_subscribe($$self, canSetVideoQuality, value => $$invalidate(108, $canSetVideoQuality = value));
+    	let playerWrapper;
+    	let { parentEl = null } = $$props;
+    	let { hasWrapper = true } = $$props;
+    	const tick$1 = () => tick();
+
+    	// Filter out any player props before passing them to the provider.
+    	const props = {};
+
+    	onDestroy(() => {
+    		if ($currentPlayer === self) set_store_value(currentPlayer, $currentPlayer = null);
+    		$$invalidate(65, self = null);
+    	});
+
+    	if (is_null($currentPlayer)) set_store_value(currentPlayer, $currentPlayer = self);
+
+    	// --------------------------------------------------------------
+    	// Provider Events
+    	// --------------------------------------------------------------
+    	// Temporary states used to normalize player differences.
+    	let tempMute = false;
+
+    	let tempPlay = false;
+    	let tempPause = false;
+    	let tempControls = false;
+    	let updatingVolume = false;
+    	let updatingTime = false;
+
+    	const cancelTempAction = async cb => {
+    		// Give some time for the provider to be set to it's original value before we receive
+    		// event updates.
+    		await tick();
+
+    		setTimeout(
+    			() => {
+    				cb();
+    			},
+    			100
+    		);
+    	};
+
+    	const initiateTempPlayback = () => {
+    		if (!$playbackReady || !$canMutedAutoplay) return;
+    		$$invalidate(67, tempMute = true);
+    		$$invalidate(68, tempPlay = true);
+    		set_store_value(playsinline, $playsinline = true);
+    	};
+
+    	const onRestart = () => {
+    		if (get_store_value(store.live) || !$playbackEnded) return;
+    		set_store_value(internalTime, $internalTime = 0);
+    		set_store_value(currentTime, $currentTime = 0);
+    		set_store_value(playbackEnded, $playbackEnded = false);
+    		$provider.setCurrentTime(0);
+    		set_store_value(paused, $paused = false);
+    	};
+
+    	const onTimeUpdate = time => {
+    		if ($seeking || updatingTime || !$canInteract) return;
+    		set_store_value(internalTime, $internalTime = time);
+    		set_store_value(currentTime, $currentTime = time);
+    		if ($internalTime === 0 && $playbackEnded) onRestart();
+    	};
+
+    	afterUpdate(() => {
+    		if (!$playbackReady || $seeking || $currentTime === $internalTime) return;
+    		set_store_value(internalTime, $internalTime = $currentTime);
+    		$provider.setCurrentTime($currentTime);
+    		updatingTime = true;
+    	});
+
+    	const checkIfBuffering = () => {
+    		if ($buffered < $currentTime || $playbackStarted && $buffered === 0) {
+    			set_store_value(buffering, $buffering = true);
+    		}
+    	};
+
+    	const checkHasSeeked = () => {
+    		if (!$seeking || $buffered <= $currentTime && $currentTime < $duration) return;
+    		set_store_value(seeking, $seeking = false);
+    		set_store_value(buffering, $buffering = false);
+    		updatingTime = false;
+
+    		if (!$playbackStarted) {
+    			set_store_value(playbackStarted, $playbackStarted = true);
+    			if ($currentTime === $duration) set_store_value(currentTime, $currentTime = 0);
+    		}
+
+    		if ($playbackEnded) set_store_value(playbackEnded, $playbackEnded = false);
+
+    		cancelTempAction(() => {
+    			$$invalidate(69, tempPause = false);
+    		});
+    	};
+
+    	const onAutoplay = () => {
+    		if (!$autoplay || $rebuilding || $currentTime > 0 || (!$canAutoplay || !$canMutedAutoplay)) return;
+    		set_store_value(paused, $paused = false);
+    		set_store_value(playsinline, $playsinline = true);
+    		if (!$canAutoplay) set_store_value(muted, $muted = true);
+    	};
+
+    	const onRebuildStart = () => {
+    		if (!$playbackReady) return;
+    		set_store_value(rebuilding, $rebuilding = true);
+    		set_store_value(buffering, $buffering = true);
+    	};
+
+    	const onRebuildEnd = async () => {
+    		if (!$playbackReady || !$rebuilding) return;
+    		if ($currentTime > 0) $provider.setCurrentTime($currentTime);
+    		await tick();
+    		set_store_value(rebuilding, $rebuilding = false);
+
+    		// eslint-disable-next-line no-use-before-define
+    		if ($isFullscreenActive) requestFullscreen().catch(noop);
+    	};
+
+    	const onRebuild = async () => {
+    		if (!$playbackReady) return;
+
+    		// Cancel any existing temp states as rebuild may be called multiple times.
+    		$$invalidate(67, tempMute = false);
+
+    		$$invalidate(68, tempPlay = false);
+    		await tick();
+
+    		if ($currentTime > 0 && $canMutedAutoplay) {
+    			initiateTempPlayback();
+    			return;
+    		}
+
+    		onRebuildEnd();
+    	};
+
+    	const onPlaybackReady = async () => {
+    		// Wait incase of any sudden src changes.
+    		await tick();
+
+    		set_store_value(playbackReady, $playbackReady = true);
+    		set_store_value(buffering, $buffering = false);
+    		onRebuild();
+    	};
+
+    	const onAutopause = () => {
+    		if (!$autopause || !$currentPlayer || $currentPlayer === self) return;
+    		set_store_value(currentPlayer, $currentPlayer.paused = true, $currentPlayer);
+    	};
+
+    	// If a provider fires a `pause` event before `seeking` we cancel it to not mess
+    	// with our internal paused state.
+    	let firePauseTimer;
+
+    	const onPause = () => {
+    		firePauseTimer = window.setTimeout(
+    			() => {
+    				if (tempPause) return;
+    				set_store_value(paused, $paused = true);
+    				set_store_value(buffering, $buffering = false);
+    				set_store_value(playing, $playing = false);
+    			},
+    			100
+    		);
+    	};
+
+    	const onVolumeChange = newVolume => {
+    		set_store_value(volume, $volume = newVolume);
+    		$$invalidate(71, updatingVolume = true);
+    	};
+
+    	const onBuffered = progress => {
+    		if (progress) set_store_value(buffered, $buffered = progress);
+    		if ($seeking) checkHasSeeked();
+    	};
+
+    	const onSeeking = () => {
+    		if ($seeking) return;
+    		window.clearTimeout(firePauseTimer);
+    		set_store_value(seeking, $seeking = true);
+    		checkIfBuffering();
+
+    		!$playbackStarted
+    		? initiateTempPlayback()
+    		: $$invalidate(69, tempPause = true);
+    	};
+
+    	const onSeeked = async () => {
+    		if (!$seeking) return;
+
+    		// Wait incase `seeking` and `seeked` are fired immediately after each other.
+    		await tick();
+
+    		onBuffered($buffered);
+    	};
+
+    	const onPlay = () => {
+    		set_store_value(paused, $paused = false);
+    		checkIfBuffering();
+    	};
+
+    	const onPlaying = () => {
+    		set_store_value(buffering, $buffering = false);
+    		set_store_value(playbackStarted, $playbackStarted = true);
+    		onSeeked();
+    		onAutopause();
+    		set_store_value(currentPlayer, $currentPlayer = self);
+
+    		if (!tempPlay) {
+    			set_store_value(paused, $paused = false);
+    			set_store_value(playing, $playing = true);
+    		}
+
+    		$provider.setPaused($paused);
+    		$provider.setMuted($muted);
+
+    		cancelTempAction(() => {
+    			$$invalidate(68, tempPlay = false);
+    			$$invalidate(67, tempMute = false);
+    		});
+
+    		onRebuildEnd();
+    	};
+
+    	const onLoop = async () => {
+    		if (get_store_value(store.live) || !get_store_value(store.loop)) return;
+    		await tick();
+    		onRestart();
+    	};
+
+    	const onPlaybackEnd = () => {
+    		set_store_value(playbackEnded, $playbackEnded = true);
+    		set_store_value(paused, $paused = true);
+    		onLoop();
+    	};
+
+    	const onStateChange = async state => {
+    		await tick();
+
+    		switch (state) {
+    			case PlayerState.CUED:
+    				onPlaybackReady();
+    				break;
+    			case PlayerState.PAUSED:
+    				if ($rebuilding) return;
+    				onPause();
+    				break;
+    			case PlayerState.BUFFERING:
+    				set_store_value(buffering, $buffering = true);
+    				break;
+    			case PlayerState.PLAYING:
+    				onPlaying();
+    				break;
+    			case PlayerState.ENDED:
+    				onPlaybackEnd();
+    				break;
+    		}
+    	};
+
+    	// TODO: this is basically a crappy reducer.
+    	const onUpdate = e => {
+    		const info = e.detail;
+    		if (info.state) onStateChange(info.state);
+    		if (info.play && !tempPlay) onPlay();
+    		if (info.rebuild) onRebuildStart();
+    		if ($rebuilding) return;
+    		if (is_null(info.poster) || info.poster) store.nativePoster.set(info.poster);
+    		if (is_boolean(info.isLive)) store.isLive.set(info.isLive);
+    		if (is_number(info.duration)) set_store_value(duration, $duration = parseFloat(info.duration));
+    		if (is_number(info.currentTime)) onTimeUpdate(parseFloat(info.currentTime));
+    		if (is_number(info.buffered)) onBuffered(parseFloat(info.buffered));
+    		if (info.seeking) onSeeking();
+    		if (info.seeked) onSeeked();
+    		if (is_number(info.mediaType)) store.mediaType.set(info.mediaType);
+    		if (info.title) store.title.set(info.title);
+    		if (info.currentSrc) store.currentSrc.set(info.currentSrc);
+    		if (info.mediaId) store.mediaId.set(info.mediaId);
+    		if (is_number(info.volume)) onVolumeChange(parseInt(info.volume, 10));
+    		if (is_boolean(info.muted) && !tempMute) set_store_value(muted, $muted = info.muted);
+    		if (info.origin) store.origin.set(info.origin);
+    		if (is_number(info.videoQuality)) store.videoQuality.forceSet(info.videoQuality);
+    		if (info.videoQualities) store.videoQualities.set(info.videoQualities);
+    		if (info.playbackRate) store.playbackRate.forceSet(info.playbackRate);
+    		if (info.playbackRates) store.playbackRates.set(info.playbackRates);
+
+    		if ($useNativeCaptions) {
+    			if (info.tracks) set_store_value(tracks, $tracks = info.tracks);
+    			if (is_number(info.currentTrackIndex)) set_store_value(currentTrackIndex, $currentTrackIndex = info.currentTrackIndex);
+    		}
+
+    		if (is_boolean(info.pip)) set_store_value(isPiPActive, $isPiPActive = info.pip);
+
+    		// eslint-disable-next-line no-use-before-define
+    		if (is_boolean(info.fullscreen)) onFullscreenChange(info.fullscreen);
+    	};
+
+    	const onSrcChange = () => {
+    		resetStore();
+
+    		// TODO: what if provider can't play the src? Need to stop buffering.
+    		if ($src && $Provider) set_store_value(buffering, $buffering = true);
+
+    		updatingTime = false;
+    		$$invalidate(68, tempPlay = false);
+    		$$invalidate(68, tempPlay = false);
+    		$$invalidate(67, tempMute = false);
+    		$$invalidate(70, tempControls = false);
+    	};
+
+    	const onProviderChange = () => {
+    		onSrcChange();
+    		store.origin.set(null);
+    		store.isPiPActive.set(false);
+
+    		// eslint-disable-next-line no-use-before-define
+    		if ($isFullscreenActive) exitFullscreen().catch(noop);
+
+    		if (!$Provider) store.mediaType.set(MediaType.NONE);
+    	};
+
+    	const pipRequest = active => {
+    		if (!$isVideoReady) {
+    			return Promise.reject(VIDEO_NOT_READY_ERROR_MSG);
+    		}
+
+    		if (!$canSetPiP) {
+    			return Promise.reject(NO_PIP_SUPPORT_ERROR_MSG);
+    		}
+
+    		return Promise.resolve($provider.setPiP(active));
+    	};
+
+    	const requestPiP = () => pipRequest(true);
+    	const exitPiP = () => pipRequest(false);
+    	const FULLSCREEN_DOC_SUPPORT = !!FullscreenApi.requestFullscreen;
+    	let fsDispose = [];
+
+    	const isFullscreen = () => {
+    		const els = [playerWrapper, parentEl, $provider && $provider.getEl()].filter(Boolean);
+    		let isActive = els.includes(document[FullscreenApi.fullscreenElement]);
+    		if (!isActive) isActive = els.some(el => el.matches && el.matches(`:${FullscreenApi.fullscreen}`));
+    		return isActive;
+    	};
+
+    	const onDocumentFullscreenChange = () => {
+    		set_store_value(isFullscreenActive, $isFullscreenActive = isFullscreen());
+    	};
+
+    	const onFullscreenChange = isActive => {
+    		set_store_value(isFullscreenActive, $isFullscreenActive = isActive);
+    		if (!$isFullscreenActive) $$invalidate(70, tempControls = false);
+    		$$invalidate(69, tempPause = false);
+
+    		// iOS pauses the video when exiting fullscreen.
+    		if (!$paused) {
+    			setTimeout(
+    				() => {
+    					$provider.setPaused(false);
+    				},
+    				300
+    			);
+    		}
+    	};
+
+    	const requestDocumentFullscreen = shouldEnter => {
+    		const el = parentEl || playerWrapper;
+    		if (!el || !shouldEnter && !isFullscreen()) return Promise.reject();
+    		if (shouldEnter && isFullscreen()) return Promise.resolve();
+
+    		const request = shouldEnter
+    		? el[FullscreenApi.requestFullscreen]()
+    		: document[FullscreenApi.exitFullscreen]();
+
+    		return Promise.resolve(request);
+    	};
+
+    	// TODO: the two providers which can set fullscreen at the moment (File/Dailymotion) don't
+    	// require a rebuild when enabling controls, if at some point a provider does this won't work.
+    	const requestProviderFullscreen = shouldEnter => {
+    		if (shouldEnter) $$invalidate(70, tempControls = true);
+    		$$invalidate(69, tempPause = true);
+    		return Promise.resolve($provider.setFullscreen(shouldEnter));
+    	};
+
+    	const fullscreenRequest = shouldEnter => {
+    		if (!$isVideoReady) {
+    			return Promise.reject(VIDEO_NOT_READY_ERROR_MSG);
+    		}
+
+    		if (FULLSCREEN_DOC_SUPPORT) {
+    			return requestDocumentFullscreen(shouldEnter);
+    		}
+
+    		if (canProviderFullscreen) {
+    			return requestProviderFullscreen(shouldEnter);
+    		}
+
+    		return Promise.reject(FULLSCREEN_NOT_SUPPORTED_ERROR_MSG);
+    	};
+
+    	const requestFullscreen = () => fullscreenRequest(true);
+    	const exitFullscreen = () => fullscreenRequest(false);
+
+    	onMount(() => {
+    		if (!FULLSCREEN_DOC_SUPPORT) return;
+    		fsDispose.push(listen(document, FullscreenApi.fullscreenchange, onDocumentFullscreenChange));
+
+    		/* *
+     * We have to listen to this on webkit, because no `fullscreenchange` event is fired when the
+     * video element enters or exits fullscreen by:
+     *
+     *  1. The native Html5 fullscreen video control.
+     *  2. Calling requestFullscreen from the video element directly.
+     *  3. Calling requestFullscreen inside an iframe.
+     * */
+    		if (document.webkitExitFullscreen) {
+    			fsDispose.push(listen(document, "webkitfullscreenchange", onDocumentFullscreenChange));
+    		}
+    	});
+
+    	onDestroy(() => {
+    		run_all(fsDispose);
+    		fsDispose = [];
+    	});
+
+    	let { $$slots = {}, $$scope } = $$props;
+    	validate_slots("StandardPlayer", $$slots, []);
+
+    	function switch_instance_binding($$value) {
+    		binding_callbacks[$$value ? "unshift" : "push"](() => {
+    			provider.set($provider = $$value);
+    		});
+    	}
+
+    	function error_handler(event) {
+    		bubble($$self, event);
+    	}
+
+    	const mount_handler = e => {
+    		$$invalidate(1, playerWrapper = e.detail);
+    	};
+
+    	$$self.$set = $$new_props => {
+    		$$invalidate(149, $$props = assign(assign({}, $$props), exclude_internal_props($$new_props)));
+    		if ("_standardStore" in $$new_props) $$invalidate(58, _standardStore = $$new_props._standardStore);
+    		if ("parentEl" in $$new_props) $$invalidate(59, parentEl = $$new_props.parentEl);
+    		if ("hasWrapper" in $$new_props) $$invalidate(0, hasWrapper = $$new_props.hasWrapper);
+    	};
+
+    	$$self.$capture_state = () => ({
+    		get: get_store_value,
+    		currentPlayer,
+    		buildStandardStore,
+    		PlayerWrapper,
+    		MediaType,
+    		PlayerState,
+    		noop,
+    		listen,
+    		get_current_component,
+    		run_all,
+    		svelteTick: tick,
+    		onMount,
+    		onDestroy,
+    		afterUpdate,
+    		is_function: is_function$1,
+    		is_number,
+    		is_boolean,
+    		is_null,
+    		self,
+    		_standardStore,
+    		onPropsChange,
+    		store,
+    		resetStore,
+    		playsinline,
+    		paused,
+    		muted,
+    		playbackEnded,
+    		volume,
+    		seeking,
+    		internalTime,
+    		currentTime,
+    		isPiPActive,
+    		playbackRate,
+    		videoQuality,
+    		src,
+    		isControlsEnabled,
+    		aspectRatio,
+    		buffering,
+    		buffered,
+    		autopause,
+    		autoplay,
+    		playing,
+    		playbackStarted,
+    		poster,
+    		playbackReady,
+    		isVideoView,
+    		tracks,
+    		currentTrackIndex,
+    		provider,
+    		rebuilding,
+    		isVideoReady,
+    		canInteract,
+    		isFullscreenActive,
+    		useNativeView,
+    		useNativeControls,
+    		useNativeCaptions,
+    		duration,
+    		Provider,
+    		isPlayerActive,
+    		providerConfig,
+    		providerVersion,
+    		canSetPiP,
+    		canSetTracks,
+    		canSetTrack,
+    		canAutoplay,
+    		canMutedAutoplay,
+    		canSetPoster,
+    		canSetPlaybackRate,
+    		canSetVideoQuality,
+    		playerWrapper,
+    		parentEl,
+    		hasWrapper,
+    		tick: tick$1,
+    		props,
+    		tempMute,
+    		tempPlay,
+    		tempPause,
+    		tempControls,
+    		updatingVolume,
+    		updatingTime,
+    		cancelTempAction,
+    		initiateTempPlayback,
+    		onRestart,
+    		onTimeUpdate,
+    		checkIfBuffering,
+    		checkHasSeeked,
+    		onAutoplay,
+    		onRebuildStart,
+    		onRebuildEnd,
+    		onRebuild,
+    		onPlaybackReady,
+    		onAutopause,
+    		firePauseTimer,
+    		onPause,
+    		onVolumeChange,
+    		onBuffered,
+    		onSeeking,
+    		onSeeked,
+    		onPlay,
+    		onPlaying,
+    		onLoop,
+    		onPlaybackEnd,
+    		onStateChange,
+    		onUpdate,
+    		onSrcChange,
+    		onProviderChange,
+    		NO_PIP_SUPPORT_ERROR_MSG,
+    		VIDEO_NOT_READY_ERROR_MSG,
+    		pipRequest,
+    		requestPiP,
+    		exitPiP,
+    		FullscreenApi,
+    		FULLSCREEN_NOT_SUPPORTED_ERROR_MSG,
+    		FULLSCREEN_DOC_SUPPORT,
+    		fsDispose,
+    		isFullscreen,
+    		onDocumentFullscreenChange,
+    		onFullscreenChange,
+    		requestDocumentFullscreen,
+    		requestProviderFullscreen,
+    		fullscreenRequest,
+    		requestFullscreen,
+    		exitFullscreen,
+    		$currentPlayer,
+    		$isPlayerActive,
+    		$playbackReady,
+    		$canMutedAutoplay,
+    		$playsinline,
+    		$playbackEnded,
+    		$internalTime,
+    		$currentTime,
+    		$provider,
+    		$paused,
+    		$seeking,
+    		$canInteract,
+    		$buffered,
+    		$playbackStarted,
+    		$buffering,
+    		$duration,
+    		$autoplay,
+    		$rebuilding,
+    		$canAutoplay,
+    		$muted,
+    		$isFullscreenActive,
+    		$autopause,
+    		$playing,
+    		$volume,
+    		$useNativeCaptions,
+    		$tracks,
+    		$currentTrackIndex,
+    		$isPiPActive,
+    		$src,
+    		$Provider,
+    		$canSetPoster,
+    		$useNativeControls,
+    		$poster,
+    		$aspectRatio,
+    		$useNativeView,
+    		$isControlsEnabled,
+    		$canSetPlaybackRate,
+    		$playbackRate,
+    		$canSetVideoQuality,
+    		$videoQuality,
+    		$canSetTracks,
+    		$canSetTrack,
+    		$isVideoReady,
+    		$canSetPiP,
+    		canProviderFullscreen,
+    		$isVideoView,
+    		$providerConfig,
+    		$providerVersion
+    	});
+
+    	$$self.$inject_state = $$new_props => {
+    		$$invalidate(149, $$props = assign(assign({}, $$props), $$new_props));
+    		if ("self" in $$props) $$invalidate(65, self = $$new_props.self);
+    		if ("_standardStore" in $$props) $$invalidate(58, _standardStore = $$new_props._standardStore);
+    		if ("onPropsChange" in $$props) $$invalidate(66, onPropsChange = $$new_props.onPropsChange);
+    		if ("playerWrapper" in $$props) $$invalidate(1, playerWrapper = $$new_props.playerWrapper);
+    		if ("parentEl" in $$props) $$invalidate(59, parentEl = $$new_props.parentEl);
+    		if ("hasWrapper" in $$props) $$invalidate(0, hasWrapper = $$new_props.hasWrapper);
+    		if ("tempMute" in $$props) $$invalidate(67, tempMute = $$new_props.tempMute);
+    		if ("tempPlay" in $$props) $$invalidate(68, tempPlay = $$new_props.tempPlay);
+    		if ("tempPause" in $$props) $$invalidate(69, tempPause = $$new_props.tempPause);
+    		if ("tempControls" in $$props) $$invalidate(70, tempControls = $$new_props.tempControls);
+    		if ("updatingVolume" in $$props) $$invalidate(71, updatingVolume = $$new_props.updatingVolume);
+    		if ("updatingTime" in $$props) updatingTime = $$new_props.updatingTime;
+    		if ("firePauseTimer" in $$props) firePauseTimer = $$new_props.firePauseTimer;
+    		if ("fsDispose" in $$props) fsDispose = $$new_props.fsDispose;
+    		if ("canProviderFullscreen" in $$props) $$invalidate(114, canProviderFullscreen = $$new_props.canProviderFullscreen);
+    	};
+
+    	let canProviderFullscreen;
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	$$self.$$.update = () => {
+    		 onPropsChange($$props);
+
+    		 Object.keys($$props).filter(prop => !store[prop]).forEach(prop => {
+    			$$invalidate(2, props[prop] = $$props[prop], props);
+    		});
+
+    		if ($$self.$$.dirty[2] & /*$currentPlayer, self*/ 8200) {
+    			 set_store_value(isPlayerActive, $isPlayerActive = $currentPlayer === self);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*$src*/ 32) {
+    			 onSrcChange();
+    		}
+
+    		if ($$self.$$.dirty[0] & /*$Provider*/ 64) {
+    			 onProviderChange();
+    		}
+
+    		if ($$self.$$.dirty[2] & /*$autoplay, $playbackReady*/ 268468224) {
+    			// --------------------------------------------------------------
+    			// State Updates
+    			// --------------------------------------------------------------
+    			 if ($autoplay && $playbackReady) onAutoplay();
+    		}
+
+    		if ($$self.$$.dirty[0] & /*$provider*/ 8 | $$self.$$.dirty[2] & /*$rebuilding, $playsinline*/ 537001984) {
+    			 if ($provider && !$rebuilding) $provider.setPlaysinline($playsinline);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*$provider*/ 8 | $$self.$$.dirty[2] & /*$rebuilding*/ 536870912 | $$self.$$.dirty[3] & /*$canSetPoster, $useNativeControls, $poster*/ 1792) {
+    			 if ($canSetPoster && !$rebuilding) $provider.setPoster($useNativeControls ? $poster : null);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*$provider, $aspectRatio*/ 136) {
+    			 if ($provider && is_function$1($provider.setAspectRatio)) $provider.setAspectRatio($aspectRatio);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*$provider*/ 8 | $$self.$$.dirty[2] & /*$rebuilding*/ 536870912 | $$self.$$.dirty[3] & /*$useNativeView*/ 2048) {
+    			 if ($provider && !$rebuilding && is_function$1($provider.setView)) {
+    				$provider.setView($useNativeView);
+    			}
+    		}
+
+    		if ($$self.$$.dirty[0] & /*$provider*/ 8 | $$self.$$.dirty[2] & /*$rebuilding, tempControls*/ 536871168 | $$self.$$.dirty[3] & /*$isControlsEnabled, $useNativeControls*/ 4608) {
+    			 if ($provider && !$rebuilding) {
+    				$provider.setControls($isControlsEnabled && ($useNativeControls || tempControls));
+    			}
+    		}
+
+    		if ($$self.$$.dirty[0] & /*$provider*/ 8 | $$self.$$.dirty[2] & /*$paused, $playbackEnded*/ 2359296) {
+    			 if ($provider && !$paused && $playbackEnded) onRestart();
+    		}
+
+    		if ($$self.$$.dirty[0] & /*$provider*/ 8 | $$self.$$.dirty[2] & /*$playbackReady, $paused, tempPause, tempPlay*/ 2130112) {
+    			 if ($provider && $playbackReady) $provider.setPaused(($paused || tempPause) && !tempPlay);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*$provider*/ 8 | $$self.$$.dirty[2] & /*$canInteract, tempMute*/ 8388640 | $$self.$$.dirty[3] & /*$muted*/ 1) {
+    			 if ($provider && $canInteract) $provider.setMuted($muted || tempMute);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*$provider*/ 8 | $$self.$$.dirty[2] & /*$canInteract*/ 8388608 | $$self.$$.dirty[3] & /*$canSetPlaybackRate, $playbackRate*/ 24576) {
+    			 if ($canSetPlaybackRate && $canInteract) $provider.setPlaybackRate($playbackRate);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*$provider*/ 8 | $$self.$$.dirty[2] & /*$canInteract*/ 8388608 | $$self.$$.dirty[3] & /*$canSetVideoQuality, $videoQuality*/ 98304) {
+    			 if ($canSetVideoQuality && $canInteract) $provider.setVideoQuality($videoQuality);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*$provider*/ 8 | $$self.$$.dirty[2] & /*$canInteract, updatingVolume*/ 8389120 | $$self.$$.dirty[3] & /*$volume*/ 8) {
+    			 $provider && $canInteract && !updatingVolume
+    			? $provider.setVolume($volume)
+    			: $$invalidate(71, updatingVolume = false);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*$provider*/ 8 | $$self.$$.dirty[2] & /*$canInteract*/ 8388608 | $$self.$$.dirty[3] & /*$canSetTracks, $useNativeCaptions, $tracks*/ 131120) {
+    			// --------------------------------------------------------------
+    			// Tracks
+    			// --------------------------------------------------------------
+    			 if ($canSetTracks && $canInteract) $provider.setTracks($useNativeCaptions ? $tracks : []);
+    		}
+
+    		if ($$self.$$.dirty[0] & /*$provider*/ 8 | $$self.$$.dirty[2] & /*$canInteract*/ 8388608 | $$self.$$.dirty[3] & /*$canSetTrack, $useNativeCaptions, $currentTrackIndex*/ 262224) {
+    			 if ($canSetTrack && $canInteract) {
+    				$provider.setTrack($useNativeCaptions ? $currentTrackIndex : -1);
+    			}
+    		}
+
+    		if ($$self.$$.dirty[0] & /*$provider*/ 8) {
+    			 $$invalidate(114, canProviderFullscreen = $provider && $provider.supportsFullscreen() && is_function$1($provider.setFullscreen));
+    		}
+
+    		if ($$self.$$.dirty[3] & /*$isVideoReady, canProviderFullscreen*/ 2621440) {
+    			 store.canSetFullscreen.set($isVideoReady && (FULLSCREEN_DOC_SUPPORT || canProviderFullscreen));
+    		}
+    	};
+
+    	$$props = exclude_internal_props($$props);
+
+    	return [
+    		hasWrapper,
+    		playerWrapper,
+    		props,
+    		$provider,
+    		$isFullscreenActive,
+    		$src,
+    		$Provider,
+    		$aspectRatio,
+    		$isVideoView,
+    		$providerConfig,
+    		$providerVersion,
+    		playsinline,
+    		paused,
+    		muted,
+    		playbackEnded,
+    		volume,
+    		seeking,
+    		internalTime,
+    		currentTime,
+    		isPiPActive,
+    		playbackRate,
+    		videoQuality,
+    		src,
+    		isControlsEnabled,
+    		aspectRatio,
+    		buffering,
+    		buffered,
+    		autopause,
+    		autoplay,
+    		playing,
+    		playbackStarted,
+    		poster,
+    		playbackReady,
+    		isVideoView,
+    		tracks,
+    		currentTrackIndex,
+    		provider,
+    		rebuilding,
+    		isVideoReady,
+    		canInteract,
+    		isFullscreenActive,
+    		useNativeView,
+    		useNativeControls,
+    		useNativeCaptions,
+    		duration,
+    		Provider,
+    		isPlayerActive,
+    		providerConfig,
+    		providerVersion,
+    		canSetPiP,
+    		canSetTracks,
+    		canSetTrack,
+    		canAutoplay,
+    		canMutedAutoplay,
+    		canSetPoster,
+    		canSetPlaybackRate,
+    		canSetVideoQuality,
+    		onUpdate,
+    		_standardStore,
+    		parentEl,
+    		tick$1,
+    		requestPiP,
+    		exitPiP,
+    		requestFullscreen,
+    		exitFullscreen,
+    		self,
+    		onPropsChange,
+    		tempMute,
+    		tempPlay,
+    		tempPause,
+    		tempControls,
+    		updatingVolume,
+    		updatingTime,
+    		firePauseTimer,
+    		fsDispose,
+    		$currentPlayer,
+    		$isPlayerActive,
+    		$playbackReady,
+    		$canMutedAutoplay,
+    		$playsinline,
+    		$playbackEnded,
+    		$internalTime,
+    		$currentTime,
+    		$paused,
+    		$seeking,
+    		$canInteract,
+    		$buffered,
+    		$playbackStarted,
+    		$buffering,
+    		$duration,
+    		$autoplay,
+    		$rebuilding,
+    		$canAutoplay,
+    		$muted,
+    		$autopause,
+    		$playing,
+    		$volume,
+    		$useNativeCaptions,
+    		$tracks,
+    		$currentTrackIndex,
+    		$isPiPActive,
+    		$canSetPoster,
+    		$useNativeControls,
+    		$poster,
+    		$useNativeView,
+    		$isControlsEnabled,
+    		$canSetPlaybackRate,
+    		$playbackRate,
+    		$canSetVideoQuality,
+    		$videoQuality,
+    		$canSetTracks,
+    		$canSetTrack,
+    		$isVideoReady,
+    		$canSetPiP,
+    		canProviderFullscreen,
+    		store,
+    		resetStore,
+    		cancelTempAction,
+    		initiateTempPlayback,
+    		onRestart,
+    		onTimeUpdate,
+    		checkIfBuffering,
+    		checkHasSeeked,
+    		onAutoplay,
+    		onRebuildStart,
+    		onRebuildEnd,
+    		onRebuild,
+    		onPlaybackReady,
+    		onAutopause,
+    		onPause,
+    		onVolumeChange,
+    		onBuffered,
+    		onSeeking,
+    		onSeeked,
+    		onPlay,
+    		onPlaying,
+    		onLoop,
+    		onPlaybackEnd,
+    		onStateChange,
+    		onSrcChange,
+    		onProviderChange,
+    		pipRequest,
+    		FULLSCREEN_DOC_SUPPORT,
+    		isFullscreen,
+    		onDocumentFullscreenChange,
+    		onFullscreenChange,
+    		requestDocumentFullscreen,
+    		requestProviderFullscreen,
+    		fullscreenRequest,
+    		$$props,
+    		switch_instance_binding,
+    		error_handler,
+    		mount_handler
+    	];
+    }
+
+    class StandardPlayer extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+
+    		init(
+    			this,
+    			options,
+    			instance$8,
+    			create_fragment$8,
+    			safe_not_equal,
+    			{
+    				_standardStore: 58,
+    				parentEl: 59,
+    				hasWrapper: 0,
+    				tick: 60,
+    				requestPiP: 61,
+    				exitPiP: 62,
+    				requestFullscreen: 63,
+    				exitFullscreen: 64
+    			},
+    			[-1, -1, -1, -1, -1]
+    		);
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "StandardPlayer",
+    			options,
+    			id: create_fragment$8.name
+    		});
+    	}
+
+    	get _standardStore() {
+    		return this.$$.ctx[58];
+    	}
+
+    	set _standardStore(_standardStore) {
+    		this.$set({ _standardStore });
+    		flush();
+    	}
+
+    	get parentEl() {
+    		return this.$$.ctx[59];
+    	}
+
+    	set parentEl(parentEl) {
+    		this.$set({ parentEl });
+    		flush();
+    	}
+
+    	get hasWrapper() {
+    		return this.$$.ctx[0];
+    	}
+
+    	set hasWrapper(hasWrapper) {
+    		this.$set({ hasWrapper });
+    		flush();
+    	}
+
+    	get tick() {
+    		return this.$$.ctx[60];
+    	}
+
+    	set tick(value) {
+    		throw new Error("<StandardPlayer>: Cannot set read-only property 'tick'");
+    	}
+
+    	get requestPiP() {
+    		return this.$$.ctx[61];
+    	}
+
+    	set requestPiP(value) {
+    		throw new Error("<StandardPlayer>: Cannot set read-only property 'requestPiP'");
+    	}
+
+    	get exitPiP() {
+    		return this.$$.ctx[62];
+    	}
+
+    	set exitPiP(value) {
+    		throw new Error("<StandardPlayer>: Cannot set read-only property 'exitPiP'");
+    	}
+
+    	get requestFullscreen() {
+    		return this.$$.ctx[63];
+    	}
+
+    	set requestFullscreen(value) {
+    		throw new Error("<StandardPlayer>: Cannot set read-only property 'requestFullscreen'");
+    	}
+
+    	get exitFullscreen() {
+    		return this.$$.ctx[64];
+    	}
+
+    	set exitFullscreen(value) {
+    		throw new Error("<StandardPlayer>: Cannot set read-only property 'exitFullscreen'");
+    	}
+    }
+
+    /* node_modules/@vime-js/standard/src/providers/Vimeo.svelte generated by Svelte v3.20.1 */
+
+    function create_fragment$9(ctx) {
+    	let current;
+
+    	let liteplayer_props = {
+    		src: /*src*/ ctx[0],
+    		params: /*params*/ ctx[2],
+    		providers: [VimeoProvider],
+    		hasWrapper: false
+    	};
+
+    	const liteplayer = new LitePlayer({ props: liteplayer_props, $$inline: true });
+    	/*liteplayer_binding*/ ctx[33](liteplayer);
+    	liteplayer.$on("error", /*error_handler*/ ctx[34]);
+    	liteplayer.$on("titlechange", /*onTitleChange*/ ctx[4]);
+    	liteplayer.$on("rebuild", /*onReload*/ ctx[6]);
+    	liteplayer.$on("rebuild", /*onRebuildStart*/ ctx[3]);
+    	liteplayer.$on("embedurlchange", /*onEmbedURLChange*/ ctx[5]);
+    	liteplayer.$on("data", /*onData*/ ctx[7]);
+
+    	const block = {
+    		c: function create() {
+    			create_component(liteplayer.$$.fragment);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			mount_component(liteplayer, target, anchor);
+    			current = true;
+    		},
+    		p: function update(ctx, dirty) {
+    			const liteplayer_changes = {};
+    			if (dirty[0] & /*src*/ 1) liteplayer_changes.src = /*src*/ ctx[0];
+    			if (dirty[0] & /*params*/ 4) liteplayer_changes.params = /*params*/ ctx[2];
+    			liteplayer.$set(liteplayer_changes);
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(liteplayer.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(liteplayer.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			/*liteplayer_binding*/ ctx[33](null);
+    			destroy_component(liteplayer, detaching);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$9.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    const VM = {};
+
+    // @see https://developer.vimeo.com/player/sdk/reference#methods-for-playback-controls
+    VM.Command = {
+    	PLAY: "play",
+    	PAUSE: "pause",
+    	SET_MUTED: "setMuted",
+    	SET_VOLUME: "setVolume",
+    	SET_CURRENT_TIME: "setCurrentTime",
+    	SET_PLAYBACK_RATE: "setPlaybackRate",
+    	ADD_EVENT_LISTENER: "addEventListener",
+    	GET_DURATION: "getDuration",
+    	GET_CURRENT_TIME: "getCurrentTime",
+    	GET_TEXT_TRACKS: "getTextTracks",
+    	ENABLE_TEXT_TRACK: "enableTextTrack",
+    	DISABLE_TEXT_TRACK: "disableTextTrack"
+    };
+
+    // Some reason event names are different when calling `addEventListener` vs the event name
+    // that comes through `onData`, hence `VM.Event` and `VM.EVENTS` below.
+    VM.Event = {
+    	PLAY: "play",
+    	PAUSE: "pause",
+    	READY: "ready",
+    	LOAD_PROGRESS: "loadProgress",
+    	BUFFER_START: "bufferstart",
+    	BUFFER_END: "bufferend",
+    	LOADED: "loaded",
+    	FINISH: "finish",
+    	SEEKING: "seeking",
+    	SEEKED: "seeked",
+    	CUE_CHANGE: "cuechange",
+    	FULLSCREEN_CHANGE: "fullscreenchange",
+    	VOLUME_CHANGE: "volumechange",
+    	DURATION_CHANGE: "durationchange",
+    	PLAYBACK_RATE_CHANGE: "playbackratechange",
+    	TEXT_TRACK_CHANGE: "texttrackchange",
+    	ERROR: "error"
+    };
+
+    // @see https://developer.vimeo.com/player/sdk/reference#events-for-playback-controls
+    VM.EVENTS = [
+    	VM.Event.PLAY,
+    	VM.Event.PAUSE,
+    	VM.Event.SEEKING,
+    	VM.Event.SEEKED,
+    	"timeupdate",
+    	VM.Event.VOLUME_CHANGE,
+    	VM.Event.DURATION_CHANGE,
+    	VM.Event.FULLSCREEN_CHANGE,
+    	VM.Event.CUE_CHANGE,
+    	"progress",
+    	VM.Event.ERROR,
+    	VM.Event.PLAYBACK_RATE_CHANGE,
+    	VM.Event.LOADED,
+    	VM.Event.BUFFER_START,
+    	VM.Event.BUFFER_END,
+    	VM.Event.TEXT_TRACK_CHANGE,
+    	"waiting",
+    	"ended"
+    ];
+
+    const canPlay = can_play;
+
+    function instance$9($$self, $$props, $$invalidate) {
+    	let litePlayer;
+    	let info = {};
+    	let tracks = [];
+    	let seeking = false;
+    	let playbackReady = false;
+    	let internalTime = 0;
+
+    	const params = {
+    		// Controlled by Vime.
+    		autopause: false
+    	};
+
+    	const dispatch = createEventDispatcher();
+    	const send = (command, args) => litePlayer && litePlayer.sendCommand(command, args);
+    	let { src = null } = $$props;
+    	const getLitePlayer = () => litePlayer;
+    	const getEl = () => litePlayer ? litePlayer.getEmbed().getIframe() : null;
+
+    	const setMuted = isMuted => {
+    		send(VM.Command.SET_MUTED, isMuted);
+    	};
+
+    	const setVolume = newVolume => {
+    		send(VM.Command.SET_VOLUME, newVolume / 100);
+    	};
+
+    	const setCurrentTime = newTime => {
+    		send(VM.Command.SET_CURRENT_TIME, newTime);
+    	};
+
+    	const setPlaysinline = isEnabled => {
+    		$$invalidate(2, params.playsinline = isEnabled, params);
+    	};
+
+    	const setControls = isEnabled => {
+    		$$invalidate(2, params.controls = isEnabled, params);
+    	};
+
+    	const setPlaybackRate = newRate => {
+    		send(VM.Command.SET_PLAYBACK_RATE, newRate);
+    	};
+
+    	const setPaused = isPaused => {
+    		isPaused
+    		? send(VM.Command.PAUSE)
+    		: send(VM.Command.PLAY);
+    	};
+
+    	const supportsPiP = () => false;
+    	const supportsFullscreen = () => true;
+
+    	const setTrack = newIndex => {
+    		if (newIndex === -1) {
+    			send(VM.Command.DISABLE_TEXT_TRACK);
+    			return;
+    		}
+
+    		const { language, kind } = tracks[newIndex];
+    		send(VM.Command.ENABLE_TEXT_TRACK, { language, kind });
+    	};
+
+    	onMount(() => {
+    		$$invalidate(20, info.origin = litePlayer.getOrigin(), info);
+    	});
+
+    	onMount(() => {
+    		$$invalidate(20, info.mediaType = MediaType.VIDEO, info);
+    	});
+
+    	const onRebuildStart = () => {
+    		$$invalidate(20, info.rebuild = true, info);
+    	};
+
+    	const onTitleChange = e => {
+    		$$invalidate(20, info.title = e.detail, info);
+    	};
+
+    	const onEmbedURLChange = e => {
+    		$$invalidate(20, info.currentSrc = e.detail, info);
+    		$$invalidate(20, info.mediaId = litePlayer.getMediaId(), info);
+    	};
+
+    	const onReload = () => {
+    		$$invalidate(23, playbackReady = false);
+    		$$invalidate(22, seeking = false);
+    		internalTime = 0;
+    		tracks = [];
+    	};
+
+    	const onTimeUpdate = time => {
+    		$$invalidate(20, info.currentTime = time, info);
+
+    		if (Math.abs(internalTime - time) > 1) {
+    			$$invalidate(22, seeking = true);
+    			$$invalidate(20, info.seeking = true, info);
+    		}
+
+    		internalTime = time;
+    	};
+
+    	let timeRaf;
+    	const cancelTimeUpdates = () => window.cancelAnimationFrame(timeRaf);
+    	onDestroy(cancelTimeUpdates);
+
+    	const getTimeUpdates = () => {
+    		send(VM.Command.GET_CURRENT_TIME);
+    		timeRaf = raf(getTimeUpdates);
+    	};
+
+    	const onMethod = (method, value) => {
+    		switch (method) {
+    			case VM.Command.GET_CURRENT_TIME:
+    				onTimeUpdate(parseFloat(value));
+    				break;
+    			case VM.Command.GET_TEXT_TRACKS:
+    				tracks = value || [];
+    				$$invalidate(20, info.tracks = tracks.map(track => ({ ...track, srclang: track.language })), info);
+    				$$invalidate(20, info.currentTrackIndex = tracks.findIndex(t => t.mode === "showing"), info);
+    				break;
+    			case VM.Command.GET_DURATION:
+    				$$invalidate(20, info.duration = parseFloat(value), info);
+    				break;
+    		}
+    	};
+
+    	const onData = e => {
+    		const data = e.detail;
+    		if (!data) return;
+    		const { event, data: payload } = data;
+    		if (data.method) onMethod(data.method, data.value);
+    		if (!event) return;
+
+    		switch (event) {
+    			case VM.Event.READY:
+    				VM.EVENTS.forEach(vmEvent => send(VM.Command.ADD_EVENT_LISTENER, vmEvent));
+    				break;
+    			case VM.Event.LOADED:
+    				$$invalidate(20, info.state = PlayerState.CUED, info);
+    				send(VM.Command.GET_DURATION);
+    				send(VM.Command.GET_TEXT_TRACKS);
+    				$$invalidate(23, playbackReady = true);
+    				break;
+    			case VM.Event.PLAY:
+    				$$invalidate(20, info.state = PlayerState.PLAYING, info);
+    				break;
+    			case VM.Event.PAUSE:
+    				$$invalidate(20, info.state = PlayerState.PAUSED, info);
+    				break;
+    			case VM.Event.LOAD_PROGRESS:
+    				$$invalidate(20, info.buffered = parseFloat(payload.seconds), info);
+    				break;
+    			case VM.Event.BUFFER_START:
+    				$$invalidate(20, info.state = PlayerState.BUFFERING, info);
+    				break;
+    			case VM.Event.SEEKING:
+    				$$invalidate(20, info.seeking = true, info);
+    				break;
+    			case VM.Event.TEXT_TRACK_CHANGE:
+    				$$invalidate(20, info.currentTrackIndex = tracks.findIndex(t => t.label === payload.label), info);
+    				break;
+    			case VM.Event.SEEKED:
+    				$$invalidate(22, seeking = false);
+    				$$invalidate(20, info.seeked = true, info);
+    				break;
+    			case VM.Event.VOLUME_CHANGE:
+    				$$invalidate(20, info.volume = parseFloat(payload.volume) * 100, info);
+    				break;
+    			case VM.Event.DURATION_CHANGE:
+    				$$invalidate(20, info.duration = parseFloat(payload.duration), info);
+    				break;
+    			case VM.Event.PLAYBACK_RATE_CHANGE:
+    				$$invalidate(20, info.playbackRate = parseFloat(payload.playbackRate), info);
+    				break;
+    			case VM.Event.FULLSCREEN_CHANGE:
+    				$$invalidate(20, info.fullscreen = !!payload.fullscreen, info);
+    				break;
+    			case VM.Event.FINISH:
+    				$$invalidate(20, info.state = PlayerState.ENDED, info);
+    				break;
+    			case VM.Event.ERROR:
+    				dispatch("error", payload);
+    				break;
+    		}
+    	};
+
+    	const fetchPoster = () => fetch_poster(src).then(poster => {
+    		$$invalidate(20, info.poster = poster, info);
+    	}).catch(e => dispatch("error", e));
+
+    	const writable_props = ["src"];
+
+    	Object.keys($$props).forEach(key => {
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<Vimeo> was created with unknown prop '${key}'`);
+    	});
+
+    	let { $$slots = {}, $$scope } = $$props;
+    	validate_slots("Vimeo", $$slots, []);
+
+    	function liteplayer_binding($$value) {
+    		binding_callbacks[$$value ? "unshift" : "push"](() => {
+    			$$invalidate(1, litePlayer = $$value);
+    		});
+    	}
+
+    	function error_handler(event) {
+    		bubble($$self, event);
+    	}
+
+    	$$self.$set = $$props => {
+    		if ("src" in $$props) $$invalidate(0, src = $$props.src);
+    	};
+
+    	$$self.$capture_state = () => ({
+    		can_play,
+    		VM,
+    		canPlay,
+    		onMount,
+    		onDestroy,
+    		createEventDispatcher,
+    		raf,
+    		LitePlayer,
+    		VimeoProvider,
+    		fetch_poster,
+    		MediaType,
+    		PlayerState,
+    		litePlayer,
+    		info,
+    		tracks,
+    		seeking,
+    		playbackReady,
+    		internalTime,
+    		params,
+    		dispatch,
+    		send,
+    		src,
+    		getLitePlayer,
+    		getEl,
+    		setMuted,
+    		setVolume,
+    		setCurrentTime,
+    		setPlaysinline,
+    		setControls,
+    		setPlaybackRate,
+    		setPaused,
+    		supportsPiP,
+    		supportsFullscreen,
+    		setTrack,
+    		onRebuildStart,
+    		onTitleChange,
+    		onEmbedURLChange,
+    		onReload,
+    		onTimeUpdate,
+    		timeRaf,
+    		cancelTimeUpdates,
+    		getTimeUpdates,
+    		onMethod,
+    		onData,
+    		fetchPoster
+    	});
+
+    	$$self.$inject_state = $$props => {
+    		if ("litePlayer" in $$props) $$invalidate(1, litePlayer = $$props.litePlayer);
+    		if ("info" in $$props) $$invalidate(20, info = $$props.info);
+    		if ("tracks" in $$props) tracks = $$props.tracks;
+    		if ("seeking" in $$props) $$invalidate(22, seeking = $$props.seeking);
+    		if ("playbackReady" in $$props) $$invalidate(23, playbackReady = $$props.playbackReady);
+    		if ("internalTime" in $$props) internalTime = $$props.internalTime;
+    		if ("src" in $$props) $$invalidate(0, src = $$props.src);
+    		if ("timeRaf" in $$props) timeRaf = $$props.timeRaf;
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	$$self.$$.update = () => {
+    		if ($$self.$$.dirty[0] & /*src*/ 1) {
+    			 fetchPoster();
+    		}
+
+    		if ($$self.$$.dirty[0] & /*seeking, playbackReady*/ 12582912) {
+    			 !seeking && playbackReady
+    			? getTimeUpdates()
+    			: cancelTimeUpdates();
+    		}
+
+    		if ($$self.$$.dirty[0] & /*info*/ 1048576) {
+    			 {
+    				dispatch("update", info);
+    				$$invalidate(20, info = {});
+    			}
+    		}
+    	};
+
+    	return [
+    		src,
+    		litePlayer,
+    		params,
+    		onRebuildStart,
+    		onTitleChange,
+    		onEmbedURLChange,
+    		onReload,
+    		onData,
+    		getLitePlayer,
+    		getEl,
+    		setMuted,
+    		setVolume,
+    		setCurrentTime,
+    		setPlaysinline,
+    		setControls,
+    		setPlaybackRate,
+    		setPaused,
+    		supportsPiP,
+    		supportsFullscreen,
+    		setTrack,
+    		info,
+    		tracks,
+    		seeking,
+    		playbackReady,
+    		internalTime,
+    		timeRaf,
+    		dispatch,
+    		send,
+    		onTimeUpdate,
+    		cancelTimeUpdates,
+    		getTimeUpdates,
+    		onMethod,
+    		fetchPoster,
+    		liteplayer_binding,
+    		error_handler
+    	];
+    }
+
+    class Vimeo extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+
+    		init(
+    			this,
+    			options,
+    			instance$9,
+    			create_fragment$9,
+    			safe_not_equal,
+    			{
+    				src: 0,
+    				getLitePlayer: 8,
+    				getEl: 9,
+    				setMuted: 10,
+    				setVolume: 11,
+    				setCurrentTime: 12,
+    				setPlaysinline: 13,
+    				setControls: 14,
+    				setPlaybackRate: 15,
+    				setPaused: 16,
+    				supportsPiP: 17,
+    				supportsFullscreen: 18,
+    				setTrack: 19
+    			},
+    			[-1, -1]
+    		);
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "Vimeo",
+    			options,
+    			id: create_fragment$9.name
+    		});
+    	}
+
+    	get src() {
+    		throw new Error("<Vimeo>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set src(value) {
+    		throw new Error("<Vimeo>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get getLitePlayer() {
+    		return this.$$.ctx[8];
+    	}
+
+    	set getLitePlayer(value) {
+    		throw new Error("<Vimeo>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get getEl() {
+    		return this.$$.ctx[9];
+    	}
+
+    	set getEl(value) {
+    		throw new Error("<Vimeo>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get setMuted() {
+    		return this.$$.ctx[10];
+    	}
+
+    	set setMuted(value) {
+    		throw new Error("<Vimeo>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get setVolume() {
+    		return this.$$.ctx[11];
+    	}
+
+    	set setVolume(value) {
+    		throw new Error("<Vimeo>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get setCurrentTime() {
+    		return this.$$.ctx[12];
+    	}
+
+    	set setCurrentTime(value) {
+    		throw new Error("<Vimeo>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get setPlaysinline() {
+    		return this.$$.ctx[13];
+    	}
+
+    	set setPlaysinline(value) {
+    		throw new Error("<Vimeo>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get setControls() {
+    		return this.$$.ctx[14];
+    	}
+
+    	set setControls(value) {
+    		throw new Error("<Vimeo>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get setPlaybackRate() {
+    		return this.$$.ctx[15];
+    	}
+
+    	set setPlaybackRate(value) {
+    		throw new Error("<Vimeo>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get setPaused() {
+    		return this.$$.ctx[16];
+    	}
+
+    	set setPaused(value) {
+    		throw new Error("<Vimeo>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get supportsPiP() {
+    		return this.$$.ctx[17];
+    	}
+
+    	set supportsPiP(value) {
+    		throw new Error("<Vimeo>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get supportsFullscreen() {
+    		return this.$$.ctx[18];
+    	}
+
+    	set supportsFullscreen(value) {
+    		throw new Error("<Vimeo>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get setTrack() {
+    		return this.$$.ctx[19];
+    	}
+
+    	set setTrack(value) {
+    		throw new Error("<Vimeo>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+    }
+
+    var VimeoProvider$1 = /*#__PURE__*/Object.freeze({
+        __proto__: null,
+        'default': Vimeo,
+        canPlay: canPlay
+    });
+
+    /* src/quanta/1-views/2-molecules/OmoVideo.svelte generated by Svelte v3.20.1 */
+
+    const file$7 = "src/quanta/1-views/2-molecules/OmoVideo.svelte";
+
+    function create_fragment$a(ctx) {
+    	let div;
+    	let current;
+    	let player_1_props = { providers: /*providers*/ ctx[1] };
+    	const player_1 = new StandardPlayer({ props: player_1_props, $$inline: true });
+    	/*player_1_binding*/ ctx[5](player_1);
+
+    	const block = {
+    		c: function create() {
+    			div = element("div");
+    			create_component(player_1.$$.fragment);
+    			attr_dev(div, "class", "bg-blue-900 w-full");
+    			add_location(div, file$7, 28, 0, 602);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, div, anchor);
+    			mount_component(player_1, div, null);
+    			current = true;
+    		},
+    		p: function update(ctx, [dirty]) {
+    			const player_1_changes = {};
+    			player_1.$set(player_1_changes);
+    		},
+    		i: function intro(local) {
+    			if (current) return;
+    			transition_in(player_1.$$.fragment, local);
+    			current = true;
+    		},
+    		o: function outro(local) {
+    			transition_out(player_1.$$.fragment, local);
+    			current = false;
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(div);
+    			/*player_1_binding*/ ctx[5](null);
+    			destroy_component(player_1);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$a.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance$a($$self, $$props, $$invalidate) {
+    	let player;
+    	const providers = [VimeoProvider$1];
+
+    	onMount(() => {
+    		$$invalidate(0, player.src = data.video_id, player);
+    	});
+
     	const model = {
     		name: "Omo Video",
     		author: "Samuel Andert",
@@ -1251,7 +5584,8 @@ var app = (function () {
     	const data = {
     		id: "",
     		title: "video",
-    		link: "https://player.vimeo.com/video/349650067"
+    		link: "https://player.vimeo.com/video/349650067",
+    		video_id: "vimeo/349650067"
     	};
 
     	const writable_props = [];
@@ -1262,25 +5596,50 @@ var app = (function () {
 
     	let { $$slots = {}, $$scope } = $$props;
     	validate_slots("OmoVideo", $$slots, []);
-    	$$self.$capture_state = () => ({ model, design, data });
-    	return [data, model, design];
+
+    	function player_1_binding($$value) {
+    		binding_callbacks[$$value ? "unshift" : "push"](() => {
+    			$$invalidate(0, player = $$value);
+    		});
+    	}
+
+    	$$self.$capture_state = () => ({
+    		onMount,
+    		Player: StandardPlayer,
+    		VimeoProvider: VimeoProvider$1,
+    		player,
+    		providers,
+    		model,
+    		design,
+    		data
+    	});
+
+    	$$self.$inject_state = $$props => {
+    		if ("player" in $$props) $$invalidate(0, player = $$props.player);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	return [player, providers, model, design, data, player_1_binding];
     }
 
     class OmoVideo extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$4, create_fragment$4, safe_not_equal, { model: 1, design: 2, data: 0 });
+    		init(this, options, instance$a, create_fragment$a, safe_not_equal, { model: 2, design: 3, data: 4 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoVideo",
     			options,
-    			id: create_fragment$4.name
+    			id: create_fragment$a.name
     		});
     	}
 
     	get model() {
-    		return this.$$.ctx[1];
+    		return this.$$.ctx[2];
     	}
 
     	set model(value) {
@@ -1288,7 +5647,7 @@ var app = (function () {
     	}
 
     	get design() {
-    		return this.$$.ctx[2];
+    		return this.$$.ctx[3];
     	}
 
     	set design(value) {
@@ -1296,7 +5655,7 @@ var app = (function () {
     	}
 
     	get data() {
-    		return this.$$.ctx[0];
+    		return this.$$.ctx[4];
     	}
 
     	set data(value) {
@@ -1306,9 +5665,9 @@ var app = (function () {
 
     /* src/quanta/1-views/2-molecules/OmoHero.svelte generated by Svelte v3.20.1 */
 
-    const file$5 = "src/quanta/1-views/2-molecules/OmoHero.svelte";
+    const file$8 = "src/quanta/1-views/2-molecules/OmoHero.svelte";
 
-    function create_fragment$5(ctx) {
+    function create_fragment$b(ctx) {
     	let div4;
     	let div3;
     	let div1;
@@ -1354,25 +5713,25 @@ var app = (function () {
     			div2 = element("div");
     			img = element("img");
     			attr_dev(h1, "class", "uppercase text-5xl text-blue-900 font-bold font-title\n        leading-none tracking-tight mb-2");
-    			add_location(h1, file$5, 29, 6, 579);
+    			add_location(h1, file$8, 29, 6, 579);
     			attr_dev(div0, "class", "text-3xl text-gray-600 font-sans italic font-light tracking-wide\n        mb-6");
-    			add_location(div0, file$5, 34, 6, 740);
+    			add_location(div0, file$8, 34, 6, 740);
     			attr_dev(p, "class", "text-gray-500 leading-relaxed mb-12");
-    			add_location(p, file$5, 39, 6, 888);
+    			add_location(p, file$8, 39, 6, 888);
     			attr_dev(a, "href", "/");
     			attr_dev(a, "class", "bg-green-400 hover:bg-blue-800 py-2 px-4 text-lg font-bold\n        text-white rounded");
-    			add_location(a, file$5, 42, 6, 986);
+    			add_location(a, file$8, 42, 6, 986);
     			attr_dev(div1, "class", "sm:w-3/5 flex flex-col items-center sm:items-start text-center\n      sm:text-left");
-    			add_location(div1, file$5, 26, 4, 471);
+    			add_location(div1, file$8, 26, 4, 471);
     			if (img.src !== (img_src_value = /*quant*/ ctx[0].data.illustration)) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "alt", img_alt_value = /*quant*/ ctx[0].data.title);
-    			add_location(img, file$5, 50, 6, 1198);
+    			add_location(img, file$8, 50, 6, 1198);
     			attr_dev(div2, "class", "lg:px-20 w-2/5");
-    			add_location(div2, file$5, 49, 4, 1163);
+    			add_location(div2, file$8, 49, 4, 1163);
     			attr_dev(div3, "class", "flex flex-col-reverse sm:flex-row jusitfy-between items-center");
-    			add_location(div3, file$5, 25, 2, 390);
+    			add_location(div3, file$8, 25, 2, 390);
     			attr_dev(div4, "class", div4_class_value = "flex flex-col mx-auto " + /*quant*/ ctx[0].design.layout);
-    			add_location(div4, file$5, 24, 0, 330);
+    			add_location(div4, file$8, 24, 0, 330);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1423,7 +5782,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$5.name,
+    		id: create_fragment$b.name,
     		type: "component",
     		source: "",
     		ctx
@@ -1432,7 +5791,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$5($$self, $$props, $$invalidate) {
+    function instance$b($$self, $$props, $$invalidate) {
     	let { quant = {
     		id: "",
     		model: {
@@ -1482,13 +5841,13 @@ var app = (function () {
     class OmoHero extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$5, create_fragment$5, safe_not_equal, { quant: 0 });
+    		init(this, options, instance$b, create_fragment$b, safe_not_equal, { quant: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoHero",
     			options,
-    			id: create_fragment$5.name
+    			id: create_fragment$b.name
     		});
     	}
 
@@ -1503,10 +5862,10 @@ var app = (function () {
 
     /* src/quanta/1-views/2-molecules/OmoHeader.svelte generated by Svelte v3.20.1 */
 
-    const file$6 = "src/quanta/1-views/2-molecules/OmoHeader.svelte";
+    const file$9 = "src/quanta/1-views/2-molecules/OmoHeader.svelte";
 
     // (31:2) {#if quant.data.subline}
-    function create_if_block_1(ctx) {
+    function create_if_block_1$1(ctx) {
     	let div;
     	let t_value = /*quant*/ ctx[0].data.subline + "";
     	let t;
@@ -1517,7 +5876,7 @@ var app = (function () {
     			div = element("div");
     			t = text(t_value);
     			attr_dev(div, "class", div_class_value = "flex-wrap text-2xl " + /*quant*/ ctx[0].design.subline);
-    			add_location(div, file$6, 31, 4, 673);
+    			add_location(div, file$9, 31, 4, 673);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -1537,7 +5896,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_1.name,
+    		id: create_if_block_1$1.name,
     		type: "if",
     		source: "(31:2) {#if quant.data.subline}",
     		ctx
@@ -1547,7 +5906,7 @@ var app = (function () {
     }
 
     // (36:2) {#if quant.data.illustration}
-    function create_if_block(ctx) {
+    function create_if_block$1(ctx) {
     	let div;
     	let img;
     	let img_src_value;
@@ -1560,9 +5919,9 @@ var app = (function () {
     			img = element("img");
     			if (img.src !== (img_src_value = /*quant*/ ctx[0].data.illustration)) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "alt", img_alt_value = /*quant*/ ctx[0].data.title);
-    			add_location(img, file$6, 37, 6, 878);
+    			add_location(img, file$9, 37, 6, 878);
     			attr_dev(div, "class", div_class_value = "mt-16 mb-10 m-auto " + /*quant*/ ctx[0].design.illustration);
-    			add_location(div, file$6, 36, 4, 811);
+    			add_location(div, file$9, 36, 4, 811);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -1588,7 +5947,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block.name,
+    		id: create_if_block$1.name,
     		type: "if",
     		source: "(36:2) {#if quant.data.illustration}",
     		ctx
@@ -1597,7 +5956,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$6(ctx) {
+    function create_fragment$c(ctx) {
     	let div;
     	let h2;
     	let t0_value = /*quant*/ ctx[0].data.title + "";
@@ -1606,8 +5965,8 @@ var app = (function () {
     	let t1;
     	let t2;
     	let div_class_value;
-    	let if_block0 = /*quant*/ ctx[0].data.subline && create_if_block_1(ctx);
-    	let if_block1 = /*quant*/ ctx[0].data.illustration && create_if_block(ctx);
+    	let if_block0 = /*quant*/ ctx[0].data.subline && create_if_block_1$1(ctx);
+    	let if_block1 = /*quant*/ ctx[0].data.illustration && create_if_block$1(ctx);
 
     	const block = {
     		c: function create() {
@@ -1619,9 +5978,9 @@ var app = (function () {
     			t2 = space();
     			if (if_block1) if_block1.c();
     			attr_dev(h2, "class", h2_class_value = "flex-wrap uppercase text-4xl " + /*quant*/ ctx[0].design.title);
-    			add_location(h2, file$6, 27, 2, 548);
+    			add_location(h2, file$9, 27, 2, 548);
     			attr_dev(div, "class", div_class_value = "m-auto flex flex-col justify-center text-center " + /*quant*/ ctx[0].design.layout);
-    			add_location(div, file$6, 25, 0, 460);
+    			add_location(div, file$9, 25, 0, 460);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1646,7 +6005,7 @@ var app = (function () {
     				if (if_block0) {
     					if_block0.p(ctx, dirty);
     				} else {
-    					if_block0 = create_if_block_1(ctx);
+    					if_block0 = create_if_block_1$1(ctx);
     					if_block0.c();
     					if_block0.m(div, t2);
     				}
@@ -1659,7 +6018,7 @@ var app = (function () {
     				if (if_block1) {
     					if_block1.p(ctx, dirty);
     				} else {
-    					if_block1 = create_if_block(ctx);
+    					if_block1 = create_if_block$1(ctx);
     					if_block1.c();
     					if_block1.m(div, null);
     				}
@@ -1683,7 +6042,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$6.name,
+    		id: create_fragment$c.name,
     		type: "component",
     		source: "",
     		ctx
@@ -1692,7 +6051,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$6($$self, $$props, $$invalidate) {
+    function instance$c($$self, $$props, $$invalidate) {
     	let { quant = {
     		id: "",
     		model: {
@@ -1745,13 +6104,13 @@ var app = (function () {
     class OmoHeader extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$6, create_fragment$6, safe_not_equal, { quant: 0 });
+    		init(this, options, instance$c, create_fragment$c, safe_not_equal, { quant: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoHeader",
     			options,
-    			id: create_fragment$6.name
+    			id: create_fragment$c.name
     		});
     	}
 
@@ -1766,9 +6125,9 @@ var app = (function () {
 
     /* src/quanta/1-views/2-molecules/OmoCard.svelte generated by Svelte v3.20.1 */
 
-    const file$7 = "src/quanta/1-views/2-molecules/OmoCard.svelte";
+    const file$a = "src/quanta/1-views/2-molecules/OmoCard.svelte";
 
-    function create_fragment$7(ctx) {
+    function create_fragment$d(ctx) {
     	let div2;
     	let a1;
     	let div1;
@@ -1795,18 +6154,18 @@ var app = (function () {
     			if (img.src !== (img_src_value = /*city*/ ctx[0].image)) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "class", "primary h-64 w-full rounded-t-lg object-cover object-center");
     			attr_dev(img, "alt", "image");
-    			add_location(img, file$7, 7, 6, 164);
+    			add_location(img, file$a, 7, 6, 164);
     			attr_dev(a0, "href", a0_href_value = "city?id=" + /*city*/ ctx[0].id);
     			attr_dev(a0, "class", "text-xl font-bold font-title uppercase");
-    			add_location(a0, file$7, 14, 8, 413);
+    			add_location(a0, file$a, 14, 8, 413);
     			attr_dev(div0, "class", "w-full px-4 pb-2 pt-3 text-center hover:bg-green-400 bg-blue-800\n        text-white");
-    			add_location(div0, file$7, 11, 6, 299);
+    			add_location(div0, file$a, 11, 6, 299);
     			attr_dev(div1, "class", "primary omo-border overflow-hidden omo-shadow");
-    			add_location(div1, file$7, 6, 4, 98);
+    			add_location(div1, file$a, 6, 4, 98);
     			attr_dev(a1, "href", a1_href_value = "city?id=" + /*city*/ ctx[0].id);
-    			add_location(a1, file$7, 5, 2, 65);
+    			add_location(a1, file$a, 5, 2, 65);
     			attr_dev(div2, "class", "min-w-100");
-    			add_location(div2, file$7, 4, 0, 39);
+    			add_location(div2, file$a, 4, 0, 39);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1845,7 +6204,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$7.name,
+    		id: create_fragment$d.name,
     		type: "component",
     		source: "",
     		ctx
@@ -1854,7 +6213,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$7($$self, $$props, $$invalidate) {
+    function instance$d($$self, $$props, $$invalidate) {
     	let { city } = $$props;
     	const writable_props = ["city"];
 
@@ -1885,13 +6244,13 @@ var app = (function () {
     class OmoCard extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$7, create_fragment$7, safe_not_equal, { city: 0 });
+    		init(this, options, instance$d, create_fragment$d, safe_not_equal, { city: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoCard",
     			options,
-    			id: create_fragment$7.name
+    			id: create_fragment$d.name
     		});
 
     		const { ctx } = this.$$;
@@ -1930,7 +6289,7 @@ var app = (function () {
         ]);
 
     /* src/quanta/1-views/3-organisms/OmoCities.svelte generated by Svelte v3.20.1 */
-    const file$8 = "src/quanta/1-views/3-organisms/OmoCities.svelte";
+    const file$b = "src/quanta/1-views/3-organisms/OmoCities.svelte";
 
     function get_each_context(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -1997,7 +6356,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$8(ctx) {
+    function create_fragment$e(ctx) {
     	let div;
     	let each_blocks = [];
     	let each_1_lookup = new Map();
@@ -2022,7 +6381,7 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "py-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4\n  gap-6");
-    			add_location(div, file$8, 6, 0, 150);
+    			add_location(div, file$b, 6, 0, 150);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -2073,7 +6432,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$8.name,
+    		id: create_fragment$e.name,
     		type: "component",
     		source: "",
     		ctx
@@ -2082,7 +6441,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$8($$self, $$props, $$invalidate) {
+    function instance$e($$self, $$props, $$invalidate) {
     	let $cities;
     	validate_store(cities, "cities");
     	component_subscribe($$self, cities, $$value => $$invalidate(1, $cities = $$value));
@@ -2116,13 +6475,13 @@ var app = (function () {
     class OmoCities extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$8, create_fragment$8, safe_not_equal, { currentId: 0 });
+    		init(this, options, instance$e, create_fragment$e, safe_not_equal, { currentId: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoCities",
     			options,
-    			id: create_fragment$8.name
+    			id: create_fragment$e.name
     		});
 
     		const { ctx } = this.$$;
@@ -2144,9 +6503,9 @@ var app = (function () {
 
     /* src/quanta/1-views/2-molecules/OmoPricing.svelte generated by Svelte v3.20.1 */
 
-    const file$9 = "src/quanta/1-views/2-molecules/OmoPricing.svelte";
+    const file$c = "src/quanta/1-views/2-molecules/OmoPricing.svelte";
 
-    function create_fragment$9(ctx) {
+    function create_fragment$f(ctx) {
     	let div24;
     	let div7;
     	let div6;
@@ -2396,15 +6755,15 @@ var app = (function () {
     			button2 = element("button");
     			button2.textContent = "Select";
     			attr_dev(h10, "class", "text-lg font-medium uppercase p-3 pb-0 text-center\n          tracking-wide");
-    			add_location(h10, file$9, 25, 8, 671);
+    			add_location(h10, file$c, 25, 8, 671);
     			attr_dev(h20, "class", "text-sm text-gray-500 text-center pb-6");
-    			add_location(h20, file$9, 30, 8, 811);
+    			add_location(h20, file$c, 30, 8, 811);
     			attr_dev(div0, "class", "block text-left text-sm sm:text-md max-w-sm mx-auto mt-2\n        text-black px-8 lg:px-6");
-    			add_location(div0, file$9, 22, 6, 552);
+    			add_location(div0, file$c, 22, 6, 552);
     			attr_dev(path0, "d", "M22 11.08V12a10 10 0 1 1-5.93-9.14");
-    			add_location(path0, file$9, 49, 16, 1525);
+    			add_location(path0, file$c, 49, 16, 1525);
     			attr_dev(polyline0, "points", "22 4 12 14.01 9 11.01");
-    			add_location(polyline0, file$9, 50, 16, 1589);
+    			add_location(polyline0, file$c, 50, 16, 1589);
     			attr_dev(svg0, "class", "w-6 h-6 align-middle");
     			attr_dev(svg0, "width", "24");
     			attr_dev(svg0, "height", "24");
@@ -2414,17 +6773,17 @@ var app = (function () {
     			attr_dev(svg0, "stroke-width", "2");
     			attr_dev(svg0, "stroke-linecap", "round");
     			attr_dev(svg0, "stroke-linejoin", "round");
-    			add_location(svg0, file$9, 39, 14, 1189);
+    			add_location(svg0, file$c, 39, 14, 1189);
     			attr_dev(div1, "class", " rounded-full p-2 fill-current text-green-700");
-    			add_location(div1, file$9, 38, 12, 1115);
+    			add_location(div1, file$c, 38, 12, 1115);
     			attr_dev(span0, "class", "text-gray-700 text-lg ml-3");
-    			add_location(span0, file$9, 53, 12, 1685);
+    			add_location(span0, file$c, 53, 12, 1685);
     			attr_dev(li0, "class", "flex items-center");
-    			add_location(li0, file$9, 37, 10, 1072);
+    			add_location(li0, file$c, 37, 10, 1072);
     			attr_dev(path1, "d", "M22 11.08V12a10 10 0 1 1-5.93-9.14");
-    			add_location(path1, file$9, 67, 16, 2226);
+    			add_location(path1, file$c, 67, 16, 2226);
     			attr_dev(polyline1, "points", "22 4 12 14.01 9 11.01");
-    			add_location(polyline1, file$9, 68, 16, 2290);
+    			add_location(polyline1, file$c, 68, 16, 2290);
     			attr_dev(svg1, "class", "w-6 h-6 align-middle");
     			attr_dev(svg1, "width", "24");
     			attr_dev(svg1, "height", "24");
@@ -2434,17 +6793,17 @@ var app = (function () {
     			attr_dev(svg1, "stroke-width", "2");
     			attr_dev(svg1, "stroke-linecap", "round");
     			attr_dev(svg1, "stroke-linejoin", "round");
-    			add_location(svg1, file$9, 57, 14, 1890);
+    			add_location(svg1, file$c, 57, 14, 1890);
     			attr_dev(div2, "class", " rounded-full p-2 fill-current text-green-700");
-    			add_location(div2, file$9, 56, 12, 1816);
+    			add_location(div2, file$c, 56, 12, 1816);
     			attr_dev(span1, "class", "text-gray-700 text-lg ml-3");
-    			add_location(span1, file$9, 71, 12, 2386);
+    			add_location(span1, file$c, 71, 12, 2386);
     			attr_dev(li1, "class", "flex items-center");
-    			add_location(li1, file$9, 55, 10, 1773);
+    			add_location(li1, file$c, 55, 10, 1773);
     			attr_dev(path2, "d", "M22 11.08V12a10 10 0 1 1-5.93-9.14");
-    			add_location(path2, file$9, 85, 16, 2925);
+    			add_location(path2, file$c, 85, 16, 2925);
     			attr_dev(polyline2, "points", "22 4 12 14.01 9 11.01");
-    			add_location(polyline2, file$9, 86, 16, 2989);
+    			add_location(polyline2, file$c, 86, 16, 2989);
     			attr_dev(svg2, "class", "w-6 h-6 align-middle");
     			attr_dev(svg2, "width", "24");
     			attr_dev(svg2, "height", "24");
@@ -2454,38 +6813,38 @@ var app = (function () {
     			attr_dev(svg2, "stroke-width", "2");
     			attr_dev(svg2, "stroke-linecap", "round");
     			attr_dev(svg2, "stroke-linejoin", "round");
-    			add_location(svg2, file$9, 75, 14, 2589);
+    			add_location(svg2, file$c, 75, 14, 2589);
     			attr_dev(div3, "class", " rounded-full p-2 fill-current text-green-700");
-    			add_location(div3, file$9, 74, 12, 2515);
+    			add_location(div3, file$c, 74, 12, 2515);
     			attr_dev(span2, "class", "text-gray-700 text-lg ml-3");
-    			add_location(span2, file$9, 89, 12, 3085);
+    			add_location(span2, file$c, 89, 12, 3085);
     			attr_dev(li2, "class", "flex items-center");
-    			add_location(li2, file$9, 73, 10, 2472);
-    			add_location(ul0, file$9, 36, 8, 1057);
+    			add_location(li2, file$c, 73, 10, 2472);
+    			add_location(ul0, file$c, 36, 8, 1057);
     			attr_dev(div4, "class", "flex flex-wrap mt-3 px-6");
-    			add_location(div4, file$9, 35, 6, 1010);
+    			add_location(div4, file$c, 35, 6, 1010);
     			attr_dev(button0, "class", "mt-3 text-lg font-semibold border-2 border-green-400 w-full\n          text-green-400 rounded px-4 py-2 block shadow-xl hover:border-blue-800\n          hover:bg-blue-800 hover:text-white");
-    			add_location(button0, file$9, 94, 8, 3251);
+    			add_location(button0, file$c, 94, 8, 3251);
     			attr_dev(div5, "class", "block flex items-center p-8");
-    			add_location(div5, file$9, 93, 6, 3201);
+    			add_location(div5, file$c, 93, 6, 3201);
     			attr_dev(div6, "class", "bg-white text-black rounded shadow-inner shadow-lg overflow-hidden");
-    			add_location(div6, file$9, 20, 4, 459);
+    			add_location(div6, file$c, 20, 4, 459);
     			attr_dev(div7, "class", "max-w-sm sm:w-4/5 lg:w-1/3 sm:my-5 my-8 z-0 rounded shadow-lg");
-    			add_location(div7, file$9, 19, 2, 379);
+    			add_location(div7, file$c, 19, 2, 379);
     			attr_dev(div8, "class", "text-sm leading-none rounded-t-lg bg-blue-800 text-white\n      font-semibold uppercase py-2 text-center tracking-wide");
-    			add_location(div8, file$9, 106, 4, 3651);
+    			add_location(div8, file$c, 106, 4, 3651);
     			attr_dev(h11, "class", "text-lg font-medium uppercase p-3 pb-0 text-center tracking-wide");
-    			add_location(h11, file$9, 114, 6, 3936);
+    			add_location(h11, file$c, 114, 6, 3936);
     			attr_dev(span3, "class", "text-3xl");
-    			add_location(span3, file$9, 119, 8, 4117);
+    			add_location(span3, file$c, 119, 8, 4117);
     			attr_dev(h21, "class", "text-sm text-gray-500 text-center pb-6");
-    			add_location(h21, file$9, 118, 6, 4057);
+    			add_location(h21, file$c, 118, 6, 4057);
     			attr_dev(div9, "class", "block text-left text-sm sm:text-md max-w-sm mx-auto mt-2 text-black\n      px-8 lg:px-6");
-    			add_location(div9, file$9, 111, 4, 3823);
+    			add_location(div9, file$c, 111, 4, 3823);
     			attr_dev(path3, "d", "M22 11.08V12a10 10 0 1 1-5.93-9.14");
-    			add_location(path3, file$9, 139, 14, 4810);
+    			add_location(path3, file$c, 139, 14, 4810);
     			attr_dev(polyline3, "points", "22 4 12 14.01 9 11.01");
-    			add_location(polyline3, file$9, 140, 14, 4872);
+    			add_location(polyline3, file$c, 140, 14, 4872);
     			attr_dev(svg3, "class", "w-6 h-6 align-middle");
     			attr_dev(svg3, "width", "24");
     			attr_dev(svg3, "height", "24");
@@ -2495,17 +6854,17 @@ var app = (function () {
     			attr_dev(svg3, "stroke-width", "2");
     			attr_dev(svg3, "stroke-linecap", "round");
     			attr_dev(svg3, "stroke-linejoin", "round");
-    			add_location(svg3, file$9, 129, 12, 4494);
+    			add_location(svg3, file$c, 129, 12, 4494);
     			attr_dev(div10, "class", "rounded-full p-2 fill-current text-green-700");
-    			add_location(div10, file$9, 128, 10, 4423);
+    			add_location(div10, file$c, 128, 10, 4423);
     			attr_dev(span4, "class", "text-gray-700 text-lg ml-3");
-    			add_location(span4, file$9, 143, 10, 4962);
+    			add_location(span4, file$c, 143, 10, 4962);
     			attr_dev(li3, "class", "flex items-center");
-    			add_location(li3, file$9, 127, 8, 4382);
+    			add_location(li3, file$c, 127, 8, 4382);
     			attr_dev(path4, "d", "M22 11.08V12a10 10 0 1 1-5.93-9.14");
-    			add_location(path4, file$9, 157, 14, 5474);
+    			add_location(path4, file$c, 157, 14, 5474);
     			attr_dev(polyline4, "points", "22 4 12 14.01 9 11.01");
-    			add_location(polyline4, file$9, 158, 14, 5536);
+    			add_location(polyline4, file$c, 158, 14, 5536);
     			attr_dev(svg4, "class", "w-6 h-6 align-middle");
     			attr_dev(svg4, "width", "24");
     			attr_dev(svg4, "height", "24");
@@ -2515,17 +6874,17 @@ var app = (function () {
     			attr_dev(svg4, "stroke-width", "2");
     			attr_dev(svg4, "stroke-linecap", "round");
     			attr_dev(svg4, "stroke-linejoin", "round");
-    			add_location(svg4, file$9, 147, 12, 5158);
+    			add_location(svg4, file$c, 147, 12, 5158);
     			attr_dev(div11, "class", " rounded-full p-2 fill-current text-green-700");
-    			add_location(div11, file$9, 146, 10, 5086);
+    			add_location(div11, file$c, 146, 10, 5086);
     			attr_dev(span5, "class", "text-gray-700 text-lg ml-3");
-    			add_location(span5, file$9, 161, 10, 5626);
+    			add_location(span5, file$c, 161, 10, 5626);
     			attr_dev(li4, "class", "flex items-center");
-    			add_location(li4, file$9, 145, 8, 5045);
+    			add_location(li4, file$c, 145, 8, 5045);
     			attr_dev(path5, "d", "M22 11.08V12a10 10 0 1 1-5.93-9.14");
-    			add_location(path5, file$9, 175, 14, 6146);
+    			add_location(path5, file$c, 175, 14, 6146);
     			attr_dev(polyline5, "points", "22 4 12 14.01 9 11.01");
-    			add_location(polyline5, file$9, 176, 14, 6208);
+    			add_location(polyline5, file$c, 176, 14, 6208);
     			attr_dev(svg5, "class", "w-6 h-6 align-middle");
     			attr_dev(svg5, "width", "24");
     			attr_dev(svg5, "height", "24");
@@ -2535,32 +6894,32 @@ var app = (function () {
     			attr_dev(svg5, "stroke-width", "2");
     			attr_dev(svg5, "stroke-linecap", "round");
     			attr_dev(svg5, "stroke-linejoin", "round");
-    			add_location(svg5, file$9, 165, 12, 5830);
+    			add_location(svg5, file$c, 165, 12, 5830);
     			attr_dev(div12, "class", " rounded-full p-2 fill-current text-green-700");
-    			add_location(div12, file$9, 164, 10, 5758);
+    			add_location(div12, file$c, 164, 10, 5758);
     			attr_dev(span6, "class", "text-gray-700 text-lg ml-3");
-    			add_location(span6, file$9, 179, 10, 6298);
+    			add_location(span6, file$c, 179, 10, 6298);
     			attr_dev(li5, "class", "flex items-center");
-    			add_location(li5, file$9, 163, 8, 5717);
-    			add_location(ul1, file$9, 126, 6, 4369);
+    			add_location(li5, file$c, 163, 8, 5717);
+    			add_location(ul1, file$c, 126, 6, 4369);
     			attr_dev(div13, "class", "flex pl-12 justify-start sm:justify-start mt-3");
-    			add_location(div13, file$9, 125, 4, 4302);
+    			add_location(div13, file$c, 125, 4, 4302);
     			attr_dev(button1, "class", "mt-3 text-lg font-semibold bg-green-400 w-full text-white rounded\n        px-6 py-3 block shadow-xl hover:bg-blue-800");
-    			add_location(button1, file$9, 185, 6, 6455);
+    			add_location(button1, file$c, 185, 6, 6455);
     			attr_dev(div14, "class", "block flex items-center p-8");
-    			add_location(div14, file$9, 184, 4, 6407);
+    			add_location(div14, file$c, 184, 4, 6407);
     			attr_dev(div15, "class", "w-full max-w-md sm:w-2/3 lg:w-1/3 sm:my-5 my-8 relative z-10 bg-white\n    rounded-lg shadow-lg");
-    			add_location(div15, file$9, 103, 2, 3534);
+    			add_location(div15, file$c, 103, 2, 3534);
     			attr_dev(h12, "class", "text-lg font-medium uppercase p-3 pb-0 text-center\n          tracking-wide");
-    			add_location(h12, file$9, 200, 8, 6963);
+    			add_location(h12, file$c, 200, 8, 6963);
     			attr_dev(h22, "class", "text-sm text-gray-500 text-center pb-6");
-    			add_location(h22, file$9, 205, 8, 7105);
+    			add_location(h22, file$c, 205, 8, 7105);
     			attr_dev(div16, "class", "block text-left text-sm sm:text-md max-w-sm mx-auto mt-2\n        text-black px-8 lg:px-6");
-    			add_location(div16, file$9, 197, 6, 6844);
+    			add_location(div16, file$c, 197, 6, 6844);
     			attr_dev(path6, "d", "M22 11.08V12a10 10 0 1 1-5.93-9.14");
-    			add_location(path6, file$9, 223, 16, 7827);
+    			add_location(path6, file$c, 223, 16, 7827);
     			attr_dev(polyline6, "points", "22 4 12 14.01 9 11.01");
-    			add_location(polyline6, file$9, 224, 16, 7891);
+    			add_location(polyline6, file$c, 224, 16, 7891);
     			attr_dev(svg6, "class", "w-6 h-6 align-middle");
     			attr_dev(svg6, "width", "24");
     			attr_dev(svg6, "height", "24");
@@ -2570,17 +6929,17 @@ var app = (function () {
     			attr_dev(svg6, "stroke-width", "2");
     			attr_dev(svg6, "stroke-linecap", "round");
     			attr_dev(svg6, "stroke-linejoin", "round");
-    			add_location(svg6, file$9, 213, 14, 7491);
+    			add_location(svg6, file$c, 213, 14, 7491);
     			attr_dev(div17, "class", " rounded-full p-2 fill-current text-green-700");
-    			add_location(div17, file$9, 212, 12, 7417);
+    			add_location(div17, file$c, 212, 12, 7417);
     			attr_dev(span7, "class", "text-gray-700 text-lg ml-3");
-    			add_location(span7, file$9, 227, 12, 7987);
+    			add_location(span7, file$c, 227, 12, 7987);
     			attr_dev(li6, "class", "flex items-center");
-    			add_location(li6, file$9, 211, 10, 7374);
+    			add_location(li6, file$c, 211, 10, 7374);
     			attr_dev(path7, "d", "M22 11.08V12a10 10 0 1 1-5.93-9.14");
-    			add_location(path7, file$9, 241, 16, 8526);
+    			add_location(path7, file$c, 241, 16, 8526);
     			attr_dev(polyline7, "points", "22 4 12 14.01 9 11.01");
-    			add_location(polyline7, file$9, 242, 16, 8590);
+    			add_location(polyline7, file$c, 242, 16, 8590);
     			attr_dev(svg7, "class", "w-6 h-6 align-middle");
     			attr_dev(svg7, "width", "24");
     			attr_dev(svg7, "height", "24");
@@ -2590,17 +6949,17 @@ var app = (function () {
     			attr_dev(svg7, "stroke-width", "2");
     			attr_dev(svg7, "stroke-linecap", "round");
     			attr_dev(svg7, "stroke-linejoin", "round");
-    			add_location(svg7, file$9, 231, 14, 8190);
+    			add_location(svg7, file$c, 231, 14, 8190);
     			attr_dev(div18, "class", "rounded-full p-2 fill-current text-green-700");
-    			add_location(div18, file$9, 230, 12, 8117);
+    			add_location(div18, file$c, 230, 12, 8117);
     			attr_dev(span8, "class", "text-gray-700 text-lg ml-3");
-    			add_location(span8, file$9, 245, 12, 8686);
+    			add_location(span8, file$c, 245, 12, 8686);
     			attr_dev(li7, "class", "flex items-center");
-    			add_location(li7, file$9, 229, 10, 8074);
+    			add_location(li7, file$c, 229, 10, 8074);
     			attr_dev(path8, "d", "M22 11.08V12a10 10 0 1 1-5.93-9.14");
-    			add_location(path8, file$9, 259, 16, 9234);
+    			add_location(path8, file$c, 259, 16, 9234);
     			attr_dev(polyline8, "points", "22 4 12 14.01 9 11.01");
-    			add_location(polyline8, file$9, 260, 16, 9298);
+    			add_location(polyline8, file$c, 260, 16, 9298);
     			attr_dev(svg8, "class", "w-6 h-6 align-middle");
     			attr_dev(svg8, "width", "24");
     			attr_dev(svg8, "height", "24");
@@ -2610,26 +6969,26 @@ var app = (function () {
     			attr_dev(svg8, "stroke-width", "2");
     			attr_dev(svg8, "stroke-linecap", "round");
     			attr_dev(svg8, "stroke-linejoin", "round");
-    			add_location(svg8, file$9, 249, 14, 8898);
+    			add_location(svg8, file$c, 249, 14, 8898);
     			attr_dev(div19, "class", " rounded-full p-2 fill-current text-green-700");
-    			add_location(div19, file$9, 248, 12, 8824);
+    			add_location(div19, file$c, 248, 12, 8824);
     			attr_dev(span9, "class", "text-gray-700 text-lg ml-3");
-    			add_location(span9, file$9, 263, 12, 9394);
+    			add_location(span9, file$c, 263, 12, 9394);
     			attr_dev(li8, "class", "flex items-center");
-    			add_location(li8, file$9, 247, 10, 8781);
-    			add_location(ul2, file$9, 210, 8, 7359);
+    			add_location(li8, file$c, 247, 10, 8781);
+    			add_location(ul2, file$c, 210, 8, 7359);
     			attr_dev(div20, "class", "flex flex-wrap mt-3 px-6");
-    			add_location(div20, file$9, 209, 6, 7312);
+    			add_location(div20, file$c, 209, 6, 7312);
     			attr_dev(button2, "class", "mt-3 text-lg font-semibold border-2 border-green-400 w-full\n          text-green-400 rounded px-4 py-2 block shadow-xl hover:border-blue-800\n          hover:bg-blue-800 hover:text-white");
-    			add_location(button2, file$9, 269, 8, 9561);
+    			add_location(button2, file$c, 269, 8, 9561);
     			attr_dev(div21, "class", "block flex items-center p-8");
-    			add_location(div21, file$9, 268, 6, 9511);
+    			add_location(div21, file$c, 268, 6, 9511);
     			attr_dev(div22, "class", "bg-white text-black rounded-lg shadow-inner shadow-lg\n      overflow-hidden");
-    			add_location(div22, file$9, 194, 4, 6742);
+    			add_location(div22, file$c, 194, 4, 6742);
     			attr_dev(div23, "class", "w-full max-w-sm sm:w-4/5 lg:w-1/3 sm:my-5 my-8 z-0 rounded shadow-lg");
-    			add_location(div23, file$9, 192, 2, 6651);
+    			add_location(div23, file$c, 192, 2, 6651);
     			attr_dev(div24, "class", "w-full m-auto flex flex-col md:flex-row items-center");
-    			add_location(div24, file$9, 18, 0, 310);
+    			add_location(div24, file$c, 18, 0, 310);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -2759,7 +7118,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$9.name,
+    		id: create_fragment$f.name,
     		type: "component",
     		source: "",
     		ctx
@@ -2768,7 +7127,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$9($$self, $$props, $$invalidate) {
+    function instance$f($$self, $$props, $$invalidate) {
     	let { quant = {
     		id: "q8",
     		component: OmoPricing,
@@ -2814,13 +7173,13 @@ var app = (function () {
     class OmoPricing_1 extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$9, create_fragment$9, safe_not_equal, { quant: 0 });
+    		init(this, options, instance$f, create_fragment$f, safe_not_equal, { quant: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoPricing_1",
     			options,
-    			id: create_fragment$9.name
+    			id: create_fragment$f.name
     		});
     	}
 
@@ -2835,9 +7194,9 @@ var app = (function () {
 
     /* src/quanta/1-views/2-molecules/OmoSubscribe.svelte generated by Svelte v3.20.1 */
 
-    const file$a = "src/quanta/1-views/2-molecules/OmoSubscribe.svelte";
+    const file$d = "src/quanta/1-views/2-molecules/OmoSubscribe.svelte";
 
-    function create_fragment$a(ctx) {
+    function create_fragment$g(ctx) {
     	let div4;
     	let div3;
     	let div0;
@@ -2872,23 +7231,23 @@ var app = (function () {
     			button = element("button");
     			t5 = text(t5_value);
     			attr_dev(div0, "class", "m-0 p-0 text-5xl font-title font-bold uppercase text-white\n      antialiased text-center");
-    			add_location(div0, file$a, 26, 4, 612);
+    			add_location(div0, file$d, 26, 4, 612);
     			attr_dev(div1, "class", " m-0 p-0 text-2xl text-white italic font-light font-sans\n      antialiased text-center");
-    			add_location(div1, file$a, 31, 4, 761);
+    			add_location(div1, file$d, 31, 4, 761);
     			attr_dev(input, "type", "text");
     			attr_dev(input, "class", "text-lg text-gray-600 w-2/3 px-6 rounded");
     			attr_dev(input, "placeholder", input_placeholder_value = /*quant*/ ctx[0].data.email);
-    			add_location(input, file$a, 37, 6, 960);
+    			add_location(input, file$d, 37, 6, 960);
     			attr_dev(button, "class", "py-3 px-4 w-1/3 bg-green-400 font-bold text-lg rounded text-white\n        hover:bg-blue-800");
     			attr_dev(button, "type", "button");
-    			add_location(button, file$a, 41, 6, 1092);
+    			add_location(button, file$d, 41, 6, 1092);
     			attr_dev(div2, "class", " mt-3 flex flex-row flex-wrap");
-    			add_location(div2, file$a, 36, 4, 910);
+    			add_location(div2, file$d, 36, 4, 910);
     			attr_dev(div3, "class", "p-10 py-20 flex flex-col flex-wrap justify-center content-center");
-    			add_location(div3, file$a, 25, 2, 529);
+    			add_location(div3, file$d, 25, 2, 529);
     			attr_dev(div4, "class", "bg-cover bg-center h-auto text-white py-24 px-16 object-fill");
     			set_style(div4, "background-image", "url(" + /*quant*/ ctx[0].data.image + ")");
-    			add_location(div4, file$a, 22, 0, 398);
+    			add_location(div4, file$d, 22, 0, 398);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -2931,7 +7290,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$a.name,
+    		id: create_fragment$g.name,
     		type: "component",
     		source: "",
     		ctx
@@ -2940,7 +7299,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$a($$self, $$props, $$invalidate) {
+    function instance$g($$self, $$props, $$invalidate) {
     	let { quant = {
     		model: {
     			name: "",
@@ -2988,13 +7347,13 @@ var app = (function () {
     class OmoSubscribe extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$a, create_fragment$a, safe_not_equal, { quant: 0 });
+    		init(this, options, instance$g, create_fragment$g, safe_not_equal, { quant: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoSubscribe",
     			options,
-    			id: create_fragment$a.name
+    			id: create_fragment$g.name
     		});
     	}
 
@@ -3009,10 +7368,10 @@ var app = (function () {
 
     /* src/quanta/1-views/1-atoms/OmoToggle.svelte generated by Svelte v3.20.1 */
 
-    const file$b = "src/quanta/1-views/1-atoms/OmoToggle.svelte";
+    const file$e = "src/quanta/1-views/1-atoms/OmoToggle.svelte";
 
     // (7:0) {#if omotoggle.status}
-    function create_if_block_1$1(ctx) {
+    function create_if_block_1$2(ctx) {
     	let label;
     	let span2;
     	let span0;
@@ -3029,18 +7388,18 @@ var app = (function () {
     			span1 = element("span");
     			input = element("input");
     			attr_dev(span0, "class", "block w-10 h-6 bg-green-400 rounded-full shadow-inner");
-    			add_location(span0, file$b, 9, 6, 204);
+    			add_location(span0, file$e, 9, 6, 204);
     			attr_dev(input, "id", "checked");
     			attr_dev(input, "type", "checkbox");
     			attr_dev(input, "class", "absolute opacity-0 w-0 h-0");
-    			add_location(input, file$b, 14, 8, 511);
+    			add_location(input, file$e, 14, 8, 511);
     			attr_dev(span1, "class", "absolute block w-4 h-4 mt-1 ml-1 rounded-full shadow inset-y-0\n        left-0 focus-within:shadow-outline transition-transform duration-300\n        ease-in-out bg-gray-100 transform translate-x-full");
-    			add_location(span1, file$b, 10, 6, 281);
+    			add_location(span1, file$e, 10, 6, 281);
     			attr_dev(span2, "class", "relative");
-    			add_location(span2, file$b, 8, 4, 174);
+    			add_location(span2, file$e, 8, 4, 174);
     			attr_dev(label, "for", "checked");
     			attr_dev(label, "class", "mt-3 inline-flex items-center cursor-pointer");
-    			add_location(label, file$b, 7, 2, 95);
+    			add_location(label, file$e, 7, 2, 95);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, label, anchor);
@@ -3057,7 +7416,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_1$1.name,
+    		id: create_if_block_1$2.name,
     		type: "if",
     		source: "(7:0) {#if omotoggle.status}",
     		ctx
@@ -3067,7 +7426,7 @@ var app = (function () {
     }
 
     // (24:0) {#if !omotoggle.status}
-    function create_if_block$1(ctx) {
+    function create_if_block$2(ctx) {
     	let label;
     	let span2;
     	let span0;
@@ -3084,18 +7443,18 @@ var app = (function () {
     			span1 = element("span");
     			input = element("input");
     			attr_dev(span0, "class", "block w-10 h-6 bg-gray-400 rounded-full shadow-inner");
-    			add_location(span0, file$b, 26, 6, 796);
+    			add_location(span0, file$e, 26, 6, 796);
     			attr_dev(input, "id", "unchecked");
     			attr_dev(input, "type", "checkbox");
     			attr_dev(input, "class", "absolute opacity-0 w-0 h-0");
-    			add_location(input, file$b, 31, 8, 1072);
+    			add_location(input, file$e, 31, 8, 1072);
     			attr_dev(span1, "class", "absolute block w-4 h-4 mt-1 ml-1 bg-white rounded-full shadow\n        inset-y-0 left-0 focus-within:shadow-outline transition-transform\n        duration-300 ease-in-out");
-    			add_location(span1, file$b, 27, 6, 872);
+    			add_location(span1, file$e, 27, 6, 872);
     			attr_dev(span2, "class", "relative");
-    			add_location(span2, file$b, 25, 4, 766);
+    			add_location(span2, file$e, 25, 4, 766);
     			attr_dev(label, "for", "unchecked");
     			attr_dev(label, "class", "mt-3 inline-flex items-center cursor-pointer");
-    			add_location(label, file$b, 24, 2, 685);
+    			add_location(label, file$e, 24, 2, 685);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, label, anchor);
@@ -3112,7 +7471,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$1.name,
+    		id: create_if_block$2.name,
     		type: "if",
     		source: "(24:0) {#if !omotoggle.status}",
     		ctx
@@ -3121,11 +7480,11 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$b(ctx) {
+    function create_fragment$h(ctx) {
     	let t;
     	let if_block1_anchor;
-    	let if_block0 = /*omotoggle*/ ctx[0].status && create_if_block_1$1(ctx);
-    	let if_block1 = !/*omotoggle*/ ctx[0].status && create_if_block$1(ctx);
+    	let if_block0 = /*omotoggle*/ ctx[0].status && create_if_block_1$2(ctx);
+    	let if_block1 = !/*omotoggle*/ ctx[0].status && create_if_block$2(ctx);
 
     	const block = {
     		c: function create() {
@@ -3146,7 +7505,7 @@ var app = (function () {
     		p: function update(ctx, [dirty]) {
     			if (/*omotoggle*/ ctx[0].status) {
     				if (!if_block0) {
-    					if_block0 = create_if_block_1$1(ctx);
+    					if_block0 = create_if_block_1$2(ctx);
     					if_block0.c();
     					if_block0.m(t.parentNode, t);
     				}
@@ -3157,7 +7516,7 @@ var app = (function () {
 
     			if (!/*omotoggle*/ ctx[0].status) {
     				if (!if_block1) {
-    					if_block1 = create_if_block$1(ctx);
+    					if_block1 = create_if_block$2(ctx);
     					if_block1.c();
     					if_block1.m(if_block1_anchor.parentNode, if_block1_anchor);
     				}
@@ -3178,7 +7537,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$b.name,
+    		id: create_fragment$h.name,
     		type: "component",
     		source: "",
     		ctx
@@ -3187,7 +7546,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$b($$self, $$props, $$invalidate) {
+    function instance$h($$self, $$props, $$invalidate) {
     	let { omotoggle = { status: false } } = $$props;
     	const writable_props = ["omotoggle"];
 
@@ -3218,13 +7577,13 @@ var app = (function () {
     class OmoToggle extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$b, create_fragment$b, safe_not_equal, { omotoggle: 0 });
+    		init(this, options, instance$h, create_fragment$h, safe_not_equal, { omotoggle: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoToggle",
     			options,
-    			id: create_fragment$b.name
+    			id: create_fragment$h.name
     		});
     	}
 
@@ -3238,9 +7597,9 @@ var app = (function () {
     }
 
     /* src/quanta/1-views/2-molecules/OmoTable.svelte generated by Svelte v3.20.1 */
-    const file$c = "src/quanta/1-views/2-molecules/OmoTable.svelte";
+    const file$f = "src/quanta/1-views/2-molecules/OmoTable.svelte";
 
-    function create_fragment$c(ctx) {
+    function create_fragment$i(ctx) {
     	let div2;
     	let div1;
     	let div0;
@@ -3392,85 +7751,85 @@ var app = (function () {
     			p11 = element("p");
     			p11.textContent = "loki@gmail.com";
     			attr_dev(th0, "class", "px-2 py-1 text-sm");
-    			add_location(th0, file$c, 17, 12, 426);
+    			add_location(th0, file$f, 17, 12, 426);
     			attr_dev(th1, "class", "text-sm");
-    			add_location(th1, file$c, 18, 12, 480);
+    			add_location(th1, file$f, 18, 12, 480);
     			attr_dev(th2, "class", "hidden md:table-cell text-sm");
-    			add_location(th2, file$c, 19, 12, 522);
+    			add_location(th2, file$f, 19, 12, 522);
     			attr_dev(th3, "class", "hidden md:table-cell text-sm ");
-    			add_location(th3, file$c, 20, 12, 587);
+    			add_location(th3, file$f, 20, 12, 587);
     			attr_dev(tr0, "class", " text-gray-600 text-left bg-gray-300 uppercase");
-    			add_location(tr0, file$c, 16, 10, 354);
+    			add_location(tr0, file$f, 16, 10, 354);
     			attr_dev(thead, "class", "");
-    			add_location(thead, file$c, 15, 8, 327);
+    			add_location(thead, file$f, 15, 8, 327);
     			attr_dev(td0, "class", "pl-6 py-4");
-    			add_location(td0, file$c, 25, 12, 796);
+    			add_location(td0, file$f, 25, 12, 796);
     			attr_dev(img0, "class", "hidden mr-1 md:mr-2 md:inline-block h-8 w-8 rounded\n                  object-cover");
     			if (img0.src !== (img0_src_value = "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=144&h=144&q=80")) attr_dev(img0, "src", img0_src_value);
     			attr_dev(img0, "alt", "");
-    			add_location(img0, file$c, 30, 16, 969);
-    			add_location(span0, file$c, 29, 14, 946);
+    			add_location(img0, file$f, 30, 16, 969);
+    			add_location(span0, file$f, 29, 14, 946);
     			attr_dev(p0, "class", "text-gray-800 text-sm");
-    			add_location(p0, file$c, 37, 16, 1366);
+    			add_location(p0, file$f, 37, 16, 1366);
     			attr_dev(p1, "class", "md:hidden text-xs text-gray-600 font-medium");
-    			add_location(p1, file$c, 38, 16, 1432);
+    			add_location(p1, file$f, 38, 16, 1432);
     			attr_dev(p2, "class", "hidden md:table-cell text-xs text-gray-500 font-medium");
-    			add_location(p2, file$c, 41, 16, 1553);
+    			add_location(p2, file$f, 41, 16, 1553);
     			attr_dev(span1, "class", "py-4 w-40");
-    			add_location(span1, file$c, 36, 14, 1325);
+    			add_location(span1, file$f, 36, 14, 1325);
     			attr_dev(td1, "class", "flex inline-flex items-center");
-    			add_location(td1, file$c, 28, 12, 889);
+    			add_location(td1, file$f, 28, 12, 889);
     			attr_dev(p3, "class", "text-sm text-gray-800 font-medium");
-    			add_location(p3, file$c, 48, 14, 1785);
+    			add_location(p3, file$f, 48, 14, 1785);
     			attr_dev(p4, "class", "text-xs text-gray-500 font-medium");
-    			add_location(p4, file$c, 49, 14, 1858);
+    			add_location(p4, file$f, 49, 14, 1858);
     			attr_dev(td2, "class", "hidden md:table-cell");
-    			add_location(td2, file$c, 47, 12, 1737);
+    			add_location(td2, file$f, 47, 12, 1737);
     			attr_dev(p5, "class", "text-sm text-gray-700 font-medium");
-    			add_location(p5, file$c, 52, 14, 2001);
+    			add_location(p5, file$f, 52, 14, 2001);
     			attr_dev(td3, "class", "hidden md:table-cell");
-    			add_location(td3, file$c, 51, 12, 1953);
+    			add_location(td3, file$f, 51, 12, 1953);
     			attr_dev(tr1, "class", "accordion border-b border-grey-light hover:bg-gray-100");
-    			add_location(tr1, file$c, 24, 10, 716);
+    			add_location(tr1, file$f, 24, 10, 716);
     			attr_dev(td4, "class", "pl-6 py-4");
-    			add_location(td4, file$c, 57, 12, 2190);
+    			add_location(td4, file$f, 57, 12, 2190);
     			attr_dev(img1, "class", "hidden mr-1 md:mr-2 md:inline-block h-8 w-8 rounded\n                  object-cover");
     			if (img1.src !== (img1_src_value = "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=4&w=144&h=144&q=80")) attr_dev(img1, "src", img1_src_value);
     			attr_dev(img1, "alt", "");
-    			add_location(img1, file$c, 62, 16, 2364);
-    			add_location(span2, file$c, 61, 14, 2341);
+    			add_location(img1, file$f, 62, 16, 2364);
+    			add_location(span2, file$f, 61, 14, 2341);
     			attr_dev(p6, "class", "text-gray-800 text-sm");
-    			add_location(p6, file$c, 69, 16, 2761);
+    			add_location(p6, file$f, 69, 16, 2761);
     			attr_dev(p7, "class", "md:hidden text-xs text-gray-600 font-medium");
-    			add_location(p7, file$c, 70, 16, 2827);
+    			add_location(p7, file$f, 70, 16, 2827);
     			attr_dev(p8, "class", "hidden md:table-cell text-xs text-gray-500 font-medium");
-    			add_location(p8, file$c, 73, 16, 2948);
+    			add_location(p8, file$f, 73, 16, 2948);
     			attr_dev(span3, "class", "py-3 w-40");
-    			add_location(span3, file$c, 68, 14, 2720);
+    			add_location(span3, file$f, 68, 14, 2720);
     			attr_dev(td5, "class", "flex inline-flex items-center");
-    			add_location(td5, file$c, 60, 12, 2284);
+    			add_location(td5, file$f, 60, 12, 2284);
     			attr_dev(p9, "class", "text-sm text-gray-800 font-medium");
-    			add_location(p9, file$c, 80, 14, 3180);
+    			add_location(p9, file$f, 80, 14, 3180);
     			attr_dev(p10, "class", "text-xs text-gray-500 font-medium");
-    			add_location(p10, file$c, 81, 14, 3253);
+    			add_location(p10, file$f, 81, 14, 3253);
     			attr_dev(td6, "class", "hidden md:table-cell");
-    			add_location(td6, file$c, 79, 12, 3132);
+    			add_location(td6, file$f, 79, 12, 3132);
     			attr_dev(p11, "class", "text-sm text-gray-700 font-medium");
-    			add_location(p11, file$c, 84, 14, 3395);
+    			add_location(p11, file$f, 84, 14, 3395);
     			attr_dev(td7, "class", "hidden md:table-cell");
-    			add_location(td7, file$c, 83, 12, 3347);
+    			add_location(td7, file$f, 83, 12, 3347);
     			attr_dev(tr2, "class", "accordion border-b border-grey-light hover:bg-gray-100");
-    			add_location(tr2, file$c, 56, 10, 2110);
+    			add_location(tr2, file$f, 56, 10, 2110);
     			attr_dev(tbody, "class", "bg-white");
-    			add_location(tbody, file$c, 23, 8, 681);
+    			add_location(tbody, file$f, 23, 8, 681);
     			attr_dev(table, "class", "w-full shadow-lg rounded ");
-    			add_location(table, file$c, 14, 6, 277);
+    			add_location(table, file$f, 14, 6, 277);
     			set_style(div0, "overflow-x", "auto");
-    			add_location(div0, file$c, 13, 4, 240);
+    			add_location(div0, file$f, 13, 4, 240);
     			attr_dev(div1, "class", "container");
-    			add_location(div1, file$c, 12, 2, 212);
+    			add_location(div1, file$f, 12, 2, 212);
     			attr_dev(div2, "class", "container mx-auto");
-    			add_location(div2, file$c, 11, 0, 178);
+    			add_location(div2, file$f, 11, 0, 178);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3566,7 +7925,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$c.name,
+    		id: create_fragment$i.name,
     		type: "component",
     		source: "",
     		ctx
@@ -3575,7 +7934,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$c($$self, $$props, $$invalidate) {
+    function instance$i($$self, $$props, $$invalidate) {
     	let { omotoggle = { status: true } } = $$props;
     	let { omotoggle2 = { status: false } } = $$props;
     	const writable_props = ["omotoggle", "omotoggle2"];
@@ -3609,13 +7968,13 @@ var app = (function () {
     class OmoTable extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$c, create_fragment$c, safe_not_equal, { omotoggle: 0, omotoggle2: 1 });
+    		init(this, options, instance$i, create_fragment$i, safe_not_equal, { omotoggle: 0, omotoggle2: 1 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoTable",
     			options,
-    			id: create_fragment$c.name
+    			id: create_fragment$i.name
     		});
     	}
 
@@ -3638,9 +7997,9 @@ var app = (function () {
 
     /* src/quanta/1-views/2-molecules/OmoAccordion.svelte generated by Svelte v3.20.1 */
 
-    const file$d = "src/quanta/1-views/2-molecules/OmoAccordion.svelte";
+    const file$g = "src/quanta/1-views/2-molecules/OmoAccordion.svelte";
 
-    function create_fragment$d(ctx) {
+    function create_fragment$j(ctx) {
     	let div7;
     	let div2;
     	let div0;
@@ -3699,49 +8058,49 @@ var app = (function () {
     			svg2 = svg_element("svg");
     			path2 = svg_element("path");
     			attr_dev(path0, "d", "m437.332031.167969h-405.332031c-17.664062 0-32 14.335937-32\n            32v21.332031c0 17.664062 14.335938 32 32 32h405.332031c17.664063 0\n            32-14.335938 32-32v-21.332031c0-17.664063-14.335937-32-32-32zm0 0");
-    			add_location(path0, file$d, 11, 10, 482);
+    			add_location(path0, file$g, 11, 10, 482);
     			attr_dev(svg0, "class", "w-3 h-3 fill-current");
     			attr_dev(svg0, "viewBox", "0 -192 469.33333 469");
     			attr_dev(svg0, "xmlns", "http://www.w3.org/2000/svg");
-    			add_location(svg0, file$d, 7, 8, 341);
+    			add_location(svg0, file$g, 7, 8, 341);
     			attr_dev(span0, "class", "h-6 w-6 flex items-center justify-center text-green-400");
-    			add_location(span0, file$d, 6, 6, 262);
+    			add_location(span0, file$g, 6, 6, 262);
     			attr_dev(div0, "class", "flex items-center justify-between bg-gray-200 pl-3 pr-2 py-3 w-full\n      rounded text-gray-600 font-bold cursor-pointer hover:bg-gray-300");
-    			add_location(div0, file$d, 2, 4, 63);
+    			add_location(div0, file$g, 2, 4, 63);
     			attr_dev(p0, "class", "text-gray-600 mb-3");
-    			add_location(p0, file$d, 19, 6, 792);
+    			add_location(p0, file$g, 19, 6, 792);
     			attr_dev(p1, "class", "text-gray-600");
-    			add_location(p1, file$d, 26, 6, 1201);
+    			add_location(p1, file$g, 26, 6, 1201);
     			attr_dev(div1, "class", "p-3");
-    			add_location(div1, file$d, 18, 4, 768);
+    			add_location(div1, file$g, 18, 4, 768);
     			attr_dev(div2, "class", "mb-4");
-    			add_location(div2, file$d, 1, 2, 40);
+    			add_location(div2, file$g, 1, 2, 40);
     			attr_dev(path1, "d", "m437.332031\n            192h-160v-160c0-17.664062-14.335937-32-32-32h-21.332031c-17.664062\n            0-32 14.335938-32 32v160h-160c-17.664062 0-32 14.335938-32\n            32v21.332031c0 17.664063 14.335938 32 32 32h160v160c0 17.664063\n            14.335938 32 32 32h21.332031c17.664063 0 32-14.335937\n            32-32v-160h160c17.664063 0 32-14.335937\n            32-32v-21.332031c0-17.664062-14.335937-32-32-32zm0 0");
-    			add_location(path1, file$d, 44, 10, 2006);
+    			add_location(path1, file$g, 44, 10, 2006);
     			attr_dev(svg1, "class", "w-3 h-3 fill-current");
     			attr_dev(svg1, "viewBox", "0 0 469.33333 469.33333");
     			attr_dev(svg1, "xmlns", "http://www.w3.org/2000/svg");
-    			add_location(svg1, file$d, 40, 8, 1862);
+    			add_location(svg1, file$g, 40, 8, 1862);
     			attr_dev(span1, "class", "h-6 w-6 flex items-center justify-center text-green-400");
-    			add_location(span1, file$d, 39, 6, 1783);
+    			add_location(span1, file$g, 39, 6, 1783);
     			attr_dev(div3, "class", "flex items-center justify-between bg-gray-200 pl-3 pr-2 py-3 w-full\n      rounded text-gray-600 font-bold cursor-pointer hover:bg-gray-300");
-    			add_location(div3, file$d, 35, 4, 1584);
+    			add_location(div3, file$g, 35, 4, 1584);
     			attr_dev(div4, "class", "mb-4");
-    			add_location(div4, file$d, 34, 2, 1561);
+    			add_location(div4, file$g, 34, 2, 1561);
     			attr_dev(path2, "d", "m437.332031\n            192h-160v-160c0-17.664062-14.335937-32-32-32h-21.332031c-17.664062\n            0-32 14.335938-32 32v160h-160c-17.664062 0-32 14.335938-32\n            32v21.332031c0 17.664063 14.335938 32 32 32h160v160c0 17.664063\n            14.335938 32 32 32h21.332031c17.664063 0 32-14.335937\n            32-32v-160h160c17.664063 0 32-14.335937\n            32-32v-21.332031c0-17.664062-14.335937-32-32-32zm0 0");
-    			add_location(path2, file$d, 66, 10, 2948);
+    			add_location(path2, file$g, 66, 10, 2948);
     			attr_dev(svg2, "class", "w-3 h-3 fill-current");
     			attr_dev(svg2, "viewBox", "0 0 469.33333 469.33333");
     			attr_dev(svg2, "xmlns", "http://www.w3.org/2000/svg");
-    			add_location(svg2, file$d, 62, 8, 2804);
+    			add_location(svg2, file$g, 62, 8, 2804);
     			attr_dev(span2, "class", "h-6 w-6 flex items-center justify-center text-green-400");
-    			add_location(span2, file$d, 61, 6, 2725);
+    			add_location(span2, file$g, 61, 6, 2725);
     			attr_dev(div5, "class", "flex items-center justify-between bg-gray-200 pl-3 pr-2 py-3 w-full\n      rounded text-gray-600 font-bold cursor-pointer hover:bg-gray-300");
-    			add_location(div5, file$d, 57, 4, 2526);
+    			add_location(div5, file$g, 57, 4, 2526);
     			attr_dev(div6, "class", "mb-4");
-    			add_location(div6, file$d, 56, 2, 2503);
+    			add_location(div6, file$g, 56, 2, 2503);
     			attr_dev(div7, "class", "bg-white mx-auto w-full");
-    			add_location(div7, file$d, 0, 0, 0);
+    			add_location(div7, file$g, 0, 0, 0);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3784,7 +8143,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$d.name,
+    		id: create_fragment$j.name,
     		type: "component",
     		source: "",
     		ctx
@@ -3793,7 +8152,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$d($$self, $$props) {
+    function instance$j($$self, $$props) {
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
@@ -3808,22 +8167,22 @@ var app = (function () {
     class OmoAccordion extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$d, create_fragment$d, safe_not_equal, {});
+    		init(this, options, instance$j, create_fragment$j, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoAccordion",
     			options,
-    			id: create_fragment$d.name
+    			id: create_fragment$j.name
     		});
     	}
     }
 
     /* src/quanta/1-views/1-atoms/OmoIconsFA.svelte generated by Svelte v3.20.1 */
 
-    const file$e = "src/quanta/1-views/1-atoms/OmoIconsFA.svelte";
+    const file$h = "src/quanta/1-views/1-atoms/OmoIconsFA.svelte";
 
-    function create_fragment$e(ctx) {
+    function create_fragment$k(ctx) {
     	let link;
 
     	const block = {
@@ -3831,7 +8190,7 @@ var app = (function () {
     			link = element("link");
     			attr_dev(link, "href", "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css");
     			attr_dev(link, "rel", "stylesheet");
-    			add_location(link, file$e, 0, 0, 0);
+    			add_location(link, file$h, 0, 0, 0);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3849,7 +8208,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$e.name,
+    		id: create_fragment$k.name,
     		type: "component",
     		source: "",
     		ctx
@@ -3858,7 +8217,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$e($$self, $$props) {
+    function instance$k($$self, $$props) {
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
@@ -3873,21 +8232,21 @@ var app = (function () {
     class OmoIconsFA extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$e, create_fragment$e, safe_not_equal, {});
+    		init(this, options, instance$k, create_fragment$k, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoIconsFA",
     			options,
-    			id: create_fragment$e.name
+    			id: create_fragment$k.name
     		});
     	}
     }
 
     /* src/quanta/1-views/2-molecules/OmoMenuVertical.svelte generated by Svelte v3.20.1 */
-    const file$f = "src/quanta/1-views/2-molecules/OmoMenuVertical.svelte";
+    const file$i = "src/quanta/1-views/2-molecules/OmoMenuVertical.svelte";
 
-    function create_fragment$f(ctx) {
+    function create_fragment$l(ctx) {
     	let t0;
     	let div;
     	let span0;
@@ -3909,15 +8268,15 @@ var app = (function () {
     			span1 = element("span");
     			i1 = element("i");
     			attr_dev(i0, "class", "fas fa-dna p-2 bg-gray-300 rounded");
-    			add_location(i0, file$f, 23, 4, 522);
+    			add_location(i0, file$i, 23, 4, 522);
     			attr_dev(span0, "class", "cursor-pointer hover:text-gray-500 px-1 block mb-2");
-    			add_location(span0, file$f, 22, 2, 452);
+    			add_location(span0, file$i, 22, 2, 452);
     			attr_dev(i1, "class", "fas fa-search p-2 bg-gray-300 rounded");
-    			add_location(i1, file$f, 26, 4, 648);
+    			add_location(i1, file$i, 26, 4, 648);
     			attr_dev(span1, "class", "cursor-pointer hover:text-gray-500 px-1 block");
-    			add_location(span1, file$f, 25, 2, 583);
+    			add_location(span1, file$i, 25, 2, 583);
     			attr_dev(div, "class", "w-16 h-full pt-4 pb-4 bg-gray-200 text-blue-900 text-center shadow-lg");
-    			add_location(div, file$f, 20, 0, 364);
+    			add_location(div, file$i, 20, 0, 364);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -3952,7 +8311,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$f.name,
+    		id: create_fragment$l.name,
     		type: "component",
     		source: "",
     		ctx
@@ -3961,7 +8320,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$f($$self, $$props, $$invalidate) {
+    function instance$l($$self, $$props, $$invalidate) {
     	let { quant = {
     		id: "q6",
     		model: {
@@ -4006,13 +8365,13 @@ var app = (function () {
     class OmoMenuVertical extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$f, create_fragment$f, safe_not_equal, { quant: 0 });
+    		init(this, options, instance$l, create_fragment$l, safe_not_equal, { quant: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoMenuVertical",
     			options,
-    			id: create_fragment$f.name
+    			id: create_fragment$l.name
     		});
     	}
 
@@ -4026,9 +8385,9 @@ var app = (function () {
     }
 
     /* src/quanta/1-views/2-molecules/OmoMenuHorizontal.svelte generated by Svelte v3.20.1 */
-    const file$g = "src/quanta/1-views/2-molecules/OmoMenuHorizontal.svelte";
+    const file$j = "src/quanta/1-views/2-molecules/OmoMenuHorizontal.svelte";
 
-    function create_fragment$g(ctx) {
+    function create_fragment$m(ctx) {
     	let t0;
     	let div1;
     	let div0;
@@ -4071,29 +8430,29 @@ var app = (function () {
     			if (img0.src !== (img0_src_value = "/images/logo_single.png")) attr_dev(img0, "src", img0_src_value);
     			attr_dev(img0, "alt", "alt placeholder");
     			attr_dev(img0, "class", "h-8 -my-1 inline mx-auto");
-    			add_location(img0, file$g, 10, 8, 290);
+    			add_location(img0, file$j, 10, 8, 290);
     			attr_dev(span0, "class", "pl-1 pr-3 mr-2 border-r border-gray-800");
-    			add_location(span0, file$g, 9, 6, 227);
+    			add_location(span0, file$j, 9, 6, 227);
     			attr_dev(a0, "href", "/home");
-    			add_location(a0, file$g, 8, 4, 204);
+    			add_location(a0, file$j, 8, 4, 204);
     			attr_dev(i, "class", "fas fa-th p-2 bg-gray-800 rounded");
-    			add_location(i, file$g, 27, 8, 819);
+    			add_location(i, file$j, 27, 8, 819);
     			attr_dev(span1, "class", "mx-1");
-    			add_location(span1, file$g, 28, 8, 875);
+    			add_location(span1, file$j, 28, 8, 875);
     			attr_dev(span2, "class", "px-1 hover:text-white cursor-pointer");
-    			add_location(span2, file$g, 26, 6, 759);
+    			add_location(span2, file$j, 26, 6, 759);
     			attr_dev(a1, "href", "/quanta");
-    			add_location(a1, file$g, 25, 4, 734);
+    			add_location(a1, file$j, 25, 4, 734);
     			if (img1.src !== (img1_src_value = "/images/samuel.jpg")) attr_dev(img1, "src", img1_src_value);
     			attr_dev(img1, "alt", "alt placeholder");
     			attr_dev(img1, "class", "h-8 inline mx-auto rounded border border-gray-600");
-    			add_location(img1, file$g, 47, 6, 1565);
+    			add_location(img1, file$j, 47, 6, 1565);
     			attr_dev(span3, "class", "cursor-pointer relative float-right");
-    			add_location(span3, file$g, 46, 4, 1508);
+    			add_location(span3, file$j, 46, 4, 1508);
     			attr_dev(div0, "class", "p-2 w-full text-gray-600 bg-gray-900 shadow-lg ");
-    			add_location(div0, file$g, 7, 2, 138);
+    			add_location(div0, file$j, 7, 2, 138);
     			attr_dev(div1, "class", "pb-0 w-full flex flex-wrap");
-    			add_location(div1, file$g, 6, 0, 95);
+    			add_location(div1, file$j, 6, 0, 95);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -4136,7 +8495,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$g.name,
+    		id: create_fragment$m.name,
     		type: "component",
     		source: "",
     		ctx
@@ -4145,7 +8504,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$g($$self, $$props, $$invalidate) {
+    function instance$m($$self, $$props, $$invalidate) {
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
@@ -4161,22 +8520,22 @@ var app = (function () {
     class OmoMenuHorizontal extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$g, create_fragment$g, safe_not_equal, {});
+    		init(this, options, instance$m, create_fragment$m, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoMenuHorizontal",
     			options,
-    			id: create_fragment$g.name
+    			id: create_fragment$m.name
     		});
     	}
     }
 
     /* src/quanta/1-views/2-molecules/OmoCardGroup.svelte generated by Svelte v3.20.1 */
 
-    const file$h = "src/quanta/1-views/2-molecules/OmoCardGroup.svelte";
+    const file$k = "src/quanta/1-views/2-molecules/OmoCardGroup.svelte";
 
-    function create_fragment$h(ctx) {
+    function create_fragment$n(ctx) {
     	let div7;
     	let div6;
     	let a;
@@ -4224,29 +8583,29 @@ var app = (function () {
     			div3 = element("div");
     			t7 = text(t7_value);
     			attr_dev(div0, "class", "right-0 mt-4 rounded-l-full absolute text-center font-bold\n          text-xs text-white px-2 py-1 bg-orange-500");
-    			add_location(div0, file$h, 28, 8, 626);
+    			add_location(div0, file$k, 28, 8, 626);
     			if (img0.src !== (img0_src_value = /*quant*/ ctx[0].data.image)) attr_dev(img0, "src", img0_src_value);
     			attr_dev(img0, "class", "h-40 rounded-lg w-full object-cover object-center");
-    			add_location(img0, file$h, 33, 8, 825);
+    			add_location(img0, file$k, 33, 8, 825);
     			if (img1.src !== (img1_src_value = /*quant*/ ctx[0].data.user)) attr_dev(img1, "src", img1_src_value);
     			attr_dev(img1, "class", "rounded-full -mt-16 border-8 object-center object-cover\n            border-white mr-2 h-32 w-32");
-    			add_location(img1, file$h, 37, 10, 986);
+    			add_location(img1, file$k, 37, 10, 986);
     			attr_dev(div1, "class", "flex justify-center");
-    			add_location(div1, file$h, 36, 8, 942);
+    			add_location(div1, file$k, 36, 8, 942);
     			attr_dev(div2, "class", "font-bold font-title text-xl text-center");
-    			add_location(div2, file$h, 43, 10, 1201);
+    			add_location(div2, file$k, 43, 10, 1201);
     			attr_dev(div3, "class", "text-sm font-light text-center my-2");
-    			add_location(div3, file$h, 46, 10, 1313);
+    			add_location(div3, file$k, 46, 10, 1313);
     			attr_dev(div4, "class", "py-2 px-2");
-    			add_location(div4, file$h, 42, 8, 1167);
+    			add_location(div4, file$k, 42, 8, 1167);
     			attr_dev(div5, "class", "bg-white relative shadow p-2 rounded-lg text-gray-800\n        hover:shadow-lg");
-    			add_location(div5, file$h, 25, 6, 518);
+    			add_location(div5, file$k, 25, 6, 518);
     			attr_dev(a, "href", "/");
-    			add_location(a, file$h, 24, 4, 499);
+    			add_location(a, file$k, 24, 4, 499);
     			attr_dev(div6, "class", "w-full m-auto md:w-1/2 lg:w-1/2");
-    			add_location(div6, file$h, 23, 2, 449);
+    			add_location(div6, file$k, 23, 2, 449);
     			attr_dev(div7, "class", "flex flex-wrap ");
-    			add_location(div7, file$h, 22, 0, 417);
+    			add_location(div7, file$k, 22, 0, 417);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -4295,7 +8654,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$h.name,
+    		id: create_fragment$n.name,
     		type: "component",
     		source: "",
     		ctx
@@ -4304,7 +8663,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$h($$self, $$props, $$invalidate) {
+    function instance$n($$self, $$props, $$invalidate) {
     	let { quant = {
     		model: {
     			name: "",
@@ -4354,13 +8713,13 @@ var app = (function () {
     class OmoCardGroup extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$h, create_fragment$h, safe_not_equal, { quant: 0 });
+    		init(this, options, instance$n, create_fragment$n, safe_not_equal, { quant: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoCardGroup",
     			options,
-    			id: create_fragment$h.name
+    			id: create_fragment$n.name
     		});
     	}
 
@@ -4375,9 +8734,9 @@ var app = (function () {
 
     /* src/quanta/1-views/2-molecules/OmoCardProduct.svelte generated by Svelte v3.20.1 */
 
-    const file$i = "src/quanta/1-views/2-molecules/OmoCardProduct.svelte";
+    const file$l = "src/quanta/1-views/2-molecules/OmoCardProduct.svelte";
 
-    function create_fragment$i(ctx) {
+    function create_fragment$o(ctx) {
     	let div4;
     	let div3;
     	let div1;
@@ -4426,27 +8785,27 @@ var app = (function () {
     			button = element("button");
     			t9 = text(t9_value);
     			attr_dev(h10, "class", "text-blue-900 font-title font-bold text-2xl uppercase");
-    			add_location(h10, file$i, 26, 6, 639);
+    			add_location(h10, file$l, 26, 6, 639);
     			attr_dev(p, "class", "text-gray-600 text-sm mt-1");
-    			add_location(p, file$i, 29, 6, 750);
+    			add_location(p, file$l, 29, 6, 750);
     			attr_dev(div0, "class", "text-xs text-blue-600 font-bold ");
-    			add_location(div0, file$i, 30, 6, 823);
+    			add_location(div0, file$l, 30, 6, 823);
     			attr_dev(div1, "class", "px-4 py-2");
-    			add_location(div1, file$i, 25, 4, 609);
+    			add_location(div1, file$l, 25, 4, 609);
     			attr_dev(img, "class", "h-56 w-full object-cover mt-2");
     			if (img.src !== (img_src_value = /*quant*/ ctx[0].data.image)) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "alt", "NIKE AIR");
-    			add_location(img, file$i, 32, 4, 895);
+    			add_location(img, file$l, 32, 4, 895);
     			attr_dev(h11, "class", "text-gray-200 font-bold text-xl");
-    			add_location(h11, file$i, 38, 6, 1093);
+    			add_location(h11, file$l, 38, 6, 1093);
     			attr_dev(button, "class", "px-3 py-1 bg-green-400 text-sm text-white hover:bg-blue-800\n        font-semibold rounded");
-    			add_location(button, file$i, 39, 6, 1167);
+    			add_location(button, file$l, 39, 6, 1167);
     			attr_dev(div2, "class", "flex items-center justify-between px-4 py-2 bg-gray-900 rounded-b");
-    			add_location(div2, file$i, 36, 4, 1001);
+    			add_location(div2, file$l, 36, 4, 1001);
     			attr_dev(div3, "class", "bg-white shadow-lg rounded");
-    			add_location(div3, file$i, 24, 2, 564);
+    			add_location(div3, file$l, 24, 2, 564);
     			attr_dev(div4, "class", "flex flex-col bg-white max-w-sm mx-auto rounded shadow-lg");
-    			add_location(div4, file$i, 23, 0, 490);
+    			add_location(div4, file$l, 23, 0, 490);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -4492,7 +8851,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$i.name,
+    		id: create_fragment$o.name,
     		type: "component",
     		source: "",
     		ctx
@@ -4501,7 +8860,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$i($$self, $$props, $$invalidate) {
+    function instance$o($$self, $$props, $$invalidate) {
     	let { quant = {
     		model: {
     			name: "",
@@ -4551,13 +8910,13 @@ var app = (function () {
     class OmoCardProduct extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$i, create_fragment$i, safe_not_equal, { quant: 0 });
+    		init(this, options, instance$o, create_fragment$o, safe_not_equal, { quant: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoCardProduct",
     			options,
-    			id: create_fragment$i.name
+    			id: create_fragment$o.name
     		});
     	}
 
@@ -4572,9 +8931,9 @@ var app = (function () {
 
     /* src/quanta/1-views/2-molecules/OmoCardUser.svelte generated by Svelte v3.20.1 */
 
-    const file$j = "src/quanta/1-views/2-molecules/OmoCardUser.svelte";
+    const file$m = "src/quanta/1-views/2-molecules/OmoCardUser.svelte";
 
-    function create_fragment$j(ctx) {
+    function create_fragment$p(ctx) {
     	let div5;
     	let img;
     	let img_src_value;
@@ -4654,54 +9013,54 @@ var app = (function () {
     			attr_dev(img, "class", "rounded-t w-full h-56 object-cover object-center");
     			if (img.src !== (img_src_value = "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=334&q=80")) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "alt", "avatar");
-    			add_location(img, file$j, 18, 2, 276);
+    			add_location(img, file$m, 18, 2, 276);
     			attr_dev(path0, "d", "M256 48C150 48 64 136.2 64 245.1v153.3c0 36.3 28.6 65.7 64\n        65.7h64V288h-85.3v-42.9c0-84.7 66.8-153.3 149.3-153.3s149.3 68.5 149.3\n        153.3V288H320v176h64c35.4 0 64-29.3 64-65.7V245.1C448 136.2 362 48 256\n        48z");
-    			add_location(path0, file$j, 24, 6, 640);
+    			add_location(path0, file$m, 24, 6, 640);
     			attr_dev(svg0, "class", "h-6 w-6 text-white fill-current");
     			attr_dev(svg0, "viewBox", "0 0 512 512");
-    			add_location(svg0, file$j, 23, 4, 566);
+    			add_location(svg0, file$m, 23, 4, 566);
     			attr_dev(h10, "class", "mx-3 text-white font-semibold text-lg");
-    			add_location(h10, file$j, 30, 4, 905);
+    			add_location(h10, file$m, 30, 4, 905);
     			attr_dev(div0, "class", "flex items-center px-6 py-3 bg-gray-900");
-    			add_location(div0, file$j, 22, 2, 508);
+    			add_location(div0, file$m, 22, 2, 508);
     			attr_dev(h11, "class", "text-xl font-title uppercase text-blue-900 font-bold");
-    			add_location(h11, file$j, 33, 4, 1008);
+    			add_location(h11, file$m, 33, 4, 1008);
     			attr_dev(p, "class", "py-2 text-md text-gray-700");
-    			add_location(p, file$j, 36, 4, 1108);
+    			add_location(p, file$m, 36, 4, 1108);
     			attr_dev(path1, "d", "M239.208 343.937c-17.78 10.103-38.342 15.876-60.255 15.876-21.909\n          0-42.467-5.771-60.246-15.87C71.544 358.331 42.643 406 32\n          448h293.912c-10.639-42-39.537-89.683-86.704-104.063zM178.953\n          120.035c-58.479 0-105.886 47.394-105.886 105.858 0 58.464 47.407\n          105.857 105.886 105.857s105.886-47.394\n          105.886-105.857c0-58.464-47.408-105.858-105.886-105.858zm0\n          186.488c-33.671 0-62.445-22.513-73.997-50.523H252.95c-11.554\n          28.011-40.326 50.523-73.997 50.523z");
-    			add_location(path1, file$j, 42, 8, 1377);
+    			add_location(path1, file$m, 42, 8, 1377);
     			attr_dev(path2, "d", "M322.602 384H480c-10.638-42-39.537-81.691-86.703-96.072-17.781\n            10.104-38.343 15.873-60.256 15.873-14.823\n            0-29.024-2.654-42.168-7.49-7.445 12.47-16.927 25.592-27.974\n            34.906C289.245 341.354 309.146 364 322.602 384zM306.545\n            200h100.493c-11.554 28-40.327 50.293-73.997 50.293-8.875\n            0-17.404-1.692-25.375-4.51a128.411 128.411 0 0 1-6.52 25.118c10.066\n            3.174 20.779 4.862 31.895 4.862 58.479 0 105.886-47.41\n            105.886-105.872 0-58.465-47.407-105.866-105.886-105.866-37.49\n            0-70.427 19.703-89.243 49.09C275.607 131.383 298.961 163 306.545\n            200z");
-    			add_location(path2, file$j, 52, 10, 1936);
-    			add_location(g, file$j, 51, 8, 1922);
+    			add_location(path2, file$m, 52, 10, 1936);
+    			add_location(g, file$m, 51, 8, 1922);
     			attr_dev(svg1, "class", "h-6 w-6 fill-current");
     			attr_dev(svg1, "viewBox", "0 0 512 512");
-    			add_location(svg1, file$j, 41, 6, 1312);
+    			add_location(svg1, file$m, 41, 6, 1312);
     			attr_dev(h12, "class", "px-2 text-sm");
-    			add_location(h12, file$j, 65, 6, 2634);
+    			add_location(h12, file$m, 65, 6, 2634);
     			attr_dev(div1, "class", "flex items-center mt-4 text-gray-700");
-    			add_location(div1, file$j, 40, 4, 1255);
+    			add_location(div1, file$m, 40, 4, 1255);
     			attr_dev(path3, "d", "M256 32c-88.004 0-160 70.557-160 156.801C96 306.4 256 480 256\n          480s160-173.6 160-291.199C416 102.557 344.004 32 256 32zm0\n          212.801c-31.996 0-57.144-24.645-57.144-56 0-31.357 25.147-56\n          57.144-56s57.144 24.643 57.144 56c0 31.355-25.148 56-57.144 56z");
-    			add_location(path3, file$j, 69, 8, 2812);
+    			add_location(path3, file$m, 69, 8, 2812);
     			attr_dev(svg2, "class", "h-6 w-6 fill-current");
     			attr_dev(svg2, "viewBox", "0 0 512 512");
-    			add_location(svg2, file$j, 68, 6, 2747);
+    			add_location(svg2, file$m, 68, 6, 2747);
     			attr_dev(h13, "class", "px-2 text-sm");
-    			add_location(h13, file$j, 75, 6, 3130);
+    			add_location(h13, file$m, 75, 6, 3130);
     			attr_dev(div2, "class", "flex items-center mt-4 text-gray-700");
-    			add_location(div2, file$j, 67, 4, 2690);
+    			add_location(div2, file$m, 67, 4, 2690);
     			attr_dev(path4, "d", "M437.332 80H74.668C51.199 80 32 99.198 32 122.667v266.666C32\n          412.802 51.199 432 74.668 432h362.664C460.801 432 480 412.802 480\n          389.333V122.667C480 99.198 460.801 80 437.332 80zM432 170.667L256 288\n          80 170.667V128l176 117.333L432 128v42.667z");
-    			add_location(path4, file$j, 79, 8, 3308);
+    			add_location(path4, file$m, 79, 8, 3308);
     			attr_dev(svg3, "class", "h-6 w-6 fill-current");
     			attr_dev(svg3, "viewBox", "0 0 512 512");
-    			add_location(svg3, file$j, 78, 6, 3243);
+    			add_location(svg3, file$m, 78, 6, 3243);
     			attr_dev(h14, "class", "px-2 text-sm");
-    			add_location(h14, file$j, 85, 6, 3620);
+    			add_location(h14, file$m, 85, 6, 3620);
     			attr_dev(div3, "class", "flex items-center mt-4 text-gray-700");
-    			add_location(div3, file$j, 77, 4, 3186);
+    			add_location(div3, file$m, 77, 4, 3186);
     			attr_dev(div4, "class", "py-4 px-6");
-    			add_location(div4, file$j, 32, 2, 980);
+    			add_location(div4, file$m, 32, 2, 980);
     			attr_dev(div5, "class", "m-auto max-w-sm bg-white shadow-lg rounded-lg");
-    			add_location(div5, file$j, 17, 0, 214);
+    			add_location(div5, file$m, 17, 0, 214);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -4751,7 +9110,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$j.name,
+    		id: create_fragment$p.name,
     		type: "component",
     		source: "",
     		ctx
@@ -4760,7 +9119,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$j($$self, $$props, $$invalidate) {
+    function instance$p($$self, $$props, $$invalidate) {
     	let { quant = {
     		model: {
     			name: "",
@@ -4803,13 +9162,13 @@ var app = (function () {
     class OmoCardUser extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$j, create_fragment$j, safe_not_equal, { quant: 0 });
+    		init(this, options, instance$p, create_fragment$p, safe_not_equal, { quant: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoCardUser",
     			options,
-    			id: create_fragment$j.name
+    			id: create_fragment$p.name
     		});
     	}
 
@@ -4824,7 +9183,7 @@ var app = (function () {
 
     /* src/quanta/1-views/2-molecules/OmoSteps.svelte generated by Svelte v3.20.1 */
 
-    const file$k = "src/quanta/1-views/2-molecules/OmoSteps.svelte";
+    const file$n = "src/quanta/1-views/2-molecules/OmoSteps.svelte";
 
     function get_each_context$1(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -4863,13 +9222,13 @@ var app = (function () {
     			attr_dev(img, "class", "object-center px-10");
     			set_style(img, "height", "20rem");
     			attr_dev(img, "alt", "image");
-    			add_location(img, file$k, 24, 8, 521);
+    			add_location(img, file$n, 24, 8, 521);
     			attr_dev(div0, "class", "text-2xl text-center text-blue-800 mb-2 flex flex-wrap\n          justify-center content-center font-title uppercase font-bold");
-    			add_location(div0, file$k, 29, 8, 656);
+    			add_location(div0, file$n, 29, 8, 656);
     			attr_dev(div1, "class", "text-gray-600");
-    			add_location(div1, file$k, 34, 8, 852);
+    			add_location(div1, file$n, 34, 8, 852);
     			attr_dev(div2, "class", "w-1/3 px-6 content-center text-center");
-    			add_location(div2, file$k, 23, 6, 461);
+    			add_location(div2, file$n, 23, 6, 461);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div2, anchor);
@@ -4906,7 +9265,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$k(ctx) {
+    function create_fragment$q(ctx) {
     	let div1;
     	let div0;
     	let each_value = /*quant*/ ctx[0].data.steps;
@@ -4927,9 +9286,9 @@ var app = (function () {
     			}
 
     			attr_dev(div0, "class", "flex content-start flex-wrap");
-    			add_location(div0, file$k, 21, 2, 372);
+    			add_location(div0, file$n, 21, 2, 372);
     			attr_dev(div1, "class", "bg-white flex justify-center0");
-    			add_location(div1, file$k, 20, 0, 326);
+    			add_location(div1, file$n, 20, 0, 326);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -4977,7 +9336,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$k.name,
+    		id: create_fragment$q.name,
     		type: "component",
     		source: "",
     		ctx
@@ -4986,7 +9345,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$k($$self, $$props, $$invalidate) {
+    function instance$q($$self, $$props, $$invalidate) {
     	let { quant = {
     		id: "q3",
     		component: OmoSteps,
@@ -5032,13 +9391,13 @@ var app = (function () {
     class OmoSteps_1 extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$k, create_fragment$k, safe_not_equal, { quant: 0 });
+    		init(this, options, instance$q, create_fragment$q, safe_not_equal, { quant: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoSteps_1",
     			options,
-    			id: create_fragment$k.name
+    			id: create_fragment$q.name
     		});
     	}
 
@@ -5051,335 +9410,351 @@ var app = (function () {
     	}
     }
 
-    const quanta = writable(
-        [{
-                id: "q0",
-                component: OmoNavbar,
-                model: {
-                    id: "m0",
-                    name: "Omo Navbar",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "molecule"
-                },
-                design: {
-
-                },
-                data: {
-                    id: "d0",
-                }
-            }, {
-                id: "q1",
-                component: OmoHeader,
-                model: {
-                    id: "m1",
-                    name: "Omo Header",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "molecule"
-                },
-                design: {
-                    layout: "py-20 bg-white",
-                    title: "text-blue-900 font-bold font-title",
-                    subline: "text-gray-500 italic font-light font-sans tracking-wide",
-                    illustration: "w-1/2"
-                },
-                data: {
-                    id: "d1",
-                    title: "title from store",
-                    subline: "subline from store",
-                    illustration: "/images/through_the_park.svg",
-                }
-            }, {
-                id: "q2",
-                component: OmoVideo,
-                model: {
-                    id: "m2",
-                    name: "Omo Video",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "molecule"
-                },
-                design: {},
-                data: {
-                    id: "d2",
-                    title: "title set from store",
-                    link: "https://player.vimeo.com/video/349650067"
-                }
-            }, {
-                id: "q3",
-                component: OmoHero,
-                model: {
-                    id: "m3",
-                    name: "Omo Hero",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "molecule"
-                },
-                design: {
-                    layout: "bg-white p-20"
-                },
-                data: {
-                    id: "d3",
-                    title: "hero set by store ",
-                    subline: "hero subtitle message",
-                    description: "Lorem ipsum dolor sit amet, consectetur adipiscing. Vestibulum rutrum metus at enim congue scelerisque. Sed suscipit metu non iaculis semper consectetur adipiscing elit.",
-                    illustration: "/images/progressive_app.svg",
-                    button: "Call to Action"
-                }
-            }, {
-                id: "q55",
-                component: OmoSteps_1,
-                model: {
-                    id: "m55",
-                    name: "Omo Steps",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "molecule"
-                },
-                design: {},
-                data: {
-                    id: "d3",
-                    steps: [{
-                            title: "Step 1",
-                            description: "description 1",
-                            image: "/images/progressive_app.svg"
-                        },
-                        {
-                            title: "Step 2",
-                            description: "description 2",
-                            image: "/images/online_messaging.svg"
-                        },
-                        {
-                            title: "Step 3",
-                            description: "description 3",
-                            image: "images/shopping_app.svg"
-                        }
-                    ]
-                }
-            }, {
-                id: "q44",
-                component: OmoBanner,
-                model: {
-                    id: "m44",
-                    name: "Omo Banner",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "molecule"
-                },
-                design: {},
-                data: {
-                    uptitle: "Uptitle",
-                    title: "Title",
-                    subtitle: "subtitle",
-                    image: "https://source.unsplash.com/random",
-                    button: "call to action"
-                }
-            }, {
-                id: "q5",
-                component: OmoCities,
-                model: {
-                    id: "m5",
-                    name: "Omo Cities",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "organism"
-                },
-                design: {
-                    grid: "md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-                },
-                data: []
-            }, {
-                id: "q8",
-                component: OmoPricing_1,
-                model: {
-                    id: "m8",
-                    name: "Omo Pricing",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "molecule"
-                },
-                design: {},
-                data: []
-            }, {
-                id: "q10",
-                component: OmoSubscribe,
-                model: {
-                    id: "m10",
-                    name: "Omo Subscribe",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "molecule"
-                },
-                design: {
-                    layout: ""
-                },
-                data: {
-                    id: "d10",
-                    title: "Get Our Updates",
-                    subline: "Find out about events and other news",
-                    email: "john@mail.com",
-                    image: "https://source.unsplash.com/random",
-                    button: "Subscribe"
-                }
-            }, {
-                id: "q11",
-                component: OmoTable,
-                model: {
-                    id: "m11",
-                    name: "Omo Table",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "molecule"
-                },
-                design: {},
-                data: []
-            }, {
-                id: "q11",
-                component: OmoAccordion,
-                model: {
-                    id: "m11",
-                    name: "Omo Pricing",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "molecule"
-                },
-                design: {},
-                data: []
-            }, {
-                id: "q4",
-                component: OmoCardArticle,
-                model: {
-                    id: "m4",
-                    name: "Omo Card Article",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "molecule"
-                },
-                design: {
-                    layout: "bg-gray-100 border border-gray-100 rounded-lg shadow-sm py-16"
-                },
-                data: {
-                    id: "d4",
-                    tag: "#tag",
-                    excerpt: "Build Your New Idea with Laravel Framework.",
-                    image: "https://randomuser.me/api/portraits/women/21.jpg",
-                    author: "John Doe",
-                    date: "Mar 10, 2018"
-                }
-            }, {
-                id: "q6",
-                component: OmoMenuVertical,
-                model: {
-                    id: "m6",
-                    name: "Omo Menu Vertical",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "molecule"
-                },
-                design: {},
-                data: []
-            }, {
-                id: "q7",
-                component: OmoMenuHorizontal,
-                model: {
-                    id: "m7",
-                    name: "Omo Menu Horizontal",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "molecule"
-                },
-                design: {},
-                data: []
-            }, {
-                id: "q20",
-                component: OmoCardGroup,
-                model: {
-                    name: "Omo Card Group",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "molecule"
-                },
-                design: {},
-                data: {
-                    id: "",
-                    follower: "10",
-                    name: "Group Name",
-                    description: "group description",
-                    image: "https://source.unsplash.com/random",
-                    user: "https://randomuser.me/api/portraits/women/21.jpg"
-                }
+    const quanta = writable([
+      {
+        id: "q0",
+        component: OmoNavbar,
+        model: {
+          id: "m0",
+          name: "Omo Navbar",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "molecule",
+        },
+        design: {},
+        data: {
+          id: "d0",
+        },
+      },
+      {
+        id: "q1",
+        component: OmoHeader,
+        model: {
+          id: "m1",
+          name: "Omo Header",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "molecule",
+        },
+        design: {
+          layout: "py-20 bg-white",
+          title: "text-blue-900 font-bold font-title",
+          subline: "text-gray-500 italic font-light font-sans tracking-wide",
+          illustration: "w-1/2",
+        },
+        data: {
+          id: "d1",
+          title: "title from store",
+          subline: "subline from store",
+          illustration: "/images/through_the_park.svg",
+        },
+      },
+      {
+        id: "q2",
+        component: OmoVideo,
+        model: {
+          id: "m2",
+          name: "Omo Video",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "molecule",
+        },
+        design: {},
+        data: {
+          id: "d2",
+          title: "title set from store",
+          link: "https://player.vimeo.com/video/349650067",
+        },
+      },
+      {
+        id: "q3",
+        component: OmoHero,
+        model: {
+          id: "m3",
+          name: "Omo Hero",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "molecule",
+        },
+        design: {
+          layout: "bg-white p-20",
+        },
+        data: {
+          id: "d3",
+          title: "hero set by store ",
+          subline: "hero subtitle message",
+          description:
+            "Lorem ipsum dolor sit amet, consectetur adipiscing. Vestibulum rutrum metus at enim congue scelerisque. Sed suscipit metu non iaculis semper consectetur adipiscing elit.",
+          illustration: "/images/progressive_app.svg",
+          button: "Call to Action",
+        },
+      },
+      {
+        id: "q55",
+        component: OmoSteps_1,
+        model: {
+          id: "m55",
+          name: "Omo Steps",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "molecule",
+        },
+        design: {},
+        data: {
+          id: "d3",
+          steps: [
+            {
+              title: "Step 1",
+              description: "description 1",
+              image: "/images/progressive_app.svg",
             },
             {
-                id: "q33",
-                component: OmoCardProduct,
-                model: {
-                    id: "m33",
-                    name: "Omo Card Product",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "molecule"
-                },
-                design: {},
-                data: {
-                    id: "d33    ",
-                    name: "PRODUCT NAME",
-                    description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi quos quidem sequi illum facere recusandae voluptatibus",
-                    image: "https://source.unsplash.com/random",
-                    price: "129€",
-                    button: "Add to Card"
-                }
-            }, {
-                id: "q88",
-                component: OmoCardUser,
-                model: {
-                    id: "m88",
-                    name: "Omo Card User",
-                    image: "/images/samuel.jpg",
-                    author: "Samuel Andert",
-                    type: "view",
-                    group: "omo",
-                    tags: "molecule"
-                },
-                design: {},
-                data: {}
-            }
-        ]);
+              title: "Step 2",
+              description: "description 2",
+              image: "/images/online_messaging.svg",
+            },
+            {
+              title: "Step 3",
+              description: "description 3",
+              image: "images/shopping_app.svg",
+            },
+          ],
+        },
+      },
+      {
+        id: "q44",
+        component: OmoBanner,
+        model: {
+          id: "m44",
+          name: "Omo Banner",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "molecule",
+        },
+        design: {},
+        data: {
+          uptitle: "Uptitle",
+          title: "Title",
+          subtitle: "subtitle",
+          image: "https://source.unsplash.com/random",
+          button: "call to action",
+        },
+      },
+      {
+        id: "q5",
+        component: OmoCities,
+        model: {
+          id: "m5",
+          name: "Omo Cities",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "organism",
+        },
+        design: {
+          grid: "md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+        },
+        data: [],
+      },
+      {
+        id: "q8",
+        component: OmoPricing_1,
+        model: {
+          id: "m8",
+          name: "Omo Pricing",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "molecule",
+        },
+        design: {},
+        data: [],
+      },
+      {
+        id: "q10",
+        component: OmoSubscribe,
+        model: {
+          id: "m10",
+          name: "Omo Subscribe",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "molecule",
+        },
+        design: {
+          layout: "",
+        },
+        data: {
+          id: "d10",
+          title: "Get Our Updates",
+          subline: "Find out about events and other news",
+          email: "john@mail.com",
+          image: "https://source.unsplash.com/random",
+          button: "Subscribe",
+        },
+      },
+      {
+        id: "q11",
+        component: OmoTable,
+        model: {
+          id: "m11",
+          name: "Omo Table",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "molecule",
+        },
+        design: {},
+        data: [],
+      },
+      {
+        id: "q11",
+        component: OmoAccordion,
+        model: {
+          id: "m11",
+          name: "Omo Pricing",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "molecule",
+        },
+        design: {},
+        data: [],
+      },
+      {
+        id: "q4",
+        component: OmoCardArticle,
+        model: {
+          id: "m4",
+          name: "Omo Card Article",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "molecule",
+        },
+        design: {
+          layout: "bg-gray-100 border border-gray-100 rounded-lg shadow-sm py-16",
+        },
+        data: {
+          id: "d4",
+          tag: "#tag",
+          excerpt: "Build Your New Idea with Laravel Framework.",
+          image: "https://randomuser.me/api/portraits/women/21.jpg",
+          author: "John Doe",
+          date: "Mar 10, 2018",
+        },
+      },
+      {
+        id: "q6",
+        component: OmoMenuVertical,
+        model: {
+          id: "m6",
+          name: "Omo Menu Vertical",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "molecule",
+        },
+        design: {},
+        data: [],
+      },
+      {
+        id: "q7",
+        component: OmoMenuHorizontal,
+        model: {
+          id: "m7",
+          name: "Omo Menu Horizontal",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "molecule",
+        },
+        design: {},
+        data: [],
+      },
+      {
+        id: "q20",
+        component: OmoCardGroup,
+        model: {
+          name: "Omo Card Group",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "molecule",
+        },
+        design: {},
+        data: {
+          id: "",
+          follower: "10",
+          name: "Group Name",
+          description: "group description",
+          image: "https://source.unsplash.com/random",
+          user: "https://randomuser.me/api/portraits/women/21.jpg",
+        },
+      },
+      {
+        id: "q33",
+        component: OmoCardProduct,
+        model: {
+          id: "m33",
+          name: "Omo Card Product",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "molecule",
+        },
+        design: {},
+        data: {
+          id: "d33    ",
+          name: "PRODUCT NAME",
+          description:
+            "Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi quos quidem sequi illum facere recusandae voluptatibus",
+          image: "https://source.unsplash.com/random",
+          price: "129€",
+          button: "Add to Card",
+        },
+      },
+      {
+        id: "q88",
+        component: OmoCardUser,
+        model: {
+          id: "m88",
+          name: "Omo Card User",
+          image: "/images/samuel.jpg",
+          author: "Samuel Andert",
+          type: "view",
+          group: "omo",
+          tags: "molecule",
+        },
+        design: {},
+        data: {},
+      },
+    ]);
 
     /* src/quanta/1-views/5-pages/Home.svelte generated by Svelte v3.20.1 */
-    const file$l = "src/quanta/1-views/5-pages/Home.svelte";
+    const file$o = "src/quanta/1-views/5-pages/Home.svelte";
 
     function get_each_context$2(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -5411,7 +9786,7 @@ var app = (function () {
     			if (switch_instance) create_component(switch_instance.$$.fragment);
     			t = space();
     			attr_dev(div, "class", "pb-10");
-    			add_location(div, file$l, 15, 4, 774);
+    			add_location(div, file$o, 15, 4, 774);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -5477,7 +9852,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$l(ctx) {
+    function create_fragment$r(ctx) {
     	let div;
     	let current;
     	let each_value = /*$quanta*/ ctx[0];
@@ -5501,7 +9876,7 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "bg-image p-10 svelte-2nh93m");
-    			add_location(div, file$l, 13, 0, 715);
+    			add_location(div, file$o, 13, 0, 715);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -5570,7 +9945,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$l.name,
+    		id: create_fragment$r.name,
     		type: "component",
     		source: "",
     		ctx
@@ -5579,7 +9954,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$l($$self, $$props, $$invalidate) {
+    function instance$r($$self, $$props, $$invalidate) {
     	let $quanta;
     	validate_store(quanta, "quanta");
     	component_subscribe($$self, quanta, $$value => $$invalidate(0, $quanta = $$value));
@@ -5613,13 +9988,13 @@ var app = (function () {
     class Home extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$l, create_fragment$l, safe_not_equal, { currentId: 1 });
+    		init(this, options, instance$r, create_fragment$r, safe_not_equal, { currentId: 1 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Home",
     			options,
-    			id: create_fragment$l.name
+    			id: create_fragment$r.name
     		});
 
     		const { ctx } = this.$$;
@@ -5640,9 +10015,9 @@ var app = (function () {
     }
 
     /* src/quanta/1-views/5-pages/User.svelte generated by Svelte v3.20.1 */
-    const file$m = "src/quanta/1-views/5-pages/User.svelte";
+    const file$p = "src/quanta/1-views/5-pages/User.svelte";
 
-    function create_fragment$m(ctx) {
+    function create_fragment$s(ctx) {
     	let div0;
     	let t0;
     	let div1;
@@ -5685,17 +10060,17 @@ var app = (function () {
     			set_style(div0, "background-image", "url('" + /*user*/ ctx[0].image + "')");
     			set_style(div0, "padding", "30rem");
     			attr_dev(div0, "title", "user");
-    			add_location(div0, file$m, 9, 0, 249);
+    			add_location(div0, file$p, 9, 0, 249);
     			set_style(p, "font-family", "'Permanent Marker', cursive", 1);
-    			add_location(p, file$m, 17, 2, 581);
+    			add_location(p, file$p, 17, 2, 581);
     			attr_dev(div1, "class", "text-5xl text-center px-4 py-16 text-gray-200 bg-blue-800 flex\n  flex-wrap justify-center content-center");
-    			add_location(div1, file$m, 14, 0, 458);
+    			add_location(div1, file$p, 14, 0, 458);
     			attr_dev(div2, "class", "flex justify-center");
-    			add_location(div2, file$m, 23, 4, 766);
+    			add_location(div2, file$p, 23, 4, 766);
     			attr_dev(div3, "class", "w-5/6 xl:w-4/6");
-    			add_location(div3, file$m, 22, 2, 733);
+    			add_location(div3, file$p, 22, 2, 733);
     			attr_dev(div4, "class", "flex justify-center my-10");
-    			add_location(div4, file$m, 21, 0, 691);
+    			add_location(div4, file$p, 21, 0, 691);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -5749,7 +10124,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$m.name,
+    		id: create_fragment$s.name,
     		type: "component",
     		source: "",
     		ctx
@@ -5758,7 +10133,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$m($$self, $$props, $$invalidate) {
+    function instance$s($$self, $$props, $$invalidate) {
     	let { db } = $$props;
     	let { user } = $$props;
     	let { currentId } = $$props;
@@ -5798,13 +10173,13 @@ var app = (function () {
     class User extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$m, create_fragment$m, safe_not_equal, { db: 1, user: 0, currentId: 3 });
+    		init(this, options, instance$s, create_fragment$s, safe_not_equal, { db: 1, user: 0, currentId: 3 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "User",
     			options,
-    			id: create_fragment$m.name
+    			id: create_fragment$s.name
     		});
 
     		const { ctx } = this.$$;
@@ -5849,9 +10224,9 @@ var app = (function () {
     }
 
     /* src/quanta/1-views/5-pages/City.svelte generated by Svelte v3.20.1 */
-    const file$n = "src/quanta/1-views/5-pages/City.svelte";
+    const file$q = "src/quanta/1-views/5-pages/City.svelte";
 
-    function create_fragment$n(ctx) {
+    function create_fragment$t(ctx) {
     	let div0;
     	let img;
     	let img_src_value;
@@ -5872,13 +10247,13 @@ var app = (function () {
     			attr_dev(img, "alt", img_alt_value = /*city*/ ctx[0].name);
     			attr_dev(img, "class", "w-full object-cover object-center");
     			set_style(img, "height", "30rem");
-    			add_location(img, file$n, 9, 2, 225);
+    			add_location(img, file$q, 9, 2, 225);
     			attr_dev(div0, "class", "");
-    			add_location(div0, file$n, 8, 0, 208);
+    			add_location(div0, file$q, 8, 0, 208);
     			attr_dev(p, "class", "font-title uppercase font-bold");
-    			add_location(p, file$n, 19, 2, 477);
+    			add_location(p, file$q, 19, 2, 477);
     			attr_dev(div1, "class", "text-4xl text-center px-4 py-12 text-gray-200 bg-blue-800 flex\n  flex-wrap justify-center content-center");
-    			add_location(div1, file$n, 16, 0, 354);
+    			add_location(div1, file$q, 16, 0, 354);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -5902,7 +10277,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$n.name,
+    		id: create_fragment$t.name,
     		type: "component",
     		source: "",
     		ctx
@@ -5911,7 +10286,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$n($$self, $$props, $$invalidate) {
+    function instance$t($$self, $$props, $$invalidate) {
     	let $cities;
     	validate_store(cities, "cities");
     	component_subscribe($$self, cities, $$value => $$invalidate(2, $cities = $$value));
@@ -5953,13 +10328,13 @@ var app = (function () {
     class City extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$n, create_fragment$n, safe_not_equal, { currentId: 1 });
+    		init(this, options, instance$t, create_fragment$t, safe_not_equal, { currentId: 1 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "City",
     			options,
-    			id: create_fragment$n.name
+    			id: create_fragment$t.name
     		});
 
     		const { ctx } = this.$$;
@@ -5981,9 +10356,9 @@ var app = (function () {
 
     /* src/quanta/1-views/2-molecules/OmoQuantPreview.svelte generated by Svelte v3.20.1 */
 
-    const file$o = "src/quanta/1-views/2-molecules/OmoQuantPreview.svelte";
+    const file$r = "src/quanta/1-views/2-molecules/OmoQuantPreview.svelte";
 
-    function create_fragment$o(ctx) {
+    function create_fragment$u(ctx) {
     	let div1;
     	let div0;
     	let current;
@@ -6006,9 +10381,9 @@ var app = (function () {
     			div0 = element("div");
     			if (switch_instance) create_component(switch_instance.$$.fragment);
     			attr_dev(div0, "class", "preview svelte-nu1sos");
-    			add_location(div0, file$o, 26, 2, 1371);
+    			add_location(div0, file$r, 26, 2, 1371);
     			attr_dev(div1, "class", "w-100 bg-green-200 overflow-hidden h-48 overflow-y-scroll object-center\n  object-cover border border-gray-300 bg-image svelte-nu1sos");
-    			add_location(div1, file$o, 23, 0, 1234);
+    			add_location(div1, file$r, 23, 0, 1234);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -6068,7 +10443,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$o.name,
+    		id: create_fragment$u.name,
     		type: "component",
     		source: "",
     		ctx
@@ -6077,7 +10452,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$o($$self, $$props, $$invalidate) {
+    function instance$u($$self, $$props, $$invalidate) {
     	let { quant } = $$props;
     	const writable_props = ["quant"];
 
@@ -6108,13 +10483,13 @@ var app = (function () {
     class OmoQuantPreview extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$o, create_fragment$o, safe_not_equal, { quant: 0 });
+    		init(this, options, instance$u, create_fragment$u, safe_not_equal, { quant: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoQuantPreview",
     			options,
-    			id: create_fragment$o.name
+    			id: create_fragment$u.name
     		});
 
     		const { ctx } = this.$$;
@@ -6135,9 +10510,9 @@ var app = (function () {
     }
 
     /* src/quanta/1-views/2-molecules/OmoQuantaItem.svelte generated by Svelte v3.20.1 */
-    const file$p = "src/quanta/1-views/2-molecules/OmoQuantaItem.svelte";
+    const file$s = "src/quanta/1-views/2-molecules/OmoQuantaItem.svelte";
 
-    function create_fragment$p(ctx) {
+    function create_fragment$v(ctx) {
     	let div3;
     	let t0;
     	let div0;
@@ -6202,25 +10577,25 @@ var app = (function () {
     			t12 = text("s");
     			attr_dev(a0, "class", "text-md font-semibold text-gray-700 font-medium ");
     			attr_dev(a0, "href", a0_href_value = "/quant?id=" + /*quant*/ ctx[0].id);
-    			add_location(a0, file$p, 8, 4, 227);
+    			add_location(a0, file$s, 8, 4, 227);
     			attr_dev(div0, "class", "py-2 px-3 bg-gray-100");
-    			add_location(div0, file$p, 7, 2, 187);
+    			add_location(div0, file$s, 7, 2, 187);
     			if (img.src !== (img_src_value = /*quant*/ ctx[0].model.image)) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "class", "w-10 h-10 object-cover rounded");
     			attr_dev(img, "alt", "avatar");
-    			add_location(img, file$p, 16, 6, 478);
-    			add_location(br, file$p, 22, 8, 696);
+    			add_location(img, file$s, 16, 6, 478);
+    			add_location(br, file$s, 22, 8, 696);
     			attr_dev(span, "class", "font-light text-xs text-gray-500");
-    			add_location(span, file$p, 23, 8, 711);
+    			add_location(span, file$s, 23, 8, 711);
     			attr_dev(a1, "class", "text-gray-700 text-sm mx-3");
     			attr_dev(a1, "href", a1_href_value = "/quant?id=" + /*quant*/ ctx[0].id);
-    			add_location(a1, file$p, 20, 6, 592);
+    			add_location(a1, file$s, 20, 6, 592);
     			attr_dev(div1, "class", "flex items-center");
-    			add_location(div1, file$p, 15, 4, 440);
+    			add_location(div1, file$s, 15, 4, 440);
     			attr_dev(div2, "class", "pb-2 px-3 flex justify-between items-center mt-2");
-    			add_location(div2, file$p, 14, 2, 373);
+    			add_location(div2, file$s, 14, 2, 373);
     			attr_dev(div3, "class", "bg-white max-w-sm rounded shadow-md border");
-    			add_location(div3, file$p, 5, 0, 98);
+    			add_location(div3, file$s, 5, 0, 98);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -6291,7 +10666,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$p.name,
+    		id: create_fragment$v.name,
     		type: "component",
     		source: "",
     		ctx
@@ -6300,7 +10675,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$p($$self, $$props, $$invalidate) {
+    function instance$v($$self, $$props, $$invalidate) {
     	let { quant } = $$props;
     	const writable_props = ["quant"];
 
@@ -6331,13 +10706,13 @@ var app = (function () {
     class OmoQuantaItem extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$p, create_fragment$p, safe_not_equal, { quant: 0 });
+    		init(this, options, instance$v, create_fragment$v, safe_not_equal, { quant: 0 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoQuantaItem",
     			options,
-    			id: create_fragment$p.name
+    			id: create_fragment$v.name
     		});
 
     		const { ctx } = this.$$;
@@ -6358,7 +10733,7 @@ var app = (function () {
     }
 
     /* src/quanta/1-views/5-pages/Quanta.svelte generated by Svelte v3.20.1 */
-    const file$q = "src/quanta/1-views/5-pages/Quanta.svelte";
+    const file$t = "src/quanta/1-views/5-pages/Quanta.svelte";
 
     function get_each_context$3(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -6413,7 +10788,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$q(ctx) {
+    function create_fragment$w(ctx) {
     	let div;
     	let current;
     	let each_value = /*$quanta*/ ctx[0];
@@ -6437,7 +10812,7 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4\n  p-10");
-    			add_location(div, file$q, 5, 0, 138);
+    			add_location(div, file$t, 5, 0, 138);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -6506,7 +10881,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$q.name,
+    		id: create_fragment$w.name,
     		type: "component",
     		source: "",
     		ctx
@@ -6515,7 +10890,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$q($$self, $$props, $$invalidate) {
+    function instance$w($$self, $$props, $$invalidate) {
     	let $quanta;
     	validate_store(quanta, "quanta");
     	component_subscribe($$self, quanta, $$value => $$invalidate(0, $quanta = $$value));
@@ -6534,13 +10909,13 @@ var app = (function () {
     class Quanta extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$q, create_fragment$q, safe_not_equal, {});
+    		init(this, options, instance$w, create_fragment$w, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Quanta",
     			options,
-    			id: create_fragment$q.name
+    			id: create_fragment$w.name
     		});
     	}
     }
@@ -6548,7 +10923,7 @@ var app = (function () {
     /* src/quanta/1-views/5-pages/Quant.svelte generated by Svelte v3.20.1 */
 
     const { Object: Object_1 } = globals;
-    const file$r = "src/quanta/1-views/5-pages/Quant.svelte";
+    const file$u = "src/quanta/1-views/5-pages/Quant.svelte";
 
     function get_each_context$4(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -6581,7 +10956,7 @@ var app = (function () {
     			img = element("img");
     			if (img.src !== (img_src_value = /*value*/ ctx[5])) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "class", "rounded mb-1 order-first");
-    			add_location(img, file$r, 32, 12, 1486);
+    			add_location(img, file$u, 32, 12, 1486);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, img, anchor);
@@ -6619,11 +10994,11 @@ var app = (function () {
     			t1 = space();
     			input = element("input");
     			attr_dev(label, "class", "text-gray-500 text-xs");
-    			add_location(label, file$r, 35, 12, 1613);
+    			add_location(label, file$u, 35, 12, 1613);
     			attr_dev(input, "class", "w-full text-sm text-blue rounded border border-gray-300\n              px-2 py-1");
     			attr_dev(input, "type", "text");
     			input.value = input_value_value = /*value*/ ctx[5];
-    			add_location(input, file$r, 36, 12, 1676);
+    			add_location(input, file$u, 36, 12, 1676);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, label, anchor);
@@ -6694,7 +11069,7 @@ var app = (function () {
     }
 
     // (51:8) {#if key != 'id'}
-    function create_if_block_1$2(ctx) {
+    function create_if_block_1$3(ctx) {
     	let div;
     	let label;
     	let t0_value = /*key*/ ctx[4] + "";
@@ -6713,12 +11088,12 @@ var app = (function () {
     			input = element("input");
     			t2 = space();
     			attr_dev(label, "class", "text-gray-500 text-xs");
-    			add_location(label, file$r, 52, 12, 2135);
+    			add_location(label, file$u, 52, 12, 2135);
     			attr_dev(input, "class", "w-full text-sm text-blue rounded border border-gray-300\n              px-2 py-1");
     			attr_dev(input, "type", "text");
     			input.value = input_value_value = /*value*/ ctx[5];
-    			add_location(input, file$r, 53, 12, 2198);
-    			add_location(div, file$r, 51, 10, 2117);
+    			add_location(input, file$u, 53, 12, 2198);
+    			add_location(div, file$u, 51, 10, 2117);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -6736,7 +11111,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_1$2.name,
+    		id: create_if_block_1$3.name,
     		type: "if",
     		source: "(51:8) {#if key != 'id'}",
     		ctx
@@ -6748,7 +11123,7 @@ var app = (function () {
     // (50:6) {#each Object.entries(quant.design) as [key, value]}
     function create_each_block_1(ctx) {
     	let if_block_anchor;
-    	let if_block = /*key*/ ctx[4] != "id" && create_if_block_1$2(ctx);
+    	let if_block = /*key*/ ctx[4] != "id" && create_if_block_1$3(ctx);
 
     	const block = {
     		c: function create() {
@@ -6780,7 +11155,7 @@ var app = (function () {
     }
 
     // (68:8) {#if key != 'id'}
-    function create_if_block$2(ctx) {
+    function create_if_block$3(ctx) {
     	let div;
     	let label;
     	let t0_value = /*key*/ ctx[4] + "";
@@ -6799,12 +11174,12 @@ var app = (function () {
     			input = element("input");
     			t2 = space();
     			attr_dev(label, "class", "text-gray-500 text-xs");
-    			add_location(label, file$r, 69, 12, 2653);
+    			add_location(label, file$u, 69, 12, 2653);
     			attr_dev(input, "class", "w-full text-sm text-blue rounded border border-gray-300\n              px-2 py-1");
     			attr_dev(input, "type", "text");
     			input.value = input_value_value = /*value*/ ctx[5];
-    			add_location(input, file$r, 70, 12, 2716);
-    			add_location(div, file$r, 68, 10, 2635);
+    			add_location(input, file$u, 70, 12, 2716);
+    			add_location(div, file$u, 68, 10, 2635);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -6822,7 +11197,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block$2.name,
+    		id: create_if_block$3.name,
     		type: "if",
     		source: "(68:8) {#if key != 'id'}",
     		ctx
@@ -6834,7 +11209,7 @@ var app = (function () {
     // (67:6) {#each Object.entries(quant.data) as [key, value]}
     function create_each_block$4(ctx) {
     	let if_block_anchor;
-    	let if_block = /*key*/ ctx[4] != "id" && create_if_block$2(ctx);
+    	let if_block = /*key*/ ctx[4] != "id" && create_if_block$3(ctx);
 
     	const block = {
     		c: function create() {
@@ -6865,7 +11240,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$r(ctx) {
+    function create_fragment$x(ctx) {
     	let div9;
     	let div0;
     	let t0;
@@ -6963,26 +11338,26 @@ var app = (function () {
     			t9 = space();
     			create_component(omomenuvertical.$$.fragment);
     			attr_dev(div0, "class", "bg-image w-full p-10 overflow-hidden overflow-y-scroll svelte-es1rzs");
-    			add_location(div0, file$r, 18, 2, 946);
+    			add_location(div0, file$u, 18, 2, 946);
     			attr_dev(div1, "class", "text-sm uppercase text-blue-900 font-title font-bold");
-    			add_location(div1, file$r, 26, 6, 1240);
+    			add_location(div1, file$u, 26, 6, 1240);
     			attr_dev(div2, "class", "flex flex-wrap");
-    			add_location(div2, file$r, 29, 6, 1353);
+    			add_location(div2, file$u, 29, 6, 1353);
     			attr_dev(div3, "class", "mb-4");
-    			add_location(div3, file$r, 25, 4, 1215);
+    			add_location(div3, file$u, 25, 4, 1215);
     			attr_dev(div4, "class", "text-sm uppercase text-blue-900 font-title font-bold");
-    			add_location(div4, file$r, 46, 6, 1921);
+    			add_location(div4, file$u, 46, 6, 1921);
     			attr_dev(div5, "class", "mb-4");
-    			add_location(div5, file$r, 45, 4, 1896);
+    			add_location(div5, file$u, 45, 4, 1896);
     			attr_dev(div6, "class", "text-sm uppercase text-blue-900 font-title font-bold");
-    			add_location(div6, file$r, 63, 6, 2443);
+    			add_location(div6, file$u, 63, 6, 2443);
     			attr_dev(div7, "class", "mb-4");
-    			add_location(div7, file$r, 62, 4, 2418);
+    			add_location(div7, file$u, 62, 4, 2418);
     			attr_dev(div8, "class", "p-6 h-full overflow-hidden overflow-y-scroll bg-gray-100 border-l\n    border-gray-300");
     			set_style(div8, "width", "300px");
-    			add_location(div8, file$r, 21, 2, 1082);
+    			add_location(div8, file$u, 21, 2, 1082);
     			attr_dev(div9, "class", "h-full w-full flex");
-    			add_location(div9, file$r, 17, 0, 911);
+    			add_location(div9, file$u, 17, 0, 911);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -7146,7 +11521,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$r.name,
+    		id: create_fragment$x.name,
     		type: "component",
     		source: "",
     		ctx
@@ -7155,7 +11530,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$r($$self, $$props, $$invalidate) {
+    function instance$x($$self, $$props, $$invalidate) {
     	let $quanta;
     	validate_store(quanta, "quanta");
     	component_subscribe($$self, quanta, $$value => $$invalidate(2, $quanta = $$value));
@@ -7200,13 +11575,13 @@ var app = (function () {
     class Quant extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$r, create_fragment$r, safe_not_equal, { currentId: 1 });
+    		init(this, options, instance$x, create_fragment$x, safe_not_equal, { currentId: 1 });
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "Quant",
     			options,
-    			id: create_fragment$r.name
+    			id: create_fragment$x.name
     		});
 
     		const { ctx } = this.$$;
@@ -7239,7 +11614,7 @@ var app = (function () {
 
     /* src/quanta/1-views/0-themes/OmoDesignBase.svelte generated by Svelte v3.20.1 */
 
-    function create_fragment$s(ctx) {
+    function create_fragment$y(ctx) {
     	const block = {
     		c: noop,
     		l: function claim(nodes) {
@@ -7254,7 +11629,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$s.name,
+    		id: create_fragment$y.name,
     		type: "component",
     		source: "",
     		ctx
@@ -7263,7 +11638,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$s($$self, $$props) {
+    function instance$y($$self, $$props) {
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
@@ -7278,20 +11653,20 @@ var app = (function () {
     class OmoDesignBase extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$s, create_fragment$s, safe_not_equal, {});
+    		init(this, options, instance$y, create_fragment$y, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoDesignBase",
     			options,
-    			id: create_fragment$s.name
+    			id: create_fragment$y.name
     		});
     	}
     }
 
     /* src/quanta/1-views/0-themes/OmoDesignUtilities.svelte generated by Svelte v3.20.1 */
 
-    function create_fragment$t(ctx) {
+    function create_fragment$z(ctx) {
     	const block = {
     		c: noop,
     		l: function claim(nodes) {
@@ -7306,7 +11681,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$t.name,
+    		id: create_fragment$z.name,
     		type: "component",
     		source: "",
     		ctx
@@ -7315,7 +11690,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$t($$self, $$props) {
+    function instance$z($$self, $$props) {
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
@@ -7330,20 +11705,20 @@ var app = (function () {
     class OmoDesignUtilities extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$t, create_fragment$t, safe_not_equal, {});
+    		init(this, options, instance$z, create_fragment$z, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoDesignUtilities",
     			options,
-    			id: create_fragment$t.name
+    			id: create_fragment$z.name
     		});
     	}
     }
 
     /* src/quanta/1-views/0-themes/OmoThemeLight.svelte generated by Svelte v3.20.1 */
 
-    function create_fragment$u(ctx) {
+    function create_fragment$A(ctx) {
     	let t;
     	let current;
     	const omodesignbase = new OmoDesignBase({ $$inline: true });
@@ -7385,7 +11760,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$u.name,
+    		id: create_fragment$A.name,
     		type: "component",
     		source: "",
     		ctx
@@ -7394,7 +11769,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$u($$self, $$props, $$invalidate) {
+    function instance$A($$self, $$props, $$invalidate) {
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
@@ -7410,19 +11785,19 @@ var app = (function () {
     class OmoThemeLight extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$u, create_fragment$u, safe_not_equal, {});
+    		init(this, options, instance$A, create_fragment$A, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoThemeLight",
     			options,
-    			id: create_fragment$u.name
+    			id: create_fragment$A.name
     		});
     	}
     }
 
     /* src/quanta/1-views/2-molecules/OmoQuantaList.svelte generated by Svelte v3.20.1 */
-    const file$s = "src/quanta/1-views/2-molecules/OmoQuantaList.svelte";
+    const file$v = "src/quanta/1-views/2-molecules/OmoQuantaList.svelte";
 
     function get_each_context$5(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -7468,14 +11843,14 @@ var app = (function () {
     			t7 = text(t7_value);
     			t8 = text("s");
     			t9 = space();
-    			add_location(br, file$s, 15, 8, 502);
+    			add_location(br, file$v, 15, 8, 502);
     			attr_dev(span, "class", "text-gray-500 text-xs");
-    			add_location(span, file$s, 16, 8, 517);
+    			add_location(span, file$v, 16, 8, 517);
     			attr_dev(div, "class", "mb-2 text-sm text-blue-900 rounded border-gray-200 border\n        bg-white px-4 py-2");
-    			add_location(div, file$s, 11, 6, 360);
+    			add_location(div, file$v, 11, 6, 360);
     			attr_dev(a, "href", a_href_value = "quant?id=" + /*quant*/ ctx[1].id);
     			attr_dev(a, "class", "cursor-pointer");
-    			add_location(a, file$s, 10, 4, 300);
+    			add_location(a, file$v, 10, 4, 300);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, a, anchor);
@@ -7519,7 +11894,7 @@ var app = (function () {
     	return block;
     }
 
-    function create_fragment$v(ctx) {
+    function create_fragment$B(ctx) {
     	let div1;
     	let div0;
     	let t1;
@@ -7543,9 +11918,9 @@ var app = (function () {
     			}
 
     			attr_dev(div0, "class", "text-sm uppercase text-blue-900 font-title font-bold");
-    			add_location(div0, file$s, 6, 2, 171);
+    			add_location(div0, file$v, 6, 2, 171);
     			attr_dev(div1, "class", "ml-4 grid grid-cols-1 mr-4 mt-4");
-    			add_location(div1, file$s, 5, 0, 123);
+    			add_location(div1, file$v, 5, 0, 123);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -7594,7 +11969,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$v.name,
+    		id: create_fragment$B.name,
     		type: "component",
     		source: "",
     		ctx
@@ -7603,7 +11978,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$v($$self, $$props, $$invalidate) {
+    function instance$B($$self, $$props, $$invalidate) {
     	let $quanta;
     	validate_store(quanta, "quanta");
     	component_subscribe($$self, quanta, $$value => $$invalidate(0, $quanta = $$value));
@@ -7622,13 +11997,13 @@ var app = (function () {
     class OmoQuantaList extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$v, create_fragment$v, safe_not_equal, {});
+    		init(this, options, instance$B, create_fragment$B, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoQuantaList",
     			options,
-    			id: create_fragment$v.name
+    			id: create_fragment$B.name
     		});
     	}
     }
@@ -7680,9 +12055,9 @@ var app = (function () {
      };
 
     /* src/quanta/1-views/4-layouts/OmoLayoutEditor.svelte generated by Svelte v3.20.1 */
-    const file$t = "src/quanta/1-views/4-layouts/OmoLayoutEditor.svelte";
+    const file$w = "src/quanta/1-views/4-layouts/OmoLayoutEditor.svelte";
 
-    function create_fragment$w(ctx) {
+    function create_fragment$C(ctx) {
     	let div6;
     	let header;
     	let div0;
@@ -7735,22 +12110,22 @@ var app = (function () {
     			footer = element("footer");
     			create_component(omomenuhorizontal.$$.fragment);
     			attr_dev(div0, "class", "bg-gray-200 text-sm font-semibold py-1 px-3 text-blue-900");
-    			add_location(div0, file$t, 33, 4, 942);
-    			add_location(header, file$t, 32, 2, 929);
+    			add_location(div0, file$w, 33, 4, 942);
+    			add_location(header, file$w, 32, 2, 929);
     			attr_dev(div1, "class", "border-r border-gray-200");
-    			add_location(div1, file$t, 38, 4, 1160);
+    			add_location(div1, file$w, 38, 4, 1160);
     			attr_dev(div2, "class", "overflow-y-scroll bg-gray-100 border-t border-r border-gray-200");
     			set_style(div2, "width", "220px");
-    			add_location(div2, file$t, 41, 4, 1240);
+    			add_location(div2, file$w, 41, 4, 1240);
     			attr_dev(div3, "class", "h-full w-full");
-    			add_location(div3, file$t, 47, 6, 1442);
+    			add_location(div3, file$w, 47, 6, 1442);
     			attr_dev(div4, "class", "h-full flex-1 overflow-y-scroll");
-    			add_location(div4, file$t, 46, 4, 1390);
+    			add_location(div4, file$w, 46, 4, 1390);
     			attr_dev(div5, "class", "h-full flex overflow-hidden");
-    			add_location(div5, file$t, 37, 2, 1114);
-    			add_location(footer, file$t, 52, 2, 1576);
+    			add_location(div5, file$w, 37, 2, 1114);
+    			add_location(footer, file$w, 52, 2, 1576);
     			attr_dev(div6, "class", "h-full flex flex-col");
-    			add_location(div6, file$t, 31, 0, 892);
+    			add_location(div6, file$w, 31, 0, 892);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -7833,7 +12208,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$w.name,
+    		id: create_fragment$C.name,
     		type: "component",
     		source: "",
     		ctx
@@ -7846,7 +12221,7 @@ var app = (function () {
     	curRoute.set(event.state.path);
     }
 
-    function instance$w($$self, $$props, $$invalidate) {
+    function instance$C($$self, $$props, $$invalidate) {
     	let $curRoute;
     	validate_store(curRoute, "curRoute");
     	component_subscribe($$self, curRoute, $$value => $$invalidate(1, $curRoute = $$value));
@@ -7903,13 +12278,13 @@ var app = (function () {
     class OmoLayoutEditor extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$w, create_fragment$w, safe_not_equal, {});
+    		init(this, options, instance$C, create_fragment$C, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "OmoLayoutEditor",
     			options,
-    			id: create_fragment$w.name
+    			id: create_fragment$C.name
     		});
     	}
     }
@@ -7917,9 +12292,9 @@ var app = (function () {
     /* src/App.svelte generated by Svelte v3.20.1 */
 
     const { window: window_1 } = globals;
-    const file$u = "src/App.svelte";
+    const file$x = "src/App.svelte";
 
-    function create_fragment$x(ctx) {
+    function create_fragment$D(ctx) {
     	let div;
     	let current;
     	let dispose;
@@ -7930,7 +12305,7 @@ var app = (function () {
     			div = element("div");
     			create_component(omolayouteditor.$$.fragment);
     			attr_dev(div, "class", "h-screen w-screen");
-    			add_location(div, file$u, 31, 0, 839);
+    			add_location(div, file$x, 31, 0, 839);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -7961,7 +12336,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_fragment$x.name,
+    		id: create_fragment$D.name,
     		type: "component",
     		source: "",
     		ctx
@@ -7974,7 +12349,7 @@ var app = (function () {
     	curRoute.set(event.state.path);
     }
 
-    function instance$x($$self, $$props, $$invalidate) {
+    function instance$D($$self, $$props, $$invalidate) {
     	let currentId;
 
     	onMount(() => {
@@ -8025,13 +12400,13 @@ var app = (function () {
     class App extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance$x, create_fragment$x, safe_not_equal, {});
+    		init(this, options, instance$D, create_fragment$D, safe_not_equal, {});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
     			tagName: "App",
     			options,
-    			id: create_fragment$x.name
+    			id: create_fragment$D.name
     		});
     	}
     }
