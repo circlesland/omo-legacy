@@ -62,11 +62,7 @@
   },
   "homepage": "https://github.com/omoearth/omo-quantum#readme",
   "dependencies": {
-    "@textile/threads-client": "^0.2.3",
-    "ipfs-http-client": "^41.0.1",
-    "js-convert-case": "^3.1.6",
-    "lit-element": "^2.2.1",
-    "ava": "2.2.0"
+    "graphql": "^15.0.0"
   },
   "devDependencies": {
     "@bitjson/npm-scripts-info": "^1.0.0",

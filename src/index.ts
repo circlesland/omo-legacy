@@ -1,17 +1,40 @@
-import { QuantumKernel } from './kernel/QuantumKernel';
-import { Ace } from './types/ace';
+// import {
+//   graphql,
+//   GraphQLSchema,
+//   GraphQLObjectType,
+//   GraphQLString,
+// } from 'graphql';
 
-declare global {
-  interface Window {
-    omo: QuantumKernel;
-  }
-  interface SymbolConstructor {
-    readonly observable: symbol;
-  }
-  var omo: QuantumKernel;
-  var ace: Ace.Ace;
-}
+// const schema = new GraphQLSchema({
+//   query: new GraphQLObjectType({
+//     name: 'RootQueryType',
+//     fields: {
+//       hello: {
+//         type: GraphQLString,
+//         resolve() {
+//           return 'world';
+//         },
+//       },
+//     },
+//   }),
+// });
 
-if (!window.omo) {
-  window.omo = new QuantumKernel();
-}
+// var AddressType = new GraphQLObjectType({
+//   name: 'Address',
+//   fields: {
+//     street: { type: GraphQLString },
+//     number: { type: GraphQLInt },
+//     formatted: {
+//       type: GraphQLString,
+//       resolve(obj) {
+//         return obj.number + ' ' + obj.street
+//       }
+//     }
+//   }
+// });
+
+// var query = '{ hello }';
+
+// graphql(schema, query).then((result) => {
+//   console.log(result);
+// });
