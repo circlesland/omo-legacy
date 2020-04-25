@@ -1,4 +1,6 @@
-import { writable } from "svelte/store";
+import {
+  writable
+} from "svelte/store";
 import OmoCardArticle from "./../1-views/2-molecules/OmoCardArticle.svelte";
 import OmoNavbar from "./../1-views/2-molecules/OmoNavbar.svelte";
 import OmoBanner from "./../1-views/2-molecules/OmoBanner.svelte";
@@ -16,9 +18,10 @@ import OmoCardGroup from "./../1-views/2-molecules/OmoCardGroup.svelte";
 import OmoCardProduct from "./../1-views/2-molecules/OmoCardProduct.svelte";
 import OmoCardUser from "./../1-views/2-molecules/OmoCardUser.svelte";
 import OmoSteps from "./../1-views/2-molecules/OmoSteps.svelte";
+import OmoNotifications from "./../1-views/2-molecules/OmoNotifications.svelte";
+import OmoResponsive from "./../1-views/2-molecules/OmoResponsive.svelte";
 
-const quanta = writable([
-  {
+const quanta = writable([{
     id: "q0",
     component: OmoNavbar,
     model: {
@@ -98,8 +101,7 @@ const quanta = writable([
       id: "d3",
       title: "hero set by store ",
       subline: "hero subtitle message",
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing. Vestibulum rutrum metus at enim congue scelerisque. Sed suscipit metu non iaculis semper consectetur adipiscing elit.",
+      description: "Lorem ipsum dolor sit amet, consectetur adipiscing. Vestibulum rutrum metus at enim congue scelerisque. Sed suscipit metu non iaculis semper consectetur adipiscing elit.",
       illustration: "/images/progressive_app.svg",
       button: "Call to Action",
     },
@@ -119,8 +121,7 @@ const quanta = writable([
     design: {},
     data: {
       id: "d3",
-      steps: [
-        {
+      steps: [{
           title: "Step 1",
           description: "description 1",
           image: "/images/progressive_app.svg",
@@ -336,8 +337,7 @@ const quanta = writable([
     data: {
       id: "d33    ",
       name: "PRODUCT NAME",
-      description:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi quos quidem sequi illum facere recusandae voluptatibus",
+      description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Modi quos quidem sequi illum facere recusandae voluptatibus",
       image: "https://source.unsplash.com/random",
       price: "129€",
       button: "Add to Card",
@@ -349,6 +349,36 @@ const quanta = writable([
     model: {
       id: "m88",
       name: "Omo Card User",
+      image: "/images/samuel.jpg",
+      author: "Samuel Andert",
+      type: "view",
+      group: "omo",
+      tags: "molecule",
+    },
+    design: {},
+    data: {},
+  },
+  {
+    id: "q111",
+    component: OmoNotifications,
+    model: {
+      id: "m111",
+      name: "Omo Notifications",
+      image: "/images/samuel.jpg",
+      author: "Samuel Andert",
+      type: "view",
+      group: "omo",
+      tags: "molecule",
+    },
+    design: {},
+    data: {},
+  },
+  {
+    id: "q1111",
+    component: OmoResponsive,
+    model: {
+      id: "m1111",
+      name: "Omo Responsive",
       image: "/images/samuel.jpg",
       author: "Samuel Andert",
       type: "view",

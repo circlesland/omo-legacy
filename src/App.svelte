@@ -1,4 +1,5 @@
 <script>
+  import Notifications from "svelte-notifications";
   import router, { curRoute, curId } from "./router.js";
   import OmoThemeLight from "./quanta/1-views/0-themes/OmoThemeLight.svelte";
   import OmoLayoutEditor from "./quanta/1-views/4-layouts/OmoLayoutEditor.svelte";
@@ -29,6 +30,8 @@
 
 <svelte:window on:popstate={handlerBackNavigation} />
 
-<div class="h-screen w-screen">
-  <OmoLayoutEditor />
-</div>
+<Notifications>
+  <div class="h-screen w-screen">
+    <OmoLayoutEditor />
+  </div>
+</Notifications>
