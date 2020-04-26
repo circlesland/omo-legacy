@@ -13256,38 +13256,6 @@ var app = (function () {
     	return child_ctx;
     }
 
-    // (32:10) {#if key === 'image'}
-    function create_if_block_3(ctx) {
-    	let img;
-    	let img_src_value;
-
-    	const block = {
-    		c: function create() {
-    			img = element("img");
-    			if (img.src !== (img_src_value = /*value*/ ctx[5])) attr_dev(img, "src", img_src_value);
-    			attr_dev(img, "class", "rounded mb-1 order-first");
-    			add_location(img, file$y, 32, 12, 1486);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, img, anchor);
-    		},
-    		p: noop,
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(img);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_3.name,
-    		type: "if",
-    		source: "(32:10) {#if key === 'image'}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
     // (35:10) {#if key != 'id' && key != 'image'}
     function create_if_block_2(ctx) {
     	let label;
@@ -13304,11 +13272,11 @@ var app = (function () {
     			t1 = space();
     			input = element("input");
     			attr_dev(label, "class", "text-gray-500 text-xs");
-    			add_location(label, file$y, 35, 12, 1613);
+    			add_location(label, file$y, 35, 12, 1610);
     			attr_dev(input, "class", "w-full text-sm text-blue rounded border border-gray-300\n              px-2 py-1");
     			attr_dev(input, "type", "text");
     			input.value = input_value_value = /*value*/ ctx[5];
-    			add_location(input, file$y, 36, 12, 1676);
+    			add_location(input, file$y, 36, 12, 1673);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, label, anchor);
@@ -13337,33 +13305,24 @@ var app = (function () {
 
     // (31:8) {#each Object.entries(quant.model) as [key, value]}
     function create_each_block_2(ctx) {
-    	let t;
-    	let if_block1_anchor;
-    	let if_block0 = /*key*/ ctx[4] === "image" && create_if_block_3(ctx);
-    	let if_block1 = /*key*/ ctx[4] != "id" && /*key*/ ctx[4] != "image" && create_if_block_2(ctx);
+    	let if_block_anchor;
+    	let if_block = /*key*/ ctx[4] != "id" && /*key*/ ctx[4] != "image" && create_if_block_2(ctx);
 
     	const block = {
     		c: function create() {
-    			if (if_block0) if_block0.c();
-    			t = space();
-    			if (if_block1) if_block1.c();
-    			if_block1_anchor = empty();
+    			if (if_block) if_block.c();
+    			if_block_anchor = empty();
     		},
     		m: function mount(target, anchor) {
-    			if (if_block0) if_block0.m(target, anchor);
-    			insert_dev(target, t, anchor);
-    			if (if_block1) if_block1.m(target, anchor);
-    			insert_dev(target, if_block1_anchor, anchor);
+    			if (if_block) if_block.m(target, anchor);
+    			insert_dev(target, if_block_anchor, anchor);
     		},
     		p: function update(ctx, dirty) {
-    			if (/*key*/ ctx[4] === "image") if_block0.p(ctx, dirty);
-    			if (/*key*/ ctx[4] != "id" && /*key*/ ctx[4] != "image") if_block1.p(ctx, dirty);
+    			if (/*key*/ ctx[4] != "id" && /*key*/ ctx[4] != "image") if_block.p(ctx, dirty);
     		},
     		d: function destroy(detaching) {
-    			if (if_block0) if_block0.d(detaching);
-    			if (detaching) detach_dev(t);
-    			if (if_block1) if_block1.d(detaching);
-    			if (detaching) detach_dev(if_block1_anchor);
+    			if (if_block) if_block.d(detaching);
+    			if (detaching) detach_dev(if_block_anchor);
     		}
     	};
 
@@ -13398,12 +13357,12 @@ var app = (function () {
     			input = element("input");
     			t2 = space();
     			attr_dev(label, "class", "text-gray-500 text-xs");
-    			add_location(label, file$y, 52, 12, 2135);
+    			add_location(label, file$y, 52, 12, 2132);
     			attr_dev(input, "class", "w-full text-sm text-blue rounded border border-gray-300\n              px-2 py-1");
     			attr_dev(input, "type", "text");
     			input.value = input_value_value = /*value*/ ctx[5];
-    			add_location(input, file$y, 53, 12, 2198);
-    			add_location(div, file$y, 51, 10, 2117);
+    			add_location(input, file$y, 53, 12, 2195);
+    			add_location(div, file$y, 51, 10, 2114);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -13484,12 +13443,12 @@ var app = (function () {
     			input = element("input");
     			t2 = space();
     			attr_dev(label, "class", "text-gray-500 text-xs");
-    			add_location(label, file$y, 69, 12, 2653);
+    			add_location(label, file$y, 69, 12, 2650);
     			attr_dev(input, "class", "w-full text-sm text-blue rounded border border-gray-300\n              px-2 py-1");
     			attr_dev(input, "type", "text");
     			input.value = input_value_value = /*value*/ ctx[5];
-    			add_location(input, file$y, 70, 12, 2716);
-    			add_location(div, file$y, 68, 10, 2635);
+    			add_location(input, file$y, 70, 12, 2713);
+    			add_location(div, file$y, 68, 10, 2632);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -13656,13 +13615,13 @@ var app = (function () {
     			attr_dev(div3, "class", "mb-4");
     			add_location(div3, file$y, 25, 4, 1215);
     			attr_dev(div4, "class", "text-sm uppercase text-blue-900 font-title font-bold");
-    			add_location(div4, file$y, 46, 6, 1921);
+    			add_location(div4, file$y, 46, 6, 1918);
     			attr_dev(div5, "class", "mb-4");
-    			add_location(div5, file$y, 45, 4, 1896);
+    			add_location(div5, file$y, 45, 4, 1893);
     			attr_dev(div6, "class", "text-sm uppercase text-blue-900 font-title font-bold");
-    			add_location(div6, file$y, 63, 6, 2443);
+    			add_location(div6, file$y, 63, 6, 2440);
     			attr_dev(div7, "class", "mb-4");
-    			add_location(div7, file$y, 62, 4, 2418);
+    			add_location(div7, file$y, 62, 4, 2415);
     			attr_dev(div8, "class", "p-6 h-full overflow-hidden overflow-y-scroll bg-gray-100 border-l\n    border-gray-300");
     			set_style(div8, "width", "300px");
     			add_location(div8, file$y, 21, 2, 1082);

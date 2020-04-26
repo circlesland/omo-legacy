@@ -29,9 +29,9 @@
       </div>
       <div class="flex flex-wrap">
         {#each Object.entries(quant.model) as [key, value]}
-          {#if key === 'image'}
-            <img src={value} class="rounded mb-1 order-first" />
-          {/if}
+          <!-- {#if key === 'image'}
+            <img src={value} class="rounded mb-1" />
+          {/if} -->
           {#if key != 'id' && key != 'image'}
             <label class="text-gray-500 text-xs">{key}</label>
             <input
