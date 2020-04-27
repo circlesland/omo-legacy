@@ -10725,933 +10725,26 @@ var app = (function () {
     	}
     }
 
-    var commonjsGlobal = typeof globalThis !== 'undefined' ? globalThis : typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
-
-    function createCommonjsModule(fn, module) {
-    	return module = { exports: {} }, fn(module, module.exports), module.exports;
-    }
-
-    var ResizeSensor = createCommonjsModule(function (module, exports) {
-
-    /**
-     * Copyright Marc J. Schmidt. See the LICENSE file at the top-level
-     * directory of this distribution and at
-     * https://github.com/marcj/css-element-queries/blob/master/LICENSE.
-     */
-    (function (root, factory) {
-        {
-            module.exports = factory();
-        }
-    }(typeof window !== 'undefined' ? window : commonjsGlobal, function () {
-
-        // Make sure it does not throw in a SSR (Server Side Rendering) situation
-        if (typeof window === "undefined") {
-            return null;
-        }
-        // https://github.com/Semantic-Org/Semantic-UI/issues/3855
-        // https://github.com/marcj/css-element-queries/issues/257
-        var globalWindow = typeof window != 'undefined' && window.Math == Math
-            ? window
-            : typeof self != 'undefined' && self.Math == Math
-                ? self
-                : Function('return this')();
-        // Only used for the dirty checking, so the event callback count is limited to max 1 call per fps per sensor.
-        // In combination with the event based resize sensor this saves cpu time, because the sensor is too fast and
-        // would generate too many unnecessary events.
-        var requestAnimationFrame = globalWindow.requestAnimationFrame ||
-            globalWindow.mozRequestAnimationFrame ||
-            globalWindow.webkitRequestAnimationFrame ||
-            function (fn) {
-                return globalWindow.setTimeout(fn, 20);
-            };
-
-        var cancelAnimationFrame = globalWindow.cancelAnimationFrame ||
-            globalWindow.mozCancelAnimationFrame ||
-            globalWindow.webkitCancelAnimationFrame ||
-            function (timer) {
-                globalWindow.clearTimeout(timer);
-            };
-
-        /**
-         * Iterate over each of the provided element(s).
-         *
-         * @param {HTMLElement|HTMLElement[]} elements
-         * @param {Function}                  callback
-         */
-        function forEachElement(elements, callback){
-            var elementsType = Object.prototype.toString.call(elements);
-            var isCollectionTyped = ('[object Array]' === elementsType
-                || ('[object NodeList]' === elementsType)
-                || ('[object HTMLCollection]' === elementsType)
-                || ('[object Object]' === elementsType)
-                || ('undefined' !== typeof jQuery && elements instanceof jQuery) //jquery
-                || ('undefined' !== typeof Elements && elements instanceof Elements) //mootools
-            );
-            var i = 0, j = elements.length;
-            if (isCollectionTyped) {
-                for (; i < j; i++) {
-                    callback(elements[i]);
-                }
-            } else {
-                callback(elements);
-            }
-        }
-
-        /**
-        * Get element size
-        * @param {HTMLElement} element
-        * @returns {Object} {width, height}
-        */
-        function getElementSize(element) {
-            if (!element.getBoundingClientRect) {
-                return {
-                    width: element.offsetWidth,
-                    height: element.offsetHeight
-                }
-            }
-
-            var rect = element.getBoundingClientRect();
-            return {
-                width: Math.round(rect.width),
-                height: Math.round(rect.height)
-            }
-        }
-
-        /**
-         * Apply CSS styles to element.
-         *
-         * @param {HTMLElement} element
-         * @param {Object} style
-         */
-        function setStyle(element, style) {
-            Object.keys(style).forEach(function(key) {
-                element.style[key] = style[key];
-            });
-        }
-
-        /**
-         * Class for dimension change detection.
-         *
-         * @param {Element|Element[]|Elements|jQuery} element
-         * @param {Function} callback
-         *
-         * @constructor
-         */
-        var ResizeSensor = function(element, callback) {
-            //Is used when checking in reset() only for invisible elements
-            var lastAnimationFrameForInvisibleCheck = 0;
-
-            /**
-             *
-             * @constructor
-             */
-            function EventQueue() {
-                var q = [];
-                this.add = function(ev) {
-                    q.push(ev);
-                };
-
-                var i, j;
-                this.call = function(sizeInfo) {
-                    for (i = 0, j = q.length; i < j; i++) {
-                        q[i].call(this, sizeInfo);
-                    }
-                };
-
-                this.remove = function(ev) {
-                    var newQueue = [];
-                    for(i = 0, j = q.length; i < j; i++) {
-                        if(q[i] !== ev) newQueue.push(q[i]);
-                    }
-                    q = newQueue;
-                };
-
-                this.length = function() {
-                    return q.length;
-                };
-            }
-
-            /**
-             *
-             * @param {HTMLElement} element
-             * @param {Function}    resized
-             */
-            function attachResizeEvent(element, resized) {
-                if (!element) return;
-                if (element.resizedAttached) {
-                    element.resizedAttached.add(resized);
-                    return;
-                }
-
-                element.resizedAttached = new EventQueue();
-                element.resizedAttached.add(resized);
-
-                element.resizeSensor = document.createElement('div');
-                element.resizeSensor.dir = 'ltr';
-                element.resizeSensor.className = 'resize-sensor';
-
-                var style = {
-                    pointerEvents: 'none',
-                    position: 'absolute',
-                    left: '0px',
-                    top: '0px',
-                    right: '0px',
-                    bottom: '0px',
-                    overflow: 'hidden',
-                    zIndex: '-1',
-                    visibility: 'hidden',
-                    maxWidth: '100%'
-                };
-                var styleChild = {
-                    position: 'absolute',
-                    left: '0px',
-                    top: '0px',
-                    transition: '0s',
-                };
-
-                setStyle(element.resizeSensor, style);
-
-                var expand = document.createElement('div');
-                expand.className = 'resize-sensor-expand';
-                setStyle(expand, style);
-
-                var expandChild = document.createElement('div');
-                setStyle(expandChild, styleChild);
-                expand.appendChild(expandChild);
-
-                var shrink = document.createElement('div');
-                shrink.className = 'resize-sensor-shrink';
-                setStyle(shrink, style);
-
-                var shrinkChild = document.createElement('div');
-                setStyle(shrinkChild, styleChild);
-                setStyle(shrinkChild, { width: '200%', height: '200%' });
-                shrink.appendChild(shrinkChild);
-
-                element.resizeSensor.appendChild(expand);
-                element.resizeSensor.appendChild(shrink);
-                element.appendChild(element.resizeSensor);
-
-                var computedStyle = window.getComputedStyle(element);
-                var position = computedStyle ? computedStyle.getPropertyValue('position') : null;
-                if ('absolute' !== position && 'relative' !== position && 'fixed' !== position && 'sticky' !== position) {
-                    element.style.position = 'relative';
-                }
-
-                var dirty = false;
-
-                //last request animation frame id used in onscroll event
-                var rafId = 0;
-                var size = getElementSize(element);
-                var lastWidth = 0;
-                var lastHeight = 0;
-                var initialHiddenCheck = true;
-                lastAnimationFrameForInvisibleCheck = 0;
-
-                var resetExpandShrink = function () {
-                    var width = element.offsetWidth;
-                    var height = element.offsetHeight;
-
-                    expandChild.style.width = (width + 10) + 'px';
-                    expandChild.style.height = (height + 10) + 'px';
-
-                    expand.scrollLeft = width + 10;
-                    expand.scrollTop = height + 10;
-
-                    shrink.scrollLeft = width + 10;
-                    shrink.scrollTop = height + 10;
-                };
-
-                var reset = function() {
-                    // Check if element is hidden
-                    if (initialHiddenCheck) {
-                        var invisible = element.offsetWidth === 0 && element.offsetHeight === 0;
-                        if (invisible) {
-                            // Check in next frame
-                            if (!lastAnimationFrameForInvisibleCheck){
-                                lastAnimationFrameForInvisibleCheck = requestAnimationFrame(function(){
-                                    lastAnimationFrameForInvisibleCheck = 0;
-                                    reset();
-                                });
-                            }
-
-                            return;
-                        } else {
-                            // Stop checking
-                            initialHiddenCheck = false;
-                        }
-                    }
-
-                    resetExpandShrink();
-                };
-                element.resizeSensor.resetSensor = reset;
-
-                var onResized = function() {
-                    rafId = 0;
-
-                    if (!dirty) return;
-
-                    lastWidth = size.width;
-                    lastHeight = size.height;
-
-                    if (element.resizedAttached) {
-                        element.resizedAttached.call(size);
-                    }
-                };
-
-                var onScroll = function() {
-                    size = getElementSize(element);
-                    dirty = size.width !== lastWidth || size.height !== lastHeight;
-
-                    if (dirty && !rafId) {
-                        rafId = requestAnimationFrame(onResized);
-                    }
-
-                    reset();
-                };
-
-                var addEvent = function(el, name, cb) {
-                    if (el.attachEvent) {
-                        el.attachEvent('on' + name, cb);
-                    } else {
-                        el.addEventListener(name, cb);
-                    }
-                };
-
-                addEvent(expand, 'scroll', onScroll);
-                addEvent(shrink, 'scroll', onScroll);
-
-                // Fix for custom Elements and invisible elements
-                lastAnimationFrameForInvisibleCheck = requestAnimationFrame(function(){
-                    lastAnimationFrameForInvisibleCheck = 0;
-                    reset();
-                });
-            }
-
-            forEachElement(element, function(elem){
-                attachResizeEvent(elem, callback);
-            });
-
-            this.detach = function(ev) {
-                // clean up the unfinished animation frame to prevent a potential endless requestAnimationFrame of reset
-                if (!lastAnimationFrameForInvisibleCheck) {
-                    cancelAnimationFrame(lastAnimationFrameForInvisibleCheck);
-                    lastAnimationFrameForInvisibleCheck = 0;
-                }
-                ResizeSensor.detach(element, ev);
-            };
-
-            this.reset = function() {
-                element.resizeSensor.resetSensor();
-            };
-        };
-
-        ResizeSensor.reset = function(element) {
-            forEachElement(element, function(elem){
-                elem.resizeSensor.resetSensor();
-            });
-        };
-
-        ResizeSensor.detach = function(element, ev) {
-            forEachElement(element, function(elem){
-                if (!elem) return;
-                if(elem.resizedAttached && typeof ev === "function"){
-                    elem.resizedAttached.remove(ev);
-                    if(elem.resizedAttached.length()) return;
-                }
-                if (elem.resizeSensor) {
-                    if (elem.contains(elem.resizeSensor)) {
-                        elem.removeChild(elem.resizeSensor);
-                    }
-                    delete elem.resizeSensor;
-                    delete elem.resizedAttached;
-                }
-            });
-        };
-
-        if (typeof MutationObserver !== "undefined") {
-            var observer = new MutationObserver(function (mutations) {
-                for (var i in mutations) {
-                    if (mutations.hasOwnProperty(i)) {
-                        var items = mutations[i].addedNodes;
-                        for (var j = 0; j < items.length; j++) {
-                            if (items[j].resizeSensor) {
-                                ResizeSensor.reset(items[j]);
-                            }
-                        }
-                    }
-                }
-            });
-
-            document.addEventListener("DOMContentLoaded", function (event) {
-                observer.observe(document.body, {
-                    childList: true,
-                    subtree: true,
-                });
-            });
-        }
-
-        return ResizeSensor;
-
-    }));
-    });
-
-    var ElementQueries = createCommonjsModule(function (module, exports) {
-
-    /**
-     * Copyright Marc J. Schmidt. See the LICENSE file at the top-level
-     * directory of this distribution and at
-     * https://github.com/marcj/css-element-queries/blob/master/LICENSE.
-     */
-    (function (root, factory) {
-        {
-            module.exports = factory(ResizeSensor);
-        }
-    }(typeof window !== 'undefined' ? window : commonjsGlobal, function (ResizeSensor) {
-
-        /**
-         *
-         * @type {Function}
-         * @constructor
-         */
-        var ElementQueries = function () {
-            //<style> element with our dynamically created styles
-            var cssStyleElement;
-
-            //all rules found for element queries
-            var allQueries = {};
-
-            //association map to identify which selector belongs to a element from the animationstart event.
-            var idToSelectorMapping = [];
-
-            /**
-             *
-             * @param element
-             * @returns {Number}
-             */
-            function getEmSize(element) {
-                if (!element) {
-                    element = document.documentElement;
-                }
-                var fontSize = window.getComputedStyle(element, null).fontSize;
-                return parseFloat(fontSize) || 16;
-            }
-
-            /**
-             * Get element size
-             * @param {HTMLElement} element
-             * @returns {Object} {width, height}
-             */
-            function getElementSize(element) {
-                if (!element.getBoundingClientRect) {
-                    return {
-                        width: element.offsetWidth,
-                        height: element.offsetHeight
-                    }
-                }
-
-                var rect = element.getBoundingClientRect();
-                return {
-                    width: Math.round(rect.width),
-                    height: Math.round(rect.height)
-                }
-            }
-
-            /**
-             *
-             * @copyright https://github.com/Mr0grog/element-query/blob/master/LICENSE
-             *
-             * @param {HTMLElement} element
-             * @param {*} value
-             * @returns {*}
-             */
-            function convertToPx(element, value) {
-                var numbers = value.split(/\d/);
-                var units = numbers[numbers.length - 1];
-                value = parseFloat(value);
-                switch (units) {
-                    case "px":
-                        return value;
-                    case "em":
-                        return value * getEmSize(element);
-                    case "rem":
-                        return value * getEmSize();
-                    // Viewport units!
-                    // According to http://quirksmode.org/mobile/tableViewport.html
-                    // documentElement.clientWidth/Height gets us the most reliable info
-                    case "vw":
-                        return value * document.documentElement.clientWidth / 100;
-                    case "vh":
-                        return value * document.documentElement.clientHeight / 100;
-                    case "vmin":
-                    case "vmax":
-                        var vw = document.documentElement.clientWidth / 100;
-                        var vh = document.documentElement.clientHeight / 100;
-                        var chooser = Math[units === "vmin" ? "min" : "max"];
-                        return value * chooser(vw, vh);
-                    default:
-                        return value;
-                    // for now, not supporting physical units (since they are just a set number of px)
-                    // or ex/ch (getting accurate measurements is hard)
-                }
-            }
-
-            /**
-             *
-             * @param {HTMLElement} element
-             * @param {String} id
-             * @constructor
-             */
-            function SetupInformation(element, id) {
-                this.element = element;
-                var key, option, elementSize, value, actualValue, attrValues, attrValue, attrName;
-
-                var attributes = ['min-width', 'min-height', 'max-width', 'max-height'];
-
-                /**
-                 * Extracts the computed width/height and sets to min/max- attribute.
-                 */
-                this.call = function () {
-                    // extract current dimensions
-                    elementSize = getElementSize(this.element);
-
-                    attrValues = {};
-
-                    for (key in allQueries[id]) {
-                        if (!allQueries[id].hasOwnProperty(key)) {
-                            continue;
-                        }
-                        option = allQueries[id][key];
-
-                        value = convertToPx(this.element, option.value);
-
-                        actualValue = option.property === 'width' ? elementSize.width : elementSize.height;
-                        attrName = option.mode + '-' + option.property;
-                        attrValue = '';
-
-                        if (option.mode === 'min' && actualValue >= value) {
-                            attrValue += option.value;
-                        }
-
-                        if (option.mode === 'max' && actualValue <= value) {
-                            attrValue += option.value;
-                        }
-
-                        if (!attrValues[attrName]) attrValues[attrName] = '';
-                        if (attrValue && -1 === (' ' + attrValues[attrName] + ' ').indexOf(' ' + attrValue + ' ')) {
-                            attrValues[attrName] += ' ' + attrValue;
-                        }
-                    }
-
-                    for (var k in attributes) {
-                        if (!attributes.hasOwnProperty(k)) continue;
-
-                        if (attrValues[attributes[k]]) {
-                            this.element.setAttribute(attributes[k], attrValues[attributes[k]].substr(1));
-                        } else {
-                            this.element.removeAttribute(attributes[k]);
-                        }
-                    }
-                };
-            }
-
-            /**
-             * @param {HTMLElement} element
-             * @param {Object}      id
-             */
-            function setupElement(element, id) {
-                if (!element.elementQueriesSetupInformation) {
-                    element.elementQueriesSetupInformation = new SetupInformation(element, id);
-                }
-
-                if (!element.elementQueriesSensor) {
-                    element.elementQueriesSensor = new ResizeSensor(element, function () {
-                        element.elementQueriesSetupInformation.call();
-                    });
-                }
-            }
-
-            /**
-             * Stores rules to the selector that should be applied once resized.
-             *
-             * @param {String} selector
-             * @param {String} mode min|max
-             * @param {String} property width|height
-             * @param {String} value
-             */
-            function queueQuery(selector, mode, property, value) {
-                if (typeof(allQueries[selector]) === 'undefined') {
-                    allQueries[selector] = [];
-                    // add animation to trigger animationstart event, so we know exactly when a element appears in the DOM
-
-                    var id = idToSelectorMapping.length;
-                    cssStyleElement.innerHTML += '\n' + selector + ' {animation: 0.1s element-queries;}';
-                    cssStyleElement.innerHTML += '\n' + selector + ' > .resize-sensor {min-width: '+id+'px;}';
-                    idToSelectorMapping.push(selector);
-                }
-
-                allQueries[selector].push({
-                    mode: mode,
-                    property: property,
-                    value: value
-                });
-            }
-
-            function getQuery(container) {
-                var query;
-                if (document.querySelectorAll) query = (container) ? container.querySelectorAll.bind(container) : document.querySelectorAll.bind(document);
-                if (!query && 'undefined' !== typeof $$) query = $$;
-                if (!query && 'undefined' !== typeof jQuery) query = jQuery;
-
-                if (!query) {
-                    throw 'No document.querySelectorAll, jQuery or Mootools\'s $$ found.';
-                }
-
-                return query;
-            }
-
-            /**
-             * If animationStart didn't catch a new element in the DOM, we can manually search for it
-             */
-            function findElementQueriesElements(container) {
-                var query = getQuery(container);
-
-                for (var selector in allQueries) if (allQueries.hasOwnProperty(selector)) {
-                    // find all elements based on the extract query selector from the element query rule
-                    var elements = query(selector, container);
-
-                    for (var i = 0, j = elements.length; i < j; i++) {
-                        setupElement(elements[i], selector);
-                    }
-                }
-            }
-
-            /**
-             *
-             * @param {HTMLElement} element
-             */
-            function attachResponsiveImage(element) {
-                var children = [];
-                var rules = [];
-                var sources = [];
-                var defaultImageId = 0;
-                var lastActiveImage = -1;
-                var loadedImages = [];
-
-                for (var i in element.children) {
-                    if (!element.children.hasOwnProperty(i)) continue;
-
-                    if (element.children[i].tagName && element.children[i].tagName.toLowerCase() === 'img') {
-                        children.push(element.children[i]);
-
-                        var minWidth = element.children[i].getAttribute('min-width') || element.children[i].getAttribute('data-min-width');
-                        //var minHeight = element.children[i].getAttribute('min-height') || element.children[i].getAttribute('data-min-height');
-                        var src = element.children[i].getAttribute('data-src') || element.children[i].getAttribute('url');
-
-                        sources.push(src);
-
-                        var rule = {
-                            minWidth: minWidth
-                        };
-
-                        rules.push(rule);
-
-                        if (!minWidth) {
-                            defaultImageId = children.length - 1;
-                            element.children[i].style.display = 'block';
-                        } else {
-                            element.children[i].style.display = 'none';
-                        }
-                    }
-                }
-
-                lastActiveImage = defaultImageId;
-
-                function check() {
-                    var imageToDisplay = false, i;
-
-                    for (i in children) {
-                        if (!children.hasOwnProperty(i)) continue;
-
-                        if (rules[i].minWidth) {
-                            if (element.offsetWidth > rules[i].minWidth) {
-                                imageToDisplay = i;
-                            }
-                        }
-                    }
-
-                    if (!imageToDisplay) {
-                        //no rule matched, show default
-                        imageToDisplay = defaultImageId;
-                    }
-
-                    if (lastActiveImage !== imageToDisplay) {
-                        //image change
-
-                        if (!loadedImages[imageToDisplay]) {
-                            //image has not been loaded yet, we need to load the image first in memory to prevent flash of
-                            //no content
-
-                            var image = new Image();
-                            image.onload = function () {
-                                children[imageToDisplay].src = sources[imageToDisplay];
-
-                                children[lastActiveImage].style.display = 'none';
-                                children[imageToDisplay].style.display = 'block';
-
-                                loadedImages[imageToDisplay] = true;
-
-                                lastActiveImage = imageToDisplay;
-                            };
-
-                            image.src = sources[imageToDisplay];
-                        } else {
-                            children[lastActiveImage].style.display = 'none';
-                            children[imageToDisplay].style.display = 'block';
-                            lastActiveImage = imageToDisplay;
-                        }
-                    } else {
-                        //make sure for initial check call the .src is set correctly
-                        children[imageToDisplay].src = sources[imageToDisplay];
-                    }
-                }
-
-                element.resizeSensorInstance = new ResizeSensor(element, check);
-                check();
-            }
-
-            function findResponsiveImages() {
-                var query = getQuery();
-
-                var elements = query('[data-responsive-image],[responsive-image]');
-                for (var i = 0, j = elements.length; i < j; i++) {
-                    attachResponsiveImage(elements[i]);
-                }
-            }
-
-            var regex = /,?[\s\t]*([^,\n]*?)((?:\[[\s\t]*?(?:min|max)-(?:width|height)[\s\t]*?[~$\^]?=[\s\t]*?"[^"]*?"[\s\t]*?])+)([^,\n\s\{]*)/mgi;
-            var attrRegex = /\[[\s\t]*?(min|max)-(width|height)[\s\t]*?[~$\^]?=[\s\t]*?"([^"]*?)"[\s\t]*?]/mgi;
-
-            /**
-             * @param {String} css
-             */
-            function extractQuery(css) {
-                var match, smatch, attrs, attrMatch;
-
-                css = css.replace(/'/g, '"');
-                while (null !== (match = regex.exec(css))) {
-                    smatch = match[1] + match[3];
-                    attrs = match[2];
-
-                    while (null !== (attrMatch = attrRegex.exec(attrs))) {
-                        queueQuery(smatch, attrMatch[1], attrMatch[2], attrMatch[3]);
-                    }
-                }
-            }
-
-            /**
-             * @param {CssRule[]|String} rules
-             */
-            function readRules(rules) {
-                var selector = '';
-
-                if (!rules) {
-                    return;
-                }
-
-                if ('string' === typeof rules) {
-                    rules = rules.toLowerCase();
-                    if (-1 !== rules.indexOf('min-width') || -1 !== rules.indexOf('max-width')) {
-                        extractQuery(rules);
-                    }
-                } else {
-                    for (var i = 0, j = rules.length; i < j; i++) {
-                        if (1 === rules[i].type) {
-                            selector = rules[i].selectorText || rules[i].cssText;
-                            if (-1 !== selector.indexOf('min-height') || -1 !== selector.indexOf('max-height')) {
-                                extractQuery(selector);
-                            } else if (-1 !== selector.indexOf('min-width') || -1 !== selector.indexOf('max-width')) {
-                                extractQuery(selector);
-                            }
-                        } else if (4 === rules[i].type) {
-                            readRules(rules[i].cssRules || rules[i].rules);
-                        } else if (3 === rules[i].type) {
-                            if(rules[i].styleSheet.hasOwnProperty("cssRules")) {
-                                readRules(rules[i].styleSheet.cssRules);
-                            }
-                        }
-                    }
-                }
-            }
-
-            var defaultCssInjected = false;
-
-            /**
-             * Searches all css rules and setups the event listener to all elements with element query rules..
-             */
-            this.init = function () {
-                var animationStart = 'animationstart';
-                if (typeof document.documentElement.style['webkitAnimationName'] !== 'undefined') {
-                    animationStart = 'webkitAnimationStart';
-                } else if (typeof document.documentElement.style['MozAnimationName'] !== 'undefined') {
-                    animationStart = 'mozanimationstart';
-                } else if (typeof document.documentElement.style['OAnimationName'] !== 'undefined') {
-                    animationStart = 'oanimationstart';
-                }
-
-                document.body.addEventListener(animationStart, function (e) {
-                    var element = e.target;
-                    var styles = element && window.getComputedStyle(element, null);
-                    var animationName = styles && styles.getPropertyValue('animation-name');
-                    var requiresSetup = animationName && (-1 !== animationName.indexOf('element-queries'));
-
-                    if (requiresSetup) {
-                        element.elementQueriesSensor = new ResizeSensor(element, function () {
-                            if (element.elementQueriesSetupInformation) {
-                                element.elementQueriesSetupInformation.call();
-                            }
-                        });
-
-                        var sensorStyles = window.getComputedStyle(element.resizeSensor, null);
-                        var id = sensorStyles.getPropertyValue('min-width');
-                        id = parseInt(id.replace('px', ''));
-                        setupElement(e.target, idToSelectorMapping[id]);
-                    }
-                });
-
-                if (!defaultCssInjected) {
-                    cssStyleElement = document.createElement('style');
-                    cssStyleElement.type = 'text/css';
-                    cssStyleElement.innerHTML = '[responsive-image] > img, [data-responsive-image] {overflow: hidden; padding: 0; } [responsive-image] > img, [data-responsive-image] > img {width: 100%;}';
-
-                    //safari wants at least one rule in keyframes to start working
-                    cssStyleElement.innerHTML += '\n@keyframes element-queries { 0% { visibility: inherit; } }';
-                    document.getElementsByTagName('head')[0].appendChild(cssStyleElement);
-                    defaultCssInjected = true;
-                }
-
-                for (var i = 0, j = document.styleSheets.length; i < j; i++) {
-                    try {
-                        if (document.styleSheets[i].href && 0 === document.styleSheets[i].href.indexOf('file://')) {
-                            console.warn("CssElementQueries: unable to parse local css files, " + document.styleSheets[i].href);
-                        }
-
-                        readRules(document.styleSheets[i].cssRules || document.styleSheets[i].rules || document.styleSheets[i].cssText);
-                    } catch (e) {
-                    }
-                }
-
-                findResponsiveImages();
-            };
-
-            /**
-             * Go through all collected rules (readRules()) and attach the resize-listener.
-             * Not necessary to call it manually, since we detect automatically when new elements
-             * are available in the DOM. However, sometimes handy for dirty DOM modifications.
-             *
-             * @param {HTMLElement} container only elements of the container are considered (document.body if not set)
-             */
-            this.findElementQueriesElements = function (container) {
-                findElementQueriesElements(container);
-            };
-
-            this.update = function () {
-                this.init();
-            };
-        };
-
-        ElementQueries.update = function () {
-            ElementQueries.instance.update();
-        };
-
-        /**
-         * Removes all sensor and elementquery information from the element.
-         *
-         * @param {HTMLElement} element
-         */
-        ElementQueries.detach = function (element) {
-            if (element.elementQueriesSetupInformation) {
-                //element queries
-                element.elementQueriesSensor.detach();
-                delete element.elementQueriesSetupInformation;
-                delete element.elementQueriesSensor;
-
-            } else if (element.resizeSensorInstance) {
-                //responsive image
-
-                element.resizeSensorInstance.detach();
-                delete element.resizeSensorInstance;
-            }
-        };
-
-        ElementQueries.init = function () {
-            if (!ElementQueries.instance) {
-                ElementQueries.instance = new ElementQueries();
-            }
-
-            ElementQueries.instance.init();
-        };
-
-        var domLoaded = function (callback) {
-            /* Mozilla, Chrome, Opera */
-            if (document.addEventListener) {
-                document.addEventListener('DOMContentLoaded', callback, false);
-            }
-            /* Safari, iCab, Konqueror */
-            else if (/KHTML|WebKit|iCab/i.test(navigator.userAgent)) {
-                var DOMLoadTimer = setInterval(function () {
-                    if (/loaded|complete/i.test(document.readyState)) {
-                        callback();
-                        clearInterval(DOMLoadTimer);
-                    }
-                }, 10);
-            }
-            /* Other web browsers */
-            else window.onload = callback;
-        };
-
-        ElementQueries.findElementQueriesElements = function (container) {
-            ElementQueries.instance.findElementQueriesElements(container);
-        };
-
-        ElementQueries.listen = function () {
-            domLoaded(ElementQueries.init);
-        };
-
-        return ElementQueries;
-
-    }));
-    });
-
     /* src/quanta/1-views/2-molecules/OmoResponsive.svelte generated by Svelte v3.20.1 */
-    const file$r = "src/quanta/1-views/2-molecules/OmoResponsive.svelte";
 
     function create_fragment$v(ctx) {
-    	let div;
-    	let h2;
+    	let t;
 
     	const block = {
     		c: function create() {
-    			div = element("div");
-    			h2 = element("h2");
-    			h2.textContent = "Element responsiveness FTW!";
-    			attr_dev(h2, "class", "svelte-1pt6lip");
-    			add_location(h2, file$r, 32, 2, 1625);
-    			attr_dev(div, "class", "widget-name w-full svelte-1pt6lip");
-    			add_location(div, file$r, 31, 0, 1590);
+    			t = text("Responsive Test");
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
     		m: function mount(target, anchor) {
-    			insert_dev(target, div, anchor);
-    			append_dev(div, h2);
+    			insert_dev(target, t, anchor);
     		},
     		p: noop,
     		i: noop,
     		o: noop,
     		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div);
+    			if (detaching) detach_dev(t);
     		}
     	};
 
@@ -11666,8 +10759,7 @@ var app = (function () {
     	return block;
     }
 
-    function instance$v($$self, $$props, $$invalidate) {
-    	ElementQueries.listen();
+    function instance$v($$self, $$props) {
     	const writable_props = [];
 
     	Object.keys($$props).forEach(key => {
@@ -11676,7 +10768,6 @@ var app = (function () {
 
     	let { $$slots = {}, $$scope } = $$props;
     	validate_slots("OmoResponsive", $$slots, []);
-    	$$self.$capture_state = () => ({ ElementQueries });
     	return [];
     }
 
@@ -12064,7 +11155,7 @@ var app = (function () {
     ]);
 
     /* src/quanta/1-views/5-pages/Home.svelte generated by Svelte v3.20.1 */
-    const file$s = "src/quanta/1-views/5-pages/Home.svelte";
+    const file$r = "src/quanta/1-views/5-pages/Home.svelte";
 
     function get_each_context$3(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -12096,7 +11187,7 @@ var app = (function () {
     			if (switch_instance) create_component(switch_instance.$$.fragment);
     			t = space();
     			attr_dev(div, "class", "pb-10");
-    			add_location(div, file$s, 15, 4, 774);
+    			add_location(div, file$r, 15, 4, 774);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -12186,7 +11277,7 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "bg-image p-10 svelte-2nh93m");
-    			add_location(div, file$s, 13, 0, 715);
+    			add_location(div, file$r, 13, 0, 715);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -12325,7 +11416,7 @@ var app = (function () {
     }
 
     /* src/quanta/1-views/5-pages/User.svelte generated by Svelte v3.20.1 */
-    const file$t = "src/quanta/1-views/5-pages/User.svelte";
+    const file$s = "src/quanta/1-views/5-pages/User.svelte";
 
     function create_fragment$x(ctx) {
     	let div0;
@@ -12370,17 +11461,17 @@ var app = (function () {
     			set_style(div0, "background-image", "url('" + /*user*/ ctx[0].image + "')");
     			set_style(div0, "padding", "30rem");
     			attr_dev(div0, "title", "user");
-    			add_location(div0, file$t, 9, 0, 249);
+    			add_location(div0, file$s, 9, 0, 249);
     			set_style(p, "font-family", "'Permanent Marker', cursive", 1);
-    			add_location(p, file$t, 17, 2, 581);
+    			add_location(p, file$s, 17, 2, 581);
     			attr_dev(div1, "class", "text-5xl text-center px-4 py-16 text-gray-200 bg-blue-800 flex\n  flex-wrap justify-center content-center");
-    			add_location(div1, file$t, 14, 0, 458);
+    			add_location(div1, file$s, 14, 0, 458);
     			attr_dev(div2, "class", "flex justify-center");
-    			add_location(div2, file$t, 23, 4, 766);
+    			add_location(div2, file$s, 23, 4, 766);
     			attr_dev(div3, "class", "w-5/6 xl:w-4/6");
-    			add_location(div3, file$t, 22, 2, 733);
+    			add_location(div3, file$s, 22, 2, 733);
     			attr_dev(div4, "class", "flex justify-center my-10");
-    			add_location(div4, file$t, 21, 0, 691);
+    			add_location(div4, file$s, 21, 0, 691);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -12534,7 +11625,7 @@ var app = (function () {
     }
 
     /* src/quanta/1-views/5-pages/City.svelte generated by Svelte v3.20.1 */
-    const file$u = "src/quanta/1-views/5-pages/City.svelte";
+    const file$t = "src/quanta/1-views/5-pages/City.svelte";
 
     function create_fragment$y(ctx) {
     	let div0;
@@ -12557,13 +11648,13 @@ var app = (function () {
     			attr_dev(img, "alt", img_alt_value = /*city*/ ctx[0].name);
     			attr_dev(img, "class", "w-full object-cover object-center");
     			set_style(img, "height", "30rem");
-    			add_location(img, file$u, 9, 2, 225);
+    			add_location(img, file$t, 9, 2, 225);
     			attr_dev(div0, "class", "");
-    			add_location(div0, file$u, 8, 0, 208);
+    			add_location(div0, file$t, 8, 0, 208);
     			attr_dev(p, "class", "font-title uppercase font-bold");
-    			add_location(p, file$u, 19, 2, 477);
+    			add_location(p, file$t, 19, 2, 477);
     			attr_dev(div1, "class", "text-4xl text-center px-4 py-12 text-gray-200 bg-blue-800 flex\n  flex-wrap justify-center content-center");
-    			add_location(div1, file$u, 16, 0, 354);
+    			add_location(div1, file$t, 16, 0, 354);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -12666,7 +11757,7 @@ var app = (function () {
 
     /* src/quanta/1-views/2-molecules/OmoQuantPreview.svelte generated by Svelte v3.20.1 */
 
-    const file$v = "src/quanta/1-views/2-molecules/OmoQuantPreview.svelte";
+    const file$u = "src/quanta/1-views/2-molecules/OmoQuantPreview.svelte";
 
     function create_fragment$z(ctx) {
     	let div1;
@@ -12691,9 +11782,9 @@ var app = (function () {
     			div0 = element("div");
     			if (switch_instance) create_component(switch_instance.$$.fragment);
     			attr_dev(div0, "class", "preview svelte-nu1sos");
-    			add_location(div0, file$v, 26, 2, 1371);
+    			add_location(div0, file$u, 26, 2, 1371);
     			attr_dev(div1, "class", "w-100 bg-green-200 overflow-hidden h-48 overflow-y-scroll object-center\n  object-cover border border-gray-300 bg-image svelte-nu1sos");
-    			add_location(div1, file$v, 23, 0, 1234);
+    			add_location(div1, file$u, 23, 0, 1234);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -12820,7 +11911,7 @@ var app = (function () {
     }
 
     /* src/quanta/1-views/2-molecules/OmoQuantaItem.svelte generated by Svelte v3.20.1 */
-    const file$w = "src/quanta/1-views/2-molecules/OmoQuantaItem.svelte";
+    const file$v = "src/quanta/1-views/2-molecules/OmoQuantaItem.svelte";
 
     function create_fragment$A(ctx) {
     	let div3;
@@ -12887,25 +11978,25 @@ var app = (function () {
     			t12 = text("s");
     			attr_dev(a0, "class", "text-md font-semibold text-gray-700 font-medium ");
     			attr_dev(a0, "href", a0_href_value = "/quant?id=" + /*quant*/ ctx[0].id);
-    			add_location(a0, file$w, 8, 4, 227);
+    			add_location(a0, file$v, 8, 4, 227);
     			attr_dev(div0, "class", "py-2 px-3 bg-gray-100");
-    			add_location(div0, file$w, 7, 2, 187);
+    			add_location(div0, file$v, 7, 2, 187);
     			if (img.src !== (img_src_value = /*quant*/ ctx[0].model.image)) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "class", "w-10 h-10 object-cover rounded");
     			attr_dev(img, "alt", "avatar");
-    			add_location(img, file$w, 16, 6, 478);
-    			add_location(br, file$w, 22, 8, 696);
+    			add_location(img, file$v, 16, 6, 478);
+    			add_location(br, file$v, 22, 8, 696);
     			attr_dev(span, "class", "font-light text-xs text-gray-500");
-    			add_location(span, file$w, 23, 8, 711);
+    			add_location(span, file$v, 23, 8, 711);
     			attr_dev(a1, "class", "text-gray-700 text-sm mx-3");
     			attr_dev(a1, "href", a1_href_value = "/quant?id=" + /*quant*/ ctx[0].id);
-    			add_location(a1, file$w, 20, 6, 592);
+    			add_location(a1, file$v, 20, 6, 592);
     			attr_dev(div1, "class", "flex items-center");
-    			add_location(div1, file$w, 15, 4, 440);
+    			add_location(div1, file$v, 15, 4, 440);
     			attr_dev(div2, "class", "pb-2 px-3 flex justify-between items-center mt-2");
-    			add_location(div2, file$w, 14, 2, 373);
+    			add_location(div2, file$v, 14, 2, 373);
     			attr_dev(div3, "class", "bg-white max-w-sm rounded shadow-md border");
-    			add_location(div3, file$w, 5, 0, 98);
+    			add_location(div3, file$v, 5, 0, 98);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -13043,7 +12134,7 @@ var app = (function () {
     }
 
     /* src/quanta/1-views/5-pages/Quanta.svelte generated by Svelte v3.20.1 */
-    const file$x = "src/quanta/1-views/5-pages/Quanta.svelte";
+    const file$w = "src/quanta/1-views/5-pages/Quanta.svelte";
 
     function get_each_context$4(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -13122,7 +12213,7 @@ var app = (function () {
     			}
 
     			attr_dev(div, "class", "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4\n  p-10");
-    			add_location(div, file$x, 5, 0, 138);
+    			add_location(div, file$w, 5, 0, 138);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -13233,7 +12324,7 @@ var app = (function () {
     /* src/quanta/1-views/5-pages/Quant.svelte generated by Svelte v3.20.1 */
 
     const { Object: Object_1 } = globals;
-    const file$y = "src/quanta/1-views/5-pages/Quant.svelte";
+    const file$x = "src/quanta/1-views/5-pages/Quant.svelte";
 
     function get_each_context$5(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -13272,11 +12363,11 @@ var app = (function () {
     			t1 = space();
     			input = element("input");
     			attr_dev(label, "class", "text-gray-500 text-xs");
-    			add_location(label, file$y, 35, 12, 1610);
+    			add_location(label, file$x, 35, 12, 1610);
     			attr_dev(input, "class", "w-full text-sm text-blue rounded border border-gray-300\n              px-2 py-1");
     			attr_dev(input, "type", "text");
     			input.value = input_value_value = /*value*/ ctx[5];
-    			add_location(input, file$y, 36, 12, 1673);
+    			add_location(input, file$x, 36, 12, 1673);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, label, anchor);
@@ -13357,12 +12448,12 @@ var app = (function () {
     			input = element("input");
     			t2 = space();
     			attr_dev(label, "class", "text-gray-500 text-xs");
-    			add_location(label, file$y, 52, 12, 2132);
+    			add_location(label, file$x, 52, 12, 2132);
     			attr_dev(input, "class", "w-full text-sm text-blue rounded border border-gray-300\n              px-2 py-1");
     			attr_dev(input, "type", "text");
     			input.value = input_value_value = /*value*/ ctx[5];
-    			add_location(input, file$y, 53, 12, 2195);
-    			add_location(div, file$y, 51, 10, 2114);
+    			add_location(input, file$x, 53, 12, 2195);
+    			add_location(div, file$x, 51, 10, 2114);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -13443,12 +12534,12 @@ var app = (function () {
     			input = element("input");
     			t2 = space();
     			attr_dev(label, "class", "text-gray-500 text-xs");
-    			add_location(label, file$y, 69, 12, 2650);
+    			add_location(label, file$x, 69, 12, 2650);
     			attr_dev(input, "class", "w-full text-sm text-blue rounded border border-gray-300\n              px-2 py-1");
     			attr_dev(input, "type", "text");
     			input.value = input_value_value = /*value*/ ctx[5];
-    			add_location(input, file$y, 70, 12, 2713);
-    			add_location(div, file$y, 68, 10, 2632);
+    			add_location(input, file$x, 70, 12, 2713);
+    			add_location(div, file$x, 68, 10, 2632);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -13607,26 +12698,26 @@ var app = (function () {
     			t9 = space();
     			create_component(omomenuvertical.$$.fragment);
     			attr_dev(div0, "class", "bg-image w-full p-10 overflow-hidden overflow-y-scroll svelte-es1rzs");
-    			add_location(div0, file$y, 18, 2, 946);
+    			add_location(div0, file$x, 18, 2, 946);
     			attr_dev(div1, "class", "text-sm uppercase text-blue-900 font-title font-bold");
-    			add_location(div1, file$y, 26, 6, 1240);
+    			add_location(div1, file$x, 26, 6, 1240);
     			attr_dev(div2, "class", "flex flex-wrap");
-    			add_location(div2, file$y, 29, 6, 1353);
+    			add_location(div2, file$x, 29, 6, 1353);
     			attr_dev(div3, "class", "mb-4");
-    			add_location(div3, file$y, 25, 4, 1215);
+    			add_location(div3, file$x, 25, 4, 1215);
     			attr_dev(div4, "class", "text-sm uppercase text-blue-900 font-title font-bold");
-    			add_location(div4, file$y, 46, 6, 1918);
+    			add_location(div4, file$x, 46, 6, 1918);
     			attr_dev(div5, "class", "mb-4");
-    			add_location(div5, file$y, 45, 4, 1893);
+    			add_location(div5, file$x, 45, 4, 1893);
     			attr_dev(div6, "class", "text-sm uppercase text-blue-900 font-title font-bold");
-    			add_location(div6, file$y, 63, 6, 2440);
+    			add_location(div6, file$x, 63, 6, 2440);
     			attr_dev(div7, "class", "mb-4");
-    			add_location(div7, file$y, 62, 4, 2415);
+    			add_location(div7, file$x, 62, 4, 2415);
     			attr_dev(div8, "class", "p-6 h-full overflow-hidden overflow-y-scroll bg-gray-100 border-l\n    border-gray-300");
     			set_style(div8, "width", "300px");
-    			add_location(div8, file$y, 21, 2, 1082);
+    			add_location(div8, file$x, 21, 2, 1082);
     			attr_dev(div9, "class", "h-full w-full flex");
-    			add_location(div9, file$y, 17, 0, 911);
+    			add_location(div9, file$x, 17, 0, 911);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -14066,7 +13157,7 @@ var app = (function () {
     }
 
     /* src/quanta/1-views/2-molecules/OmoQuantaList.svelte generated by Svelte v3.20.1 */
-    const file$z = "src/quanta/1-views/2-molecules/OmoQuantaList.svelte";
+    const file$y = "src/quanta/1-views/2-molecules/OmoQuantaList.svelte";
 
     function get_each_context$6(ctx, list, i) {
     	const child_ctx = ctx.slice();
@@ -14112,14 +13203,14 @@ var app = (function () {
     			t7 = text(t7_value);
     			t8 = text("s");
     			t9 = space();
-    			add_location(br, file$z, 15, 8, 502);
+    			add_location(br, file$y, 15, 8, 502);
     			attr_dev(span, "class", "text-gray-500 text-xs");
-    			add_location(span, file$z, 16, 8, 517);
+    			add_location(span, file$y, 16, 8, 517);
     			attr_dev(div, "class", "mb-2 text-sm text-blue-900 rounded border-gray-200 border\n        bg-white px-4 py-2");
-    			add_location(div, file$z, 11, 6, 360);
+    			add_location(div, file$y, 11, 6, 360);
     			attr_dev(a, "href", a_href_value = "quant?id=" + /*quant*/ ctx[1].id);
     			attr_dev(a, "class", "cursor-pointer");
-    			add_location(a, file$z, 10, 4, 300);
+    			add_location(a, file$y, 10, 4, 300);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, a, anchor);
@@ -14187,9 +13278,9 @@ var app = (function () {
     			}
 
     			attr_dev(div0, "class", "text-sm uppercase text-blue-900 font-title font-bold");
-    			add_location(div0, file$z, 6, 2, 171);
+    			add_location(div0, file$y, 6, 2, 171);
     			attr_dev(div1, "class", "ml-4 grid grid-cols-1 mr-4 mt-4");
-    			add_location(div1, file$z, 5, 0, 123);
+    			add_location(div1, file$y, 5, 0, 123);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -14324,7 +13415,7 @@ var app = (function () {
      };
 
     /* src/quanta/1-views/4-layouts/OmoLayoutEditor.svelte generated by Svelte v3.20.1 */
-    const file$A = "src/quanta/1-views/4-layouts/OmoLayoutEditor.svelte";
+    const file$z = "src/quanta/1-views/4-layouts/OmoLayoutEditor.svelte";
 
     function create_fragment$H(ctx) {
     	let div6;
@@ -14379,22 +13470,22 @@ var app = (function () {
     			footer = element("footer");
     			create_component(omomenuhorizontal.$$.fragment);
     			attr_dev(div0, "class", "bg-gray-200 text-sm font-semibold py-1 px-3 text-blue-900");
-    			add_location(div0, file$A, 33, 4, 942);
-    			add_location(header, file$A, 32, 2, 929);
+    			add_location(div0, file$z, 33, 4, 942);
+    			add_location(header, file$z, 32, 2, 929);
     			attr_dev(div1, "class", "border-r border-gray-200");
-    			add_location(div1, file$A, 38, 4, 1160);
+    			add_location(div1, file$z, 38, 4, 1160);
     			attr_dev(div2, "class", "overflow-y-scroll bg-gray-100 border-t border-r border-gray-200");
     			set_style(div2, "width", "220px");
-    			add_location(div2, file$A, 41, 4, 1240);
+    			add_location(div2, file$z, 41, 4, 1240);
     			attr_dev(div3, "class", "h-full w-full");
-    			add_location(div3, file$A, 47, 6, 1442);
+    			add_location(div3, file$z, 47, 6, 1442);
     			attr_dev(div4, "class", "h-full flex-1 overflow-y-scroll");
-    			add_location(div4, file$A, 46, 4, 1390);
+    			add_location(div4, file$z, 46, 4, 1390);
     			attr_dev(div5, "class", "h-full flex overflow-hidden");
-    			add_location(div5, file$A, 37, 2, 1114);
-    			add_location(footer, file$A, 52, 2, 1576);
+    			add_location(div5, file$z, 37, 2, 1114);
+    			add_location(footer, file$z, 52, 2, 1576);
     			attr_dev(div6, "class", "h-full flex flex-col");
-    			add_location(div6, file$A, 31, 0, 892);
+    			add_location(div6, file$z, 31, 0, 892);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -14561,7 +13652,7 @@ var app = (function () {
     /* src/App.svelte generated by Svelte v3.20.1 */
 
     const { window: window_1 } = globals;
-    const file$B = "src/App.svelte";
+    const file$A = "src/App.svelte";
 
     // (33:0) <Notifications>
     function create_default_slot$3(ctx) {
@@ -14574,7 +13665,7 @@ var app = (function () {
     			div = element("div");
     			create_component(omolayouteditor.$$.fragment);
     			attr_dev(div, "class", "h-screen w-screen");
-    			add_location(div, file$B, 33, 2, 909);
+    			add_location(div, file$A, 33, 2, 909);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
