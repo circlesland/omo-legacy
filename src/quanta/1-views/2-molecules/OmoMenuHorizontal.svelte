@@ -29,6 +29,12 @@
         <span class="mx-1">Quanta</span>
       </span>
     </a>
+    <a href="/editor">
+      <span class="px-1 hover:text-white cursor-pointer">
+        <i class="fas fa-th p-2 bg-gray-800 rounded" />
+        <span class="mx-1">Editor</span>
+      </span>
+    </a>
     <!-- <span class="px-1 hover:text-white cursor-pointer">
       <i class="w-8 fas fa-calendar-alt p-2 bg-gray-800 rounded" />
     </span>

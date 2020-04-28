@@ -24,6 +24,7 @@
   "dependencies": {
     "@vime-js/standard": "^1.5.0",
     "apollo-boost": "^0.4.7",
+    "flow-view": "^4.2.1",
     "graphql": "^15.0.0",
     "sirv-cli": "^0.4.4",
     "svelte-apollo": "^0.3.0",
