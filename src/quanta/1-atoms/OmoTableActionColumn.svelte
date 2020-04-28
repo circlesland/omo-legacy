@@ -6,7 +6,7 @@
   //   }
 </script>
 
-<td class="">
+<td>
   <button
     on:click={action}
     class="text-sm bg-orange-400 rounded text-white py-1 px-3">

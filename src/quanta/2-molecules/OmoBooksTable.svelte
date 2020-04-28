@@ -4,6 +4,8 @@
   import OmoTableTextColumn from "./../1-atoms/OmoTableTextColumn.svelte";
   import OmoTableActionColumn from "./../1-atoms/OmoTableActionColumn.svelte";
 
+  import OmoTableRowBookAdd from "./../1-atoms/OmoTableRowBookAdd.svelte";
+
   var model = {
     header: [
       { title: "ID" },
@@ -15,15 +17,15 @@
     books: []
   };
 
-  window
-    .subscribe("subscription {books {ID name author {name} library {name}}}")
-    .then(subscription => {
+  subscribe("subscription {books {ID name author {name} library {name}}}").then(
+    subscription => {
       (async () => {
         for await (let value of subscription) {
           model.books = value.data.books;
         }
       })();
-    });
+    }
+  );
 
   async function deleteBook(id) {
     if (confirm("Wirklich?"))
@@ -43,4 +45,5 @@
     </OmoTableRow>
     <!-- </tr> -->
   {/each}
+  <OmoTableRowBookAdd />
 </OmoTable>
