@@ -1,9 +1,15 @@
 import "./styles/index.scss";
 import App from "./App.svelte";
 
-import { graphql, printSchema, subscribe, parse, ExecutionResult } from 'graphql';
-import { schema } from './schemas';
-import { initDB, seedDB, BookCollection } from './textileThreads';
+import {
+	graphql,
+	printSchema,
+	subscribe,
+	parse,
+	ExecutionResult,
+} from "graphql";
+import { schema } from "./schemas";
+import { initDB, seedDB, BookCollection } from "./textileThreads";
 console.clear();
 
 let app;
