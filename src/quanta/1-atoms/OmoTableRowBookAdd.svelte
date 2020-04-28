@@ -1,5 +1,6 @@
 <script>
   import AutoComplete from "simple-svelte-autocomplete";
+  import Select from "svelte-select";
 
   let books = [];
   graphql("{books{ID name}}").then(result => (books = result.data.books));
@@ -59,7 +60,17 @@
       library: {}
     };
   }
-
+  let selected = null;
+  const authorSelected = () => {
+    if (event.code == "Enter") {
+      console.log(selected);
+    }
+  };
+  const librarySelected = () => {
+    if (event.code == "Enter") {
+      console.log(selected);
+    }
+  };
   const handleKeyup = () => {
     if (event.code == "Enter") {
       saveBook();
@@ -71,22 +82,30 @@
   <td>add new book</td>
   <td>
     <input on:keyup|preventDefault={handleKeyup} bind:value={newBook.name} />
-    s
+  </td>
+  <td class="">
+    <Select
+      isCreatable="true"
+      createItem={filterText => {
+        return { label: filterText, value: true };
+      }}
+      bind:selectedValue={newBook.author}
+      on:select={authorSelected}
+      items={authors.map(author => {
+        return { value: author.ID, label: author.name };
+      })} />
   </td>
   <td>
-    <AutoComplete
-      items={authors}
-      bind:selectedItem={newBook.author}
-      bind:value={newBook.authorName}
-      labelFieldName="name"
-      valueFieldName="ID" />
-  </td>
-  <td>
-    <AutoComplete
-      items={libraries}
-      bind:selectedItem={newBook.library}
-      labelFieldName="name"
-      valueFieldName="ID" />
+    <Select
+      isCreatable="true"
+      createItem={filterText => {
+        return { label: filterText, value: true };
+      }}
+      bind:selectedValue={newBook.library}
+      on:select={librarySelected}
+      items={libraries.map(author => {
+        return { value: author.ID, label: author.name };
+      })} />
   </td>
   <td>
     <button

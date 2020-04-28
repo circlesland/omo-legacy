@@ -1,10 +1,6 @@
 <script>
   import OmoTable from "./../2-molecules/OmoTable.svelte";
-  import OmoTableRow from "./../1-atoms/OmoTableRow.svelte";
-  import OmoTableTextColumn from "./../1-atoms/OmoTableTextColumn.svelte";
-  import OmoTableActionColumn from "./../1-atoms/OmoTableActionColumn.svelte";
-
-  import OmoTableRowBookAdd from "./../1-atoms/OmoTableRowBookAdd.svelte";
+  import OmoTableBookRow from "./../1-atoms/OmoTableBookRow.svelte";
 
   var model = {
     header: [
@@ -14,36 +10,50 @@
       { title: "library" },
       { title: "actions" }
     ],
-    books: []
+    books: [],
+    libraries: [],
+    authors: []
   };
 
-  subscribe("subscription {books {ID name author {name} library {name}}}").then(
-    subscription => {
+  graphql("{books {ID name author {name} library {name}}}").then(
+    result => (model.books = result.data.books)
+  ),
+    graphql("{authors {ID name}}").then(
+      result => (model.authors = result.data.authors)
+    ),
+    graphql("{libraries {ID name }}").then(
+      result => (model.libraries = result.data.libraries)
+    ),
+    subscribe(
+      "subscription {books {ID name author {name} library {name}}}"
+    ).then(subscription => {
       (async () => {
         for await (let value of subscription) {
           model.books = value.data.books;
         }
       })();
-    }
-  );
-
-  async function deleteBook(id) {
-    if (confirm("Wirklich?"))
-      await graphql(`mutation {deleteBook(ID:"${id}")}`);
-  }
+    });
+  subscribe("subscription {authors {ID name }}").then(subscription => {
+    (async () => {
+      for await (let value of subscription) {
+        model.authors = value.data.authors;
+      }
+    })();
+  });
+  subscribe("subscription {libraries {ID name }}").then(subscription => {
+    (async () => {
+      for await (let value of subscription) {
+        model.libraries = value.data.libraries;
+      }
+    })();
+  });
 </script>
 
 <OmoTable header={model.header}>
   {#each model.books as book}
-    <!-- <tr class="accordion border-b border-grey-light hover:bg-gray-100"> -->
-    <OmoTableRow>
-      <OmoTableTextColumn text={book.ID} />
-      <OmoTableTextColumn text={book.name} />
-      <OmoTableTextColumn text={book.author} />
-      <OmoTableTextColumn text={book.library} />
-      <OmoTableActionColumn text="delete" action={() => deleteBook(book.ID)} />
-    </OmoTableRow>
-    <!-- </tr> -->
+    <OmoTableBookRow
+      {book}
+      authors={model.authors}
+      libraries={model.libraries} />
   {/each}
-  <OmoTableRowBookAdd />
 </OmoTable>
