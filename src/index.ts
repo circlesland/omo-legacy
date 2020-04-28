@@ -1,8 +1,26 @@
 import "./styles/index.scss";
 import App from "./App.svelte";
 
-const app = new App({
+import {
+  graphql,
+  printSchema,
+  subscribe,
+  parse,
+  ExecutionResult,
+} from "graphql";
+import { schema } from "./schemas";
+import { initDB, seedDB, BookCollection } from "./textileThreads";
+console.clear();
+
+let app = new App({
   target: document.body,
 });
+
+initDB().then(() =>
+  seedDB().then(() => {
+    // DemoProgram();
+    window["graphql"] = (query) => graphql(schema, query);
+  })
+);
 
 export default app;
