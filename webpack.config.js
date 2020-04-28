@@ -96,10 +96,12 @@ module.exports = {
 					"sass-loader"
 				]
 			},
-			{
-				test: /\.json$/,
-				use: "json-loader"
-			},
+			// {
+			// 	test: /\.json$/,
+			// 	use: "json-loader",
+			// 	exclude: /node_modules/
+
+			// },
 			{
 				loader: require.resolve("file-loader"),
 				// Exclude `js` files to keep "css" loader working as it injects
@@ -121,9 +123,9 @@ module.exports = {
 	mode,
 	plugins: [
 		prod &&
-			new CleanWebpackPlugin({
-				verbose: true
-			}),
+		new CleanWebpackPlugin({
+			verbose: true
+		}),
 		new HtmlWebPackPlugin(
 			merge(
 				{
@@ -133,19 +135,19 @@ module.exports = {
 				},
 				prod
 					? {
-							minify: {
-								removeComments: true,
-								collapseWhitespace: true,
-								removeRedundantAttributes: true,
-								useShortDoctype: true,
-								removeEmptyAttributes: true,
-								removeStyleLinkTypeAttributes: true,
-								keepClosingSlash: true,
-								minifyJS: true,
-								minifyCSS: true,
-								minifyURLs: true
-							}
-					  }
+						minify: {
+							removeComments: true,
+							collapseWhitespace: true,
+							removeRedundantAttributes: true,
+							useShortDoctype: true,
+							removeEmptyAttributes: true,
+							removeStyleLinkTypeAttributes: true,
+							keepClosingSlash: true,
+							minifyJS: true,
+							minifyCSS: true,
+							minifyURLs: true
+						}
+					}
 					: {}
 			)
 		),
@@ -155,12 +157,12 @@ module.exports = {
 		}),
 		!prod && new CaseSensitivePathsPlugin(),
 		prod &&
-			new MiniCssExtractPlugin({
-				// Options similar to the same options in webpackOptions.output
-				// both options are optional
-				filename: "[name].[contenthash:5].css",
-				chunkFilename: "[name].[contenthash:5].chunk.css"
-			}),
+		new MiniCssExtractPlugin({
+			// Options similar to the same options in webpackOptions.output
+			// both options are optional
+			filename: "[name].[contenthash:5].css",
+			chunkFilename: "[name].[contenthash:5].chunk.css"
+		}),
 		new ManifestPlugin({
 			fileName: "asset-manifest.json",
 			publicPath
@@ -225,13 +227,13 @@ module.exports = {
 					parser: safePostCssParser,
 					map: shouldUseSourceMap
 						? {
-								// `inline: false` forces the sourcemap to be output into a
-								// separate file
-								inline: false,
-								// `annotation: true` appends the sourceMappingURL to the end of
-								// the css file, helping the browser find the sourcemap
-								annotation: true
-						  }
+							// `inline: false` forces the sourcemap to be output into a
+							// separate file
+							inline: false,
+							// `annotation: true` appends the sourceMappingURL to the end of
+							// the css file, helping the browser find the sourcemap
+							annotation: true
+						}
 						: false
 				}
 			})
