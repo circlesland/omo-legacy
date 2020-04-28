@@ -1,10 +1,15 @@
 <script>
-  export let value;
+  export let text;
+  export let action;
+  //   function handleClick() {
+  //     alert("delete");
+  //   }
 </script>
 
-<td class="hidden md:table-cell">
-
-  <p class="text-sm text-gray-700 font-medium p-3">
-    {#if value.name}{value.name}{:else}{value}{/if}
-  </p>
+<td class="">
+  <button
+    on:click={action}
+    class="text-sm bg-orange-400 rounded text-white py-1 px-3">
+    {#if text.name}{text.name}{:else}{text}{/if}
+  </button>
 </td>

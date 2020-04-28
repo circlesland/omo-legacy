@@ -25,8 +25,9 @@
       })();
     });
 
-  function deleteBook(id) {
-    alert("delete");
+  async function deleteBook(id) {
+    if (confirm("Wirklich?"))
+      await graphql(`mutation {deleteBook(ID:"${id}")}`);
   }
 </script>
 
@@ -38,6 +39,7 @@
       <OmoTableTextColumn text={book.name} />
       <OmoTableTextColumn text={book.author} />
       <OmoTableTextColumn text={book.library} />
+      <OmoTableActionColumn text="delete" action={() => deleteBook(book.ID)} />
     </OmoTableRow>
     <!-- </tr> -->
   {/each}
