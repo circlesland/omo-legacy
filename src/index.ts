@@ -10,7 +10,7 @@ import {
 } from "graphql";
 import { schema } from "./schemas";
 import { initDB, seedDB, BookCollection } from "./textileThreads";
-console.clear();
+// console.clear();
 
 let app;
 
