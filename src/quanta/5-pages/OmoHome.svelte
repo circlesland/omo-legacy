@@ -8,10 +8,14 @@
       "Imagine you could turn any idea with easy drag and drop lego-like building blocks, into modern opensource multiplatform resilient (d)apps",
     illustration: "/images/the_world_is_mine.svg"
   };
-  const quant2 = {
+  const contributors = {
     title: "About OMO's",
     subline:
       "OMO contributors love to play with opensource, decentralized and modern web technologies"
+  };
+  const documentation = {
+    title: "Getting Started",
+    subline: "How to play with omo.earth"
   };
 </script>
 
@@ -26,8 +30,8 @@
       ,
       <span class="underline font-bold">decentralized</span>
       ,
-      <span class="underline font-bold">privacy preserving</span>
-      encrypted database editor build on
+      <span class="underline font-bold">and serverless</span>
+      encrypted by default database editor build on
       <a href="https://ipfs.io/" class="text-green-500 font-bold">ipfs</a>
       and
       <a href="https://textile.io/" class="text-green-500 font-bold">
@@ -46,15 +50,25 @@
       </a>
     </p>
 
-    <div class="pt-10">
-      To get started, just select on the left side a schema and start adding and
-      deleting database entries and update the relationships between the
-      objects.
-    </div>
   </div>
 
   <div class="pt-12">
-    <OmoHero quant={quant2} />
+    <OmoHero quant={documentation} />
+    <p>
+      To get started, just select on the left side a schema and start adding and
+      deleting database entries and update the relationships between the
+      objects. Every change will update the obejcts in textile threads DB in
+      realtime and offline first in your local store.
+    </p>
+    <b>
+      NOTE: You need a running textile threads deamon running locally, check out
+      <a href="https://github.com/textileio/go-threads">go-threads</a>
+      for installing.
+    </b>
+  </div>
+
+  <div class="pt-12">
+    <OmoHero quant={contributors} />
     <OmoContributors />
   </div>
 </div>
