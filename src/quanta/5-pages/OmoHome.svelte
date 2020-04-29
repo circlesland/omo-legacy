@@ -1,6 +1,7 @@
 <script>
   import OmoHero from "./../2-molecules/OmoHero";
   import OmoContributors from "./../2-molecules/OmoContributors";
+  import OmoPartners from "./../2-molecules/OmoPartners";
 
   const quant = {
     title: "transforming visions into (d)apps",
@@ -22,8 +23,8 @@
 <div class="overflow-hidden overflow-y-auto ">
 
   <OmoHero {quant} />
-
-  <div class="text-center">
+  <OmoPartners />
+  <div class="text-center pt-10">
     <p class="text-gray-900">
       OMO.alpha is an
       <span class="underline font-bold">offline first</span>
@@ -49,7 +50,6 @@
         tailwind.css
       </a>
     </p>
-
   </div>
 
   <div class="pt-12">
@@ -98,7 +98,6 @@
         http://localhost:5000 to see your (d)app running locally. Edit files in
         `src`, save it, and reload the page to see your changes.
       </a>
-
     </div>
   </div>
 

@@ -36,9 +36,9 @@
     Context Title
   </header>
   <main class="h-full flex-1 flex overflow-hidden">
-    <div class="h-full border-r border-gray-200">
-      <OmoMenuVertical />
-    </div>
+    <!-- <div class="h-full border-r border-gray-200">
+        <OmoMenuVertical />
+      </div> -->
     <div
       class="h-full overflow-y-scroll bg-gray-100 border-t border-r
       border-gray-200 w-64">
