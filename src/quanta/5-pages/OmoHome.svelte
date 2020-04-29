@@ -4,9 +4,9 @@
   import OmoPartners from "./../2-molecules/OmoPartners";
 
   const quant = {
-    title: "transforming visions into (d)apps",
+    title: "transform your visions into (d)apps",
     subline:
-      "Imagine you could turn any idea with easy drag and drop lego-like building blocks, into modern opensource multiplatform and resilient serverless (d)apps",
+      "imagine you could turn any idea with easy drag and drop lego-like building blocks, into modern opensource multiplatform and resilient serverless (d)apps",
     illustration: "/images/the_world_is_mine.svg"
   };
   const contributors = {
@@ -16,22 +16,20 @@
   };
   const documentation = {
     title: "Getting Started",
-    subline: "How to play with omo.earth"
+    subline: "How to play with OMO.earth"
   };
 </script>
 
 <div class="overflow-hidden overflow-y-auto ">
 
   <OmoHero {quant} />
-  <OmoPartners />
-  <div class="text-center pt-10">
+
+  <div class=" py-10">
     <p class="text-gray-900">
-      OMO.alpha is an
-      <span class="underline font-bold">offline first</span>
-      ,
-      <span class="underline font-bold">decentralized</span>
-      ,
-      <span class="underline font-bold">and serverless</span>
+      OMO.earth is an
+      <span class="underline font-bold">
+        offline first, decentralized and serverless
+      </span>
       encrypted by default database editor build on
       <a href="https://ipfs.io/" class="text-green-500 font-bold">ipfs</a>
       and
@@ -51,8 +49,8 @@
       </a>
     </p>
   </div>
-
-  <div class="pt-12">
+  <OmoPartners />
+  <div class="py-6">
     <OmoHero quant={documentation} />
     <p>
       To get started, just select on the left side a schema and start adding and
