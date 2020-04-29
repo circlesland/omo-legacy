@@ -50,13 +50,17 @@
   });
 </script>
 
-<div class="h-full w-full bg-yellow-300">
-  <OmoTable header={model.header}>
-    {#each model.books as book}
-      <OmoTableBookRow
-        {book}
-        authors={model.authors}
-        libraries={model.libraries} />
-    {/each}
-  </OmoTable>
-</div>
+<OmoTable header={model.header}>
+  {#each model.books as book}
+    <OmoTableBookRow
+      bookname={book.name}
+      {book}
+      authors={model.authors}
+      libraries={model.libraries} />
+  {/each}
+</OmoTable>
+<button
+  class="rounded text-sm py-2 px-4 bg-green-400 text-white"
+  on:click={async () => await window.graphql('mutation { addBook(name:""){ID}}')}>
+  add book
+</button>
