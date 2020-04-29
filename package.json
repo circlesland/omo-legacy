@@ -19,6 +19,8 @@
     "@types/uuid": "^7.0.2",
     "datastore-core": "^1.0.0",
     "datastore-level": "^0.14.1",
+    "@vime-js/standard": "^1.5.0",
+    "apollo-boost": "^0.4.7",
     "graphql": "^15.0.0",
     "graphql-subscriptions": "^1.1.0",
     "interface-datastore": "^0.8.3",
