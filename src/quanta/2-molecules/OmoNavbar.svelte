@@ -1,6 +1,8 @@
-<!-- <script>
+<script>
   import OmoIconsFA from "./../1-atoms/OmoIconsFA.svelte";
-</script><OmoIconsFA /> -->
+</script>
+
+<OmoIconsFA />
 
 <div class="pb-0 w-full flex flex-wrap">
   <div class="p-2 w-full text-gray-600 bg-gray-900 shadow-lg ">
@@ -14,13 +16,13 @@
     </a>
     <a href="/">
       <span class="px-1 hover:text-white cursor-pointer">
-        <!-- <i class="fas fa-stream p-2 bg-gray-800 rounded" /> -->
+        <i class="fas fa-home p-2 bg-gray-800 rounded" />
         Home
       </span>
     </a>
     <a href="/editor">
       <span class="px-1 hover:text-white cursor-pointer">
-        <!-- <i class="fas fa-stream p-2 bg-gray-800 rounded" /> -->
+        <i class="fas fa-edit p-2 bg-gray-800 rounded" />
         Editor
       </span>
     </a>

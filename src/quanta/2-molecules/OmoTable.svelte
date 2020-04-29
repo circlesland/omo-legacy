@@ -2,9 +2,9 @@
   export let header = [];
 </script>
 
-<table class="w-full h-full shadow-lg rounded">
+<table class="w-full h-full border">
   <thead class="">
-    <tr class=" text-gray-600 text-left bg-gray-300 uppercase">
+    <tr class="text-gray-600 text-left bg-gray-200 uppercase">
       {#each header as head}
         <th class="px-2 py-1 text-sm">{head.title}</th>
       {/each}
