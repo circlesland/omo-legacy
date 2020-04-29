@@ -5,7 +5,7 @@
 <OmoIconsFA />
 
 <div class="pb-0 w-full flex flex-wrap">
-  <div class="p-2 w-full text-gray-600 bg-gray-900 shadow-lg ">
+  <div class="p-3 w-full text-gray-500 bg-gray-900 shadow-lg ">
     <a href="/">
       <span class="pl-1 pr-3 mr-2 border-r border-gray-800">
         <img
@@ -15,14 +15,16 @@
       </span>
     </a>
     <a href="/">
-      <span class="px-1 hover:text-white cursor-pointer">
-        <i class="fas fa-home p-2 bg-gray-800 rounded" />
+      <span
+        class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
+        <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->
         Home
       </span>
     </a>
     <a href="/editor">
-      <span class="px-1 hover:text-white cursor-pointer">
-        <i class="fas fa-edit p-2 bg-gray-800 rounded" />
+      <span
+        class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
+        <!-- <i class="fas fa-edit p-2 bg-gray-800 rounded" /> -->
         Editor
       </span>
     </a>

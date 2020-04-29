@@ -2,6 +2,6 @@
   import Page from "./quanta/4-layouts/Page.svelte";
 </script>
 
-<div class="h-full w-full">
+<div class="h-screen w-screen">
   <Page />
 </div>
