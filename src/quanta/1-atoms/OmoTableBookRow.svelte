@@ -3,6 +3,7 @@
   import Select from "svelte-select";
 
   export let book;
+  export let bookname;
   export let library;
   export let authors;
   export let libraries;
@@ -14,6 +15,9 @@
 
   async function selectValue(type) {
     switch (type) {
+      case "bookname":
+        book.name = bookname.label;
+        break;
       case "author":
         if (book.author.ID === undefined) return;
         if (book.author.ID === null) {
@@ -42,26 +46,29 @@
 
   async function clearValue(type) {
     switch (type) {
+      case "bookname":
+        book.name = null;
+        break;
       case "author":
-        await graphql(
-          `mutation {saveBook(ID:"${book.ID}", name:"${
-            book.name
-          }",authorId:"null",libraryId:"${
-            book.library ? book.library.ID : null
-          }"){ ID name author{name ID} library{name ID}}}`
-        );
+        book.author = null;
+        break;
       case "library":
-        await graphql(
-          `mutation {saveBook(ID:"${book.ID}", name:"${book.name}",authorId:"${
-            book.author ? book.author.ID : null
-          }",libraryId:"null}"){ ID name author{name ID} library{name ID}}}`
-        );
+        book.library = null;
+        break;
     }
+    await graphql(
+      `mutation {saveBook(ID:"${book.ID}", name:"${book.name}",authorId:"${
+        book.author ? book.author.ID : null
+      }",libraryId:"${
+        book.library ? book.library.ID : null
+      }"){ ID name author{name ID} library{name ID}}}`
+    );
   }
 
   const createItem = filterText => {
     return { name: filterText, ID: null };
   };
+
   const optionIdentifier = "ID";
   const getOptionLabel = (option, filterText) =>
     option.isCreator ? `Create "${filterText}"` : option.name;
@@ -71,8 +78,16 @@
 <tr class="w-full accordion border-b border-grey-light hover:bg-gray-100">
   <td class="py-2 px-4">{book.ID}</td>
   <td class="py-2 px-4">
-    <input placeholder="name" bind:value={book.name} />
-
+    <Select
+      isCreatable="true"
+      bind:selectedValue={bookname}
+      createItem={filterText => {
+        return { label: filterText };
+      }}
+      getOptionLabel={option => option.label}
+      getSelectionLabel={option => option.label}
+      on:select={() => selectValue('bookname')}
+      on:clear={() => clearValue('bookname', book)} />
   </td>
   <td class="py-2 px-4">
     <Select
@@ -86,9 +101,6 @@
       on:select={() => selectValue('author')}
       on:clear={() => clearValue('author')} />
   </td>
-
-  <!-- -->
-  <!-- on:select={() => selectValue('author')} -->
   <td class="py-2 px-4">
     <Select
       isCreatable="true"
@@ -101,7 +113,6 @@
       on:select={() => selectValue('library')}
       on:clear={() => clearValue('library')} />
   </td>
-  <!-- on:select={() => selectValue('library')} -->
   <td>
     <button
       on:click={deleteBook}

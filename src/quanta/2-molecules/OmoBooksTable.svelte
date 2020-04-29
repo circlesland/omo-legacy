@@ -53,8 +53,14 @@
 <OmoTable header={model.header}>
   {#each model.books as book}
     <OmoTableBookRow
+      bookname={book.name}
       {book}
       authors={model.authors}
       libraries={model.libraries} />
   {/each}
 </OmoTable>
+<button
+  class="rounded text-sm py-2 px-4 bg-green-400 text-white"
+  on:click={async () => await window.graphql('mutation { addBook(name:""){ID}}')}>
+  add book
+</button>
