@@ -5,13 +5,13 @@
   const quant = {
     title: "transforming visions into (d)apps",
     subline:
-      "Imagine you could turn any idea with easy drag and drop building blocks, into modern opensource multiplatform (d)apps",
+      "Imagine you could turn any idea with easy drag and drop lego-like building blocks, into modern opensource multiplatform resilient (d)apps",
     illustration: "/images/the_world_is_mine.svg"
   };
   const quant2 = {
     title: "About OMO's",
     subline:
-      "OMO's love to play with opensource, decentralized and modern web technologies"
+      "OMO contributors love to play with opensource, decentralized and modern web technologies"
   };
 </script>
 
