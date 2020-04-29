@@ -2,11 +2,11 @@
   export let header = [];
 </script>
 
-<table class="w-full h-full border">
+<table class="w-full border">
   <thead class="">
-    <tr class="text-gray-600 text-left bg-gray-200 uppercase">
+    <tr class="bg-gray-200 text-xs text-left text-gray-600 uppercase">
       {#each header as head}
-        <th class="px-2 py-1 text-sm">{head.title}</th>
+        <th class="px-2 py-1 text-xs">{head.title}</th>
       {/each}
     </tr>
   </thead>

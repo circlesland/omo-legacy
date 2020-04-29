@@ -25,14 +25,16 @@ export async function initDB(seed: Boolean): Promise<void> {
   console.log("COLLECTIONS", db.collections);
   if (!db.collections.has("Book")) {
     // First time created
-    LibraryCollection = await db.newCollection<Library>("Library", LibrarySchema);
+    LibraryCollection = await db.newCollection<Library>(
+      "Library",
+      LibrarySchema
+    );
     BookCollection = await db.newCollection<Book>("Book", BookSchema);
     AuthorCollection = await db.newCollection<Author>("Author", AuthorSchema);
     if (seed) {
       await seedDB();
     }
-  }
-  else {
+  } else {
     LibraryCollection = db.collections.get("Library") as Collection<Library>;
     BookCollection = db.collections.get("Book") as Collection<Book>;
     AuthorCollection = db.collections.get("Author") as Collection<Author>;

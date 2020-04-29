@@ -76,7 +76,7 @@
 
 <tr class="w-full accordion border-b border-grey-light hover:bg-gray-100">
   <!-- <td class="py-2 px-4">{book.ID}</td> -->
-  <td class="py-2 px-4">
+  <td class="p-2">
     <Select
       isCreatable="true"
       bind:selectedValue={bookname}
@@ -88,7 +88,7 @@
       on:select={() => selectValue('bookname')}
       on:clear={() => clearValue('bookname', book)} />
   </td>
-  <td class="">
+  <td class="p-2">
     <div class="themed">
       <Select
         isCreatable="true"
@@ -102,7 +102,7 @@
         on:clear={() => clearValue('author')} />
     </div>
   </td>
-  <td class="py-2 px-4">
+  <td class="p-2">
     <Select
       isCreatable="true"
       items={libraries}
