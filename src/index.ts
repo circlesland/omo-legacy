@@ -22,6 +22,7 @@ initDB(true).then(() => {
       rootValue: "data",
     })) as AsyncIterableIterator<ExecutionResult>;
   window["schema"] = printSchema(schema);
+  window["seed"] = seedDB;
   console.log("app");
   app = new App({
     target: document.body,

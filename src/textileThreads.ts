@@ -40,6 +40,7 @@ export async function initDB(seed: Boolean): Promise<void> {
 
   // Subsriptions
   db.on("**", async (update) => {
+    console.info(update);
     const collection = db.collections.get(update.collection);
     if (collection) {
       switch (update.event.type) {

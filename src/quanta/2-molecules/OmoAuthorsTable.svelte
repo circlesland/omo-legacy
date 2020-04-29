@@ -1,32 +1,24 @@
 <script>
   import OmoTable from "./../2-molecules/OmoTable.svelte";
-  import OmoTableBookRow from "./../1-atoms/OmoTableBookRow.svelte";
+  import OmoTableAuthorRow from "./../1-atoms/OmoTableAuthorRow.svelte";
 
   var model = {
-    header: [
-      // { title: "ID" },
-      { title: "book" },
-      { title: "author" },
-      { title: "library" },
-      { title: "actions" }
-    ],
+    header: [{ title: "name" }, { title: "books" }, { title: "actions" }],
     books: [],
     libraries: [],
     authors: []
   };
 
-  graphql("{books {ID name author {name} library {name}}}").then(
+  graphql("{books {ID name }}").then(
     result => (model.books = result.data.books)
   ),
-    graphql("{authors {ID name}}").then(
+    graphql("{authors {ID name books {ID name}} }").then(
       result => (model.authors = result.data.authors)
     ),
     graphql("{libraries {ID name }}").then(
       result => (model.libraries = result.data.libraries)
     ),
-    subscribe(
-      "subscription {books {ID name author {ID name} library {ID name}}}"
-    ).then(subscription => {
+    subscribe("subscription {books {ID name }}").then(subscription => {
       (async () => {
         for await (let value of subscription) {
           model.books = value.data.books;
@@ -34,13 +26,15 @@
         }
       })();
     });
-  subscribe("subscription {authors {ID name }}").then(subscription => {
-    (async () => {
-      for await (let value of subscription) {
-        model.authors = value.data.authors;
-      }
-    })();
-  });
+  subscribe("subscription {authors {ID name books {ID name}} }").then(
+    subscription => {
+      (async () => {
+        for await (let value of subscription) {
+          model.authors = value.data.authors;
+        }
+      })();
+    }
+  );
   subscribe("subscription {libraries {ID name }}").then(subscription => {
     (async () => {
       for await (let value of subscription) {
@@ -50,18 +44,17 @@
   });
 </script>
 
-AUTHORS
 <OmoTable header={model.header}>
-  {#each model.books as book}
-    <OmoTableBookRow
-      bookname={book.name}
-      {book}
-      authors={model.authors}
+  {#each model.authors as author}
+    <OmoTableAuthorRow
+      authorname={author.name}
+      {author}
+      books={model.books}
       libraries={model.libraries} />
   {/each}
 </OmoTable>
 <button
   class="rounded text-sm py-2 px-4 bg-green-400 text-white"
-  on:click={async () => await window.graphql('mutation { addBook(name:""){ID}}')}>
-  add book
+  on:click={async () => await window.graphql('mutation { addAuthor(name:""){ID}}')}>
+  add author
 </button>
