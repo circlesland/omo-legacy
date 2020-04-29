@@ -4,7 +4,6 @@
 
   export let book;
   export let bookname;
-  export let library;
   export let authors;
   export let libraries;
 

@@ -2,12 +2,12 @@
   import OmoIconsFA from "./../1-atoms/OmoIconsFA.svelte";
 </script>
 
-<div class="text-blue-900 text-center">
-  <span class="cursor-pointer bg-gray-200 w-12 hover:text-gray-500 block">
-    <i class="fas fa-dna p-4" />
+<div class="text-blue-900 h-full bg-gray-300 text-center">
+  <span class="cursor-pointer w-12 hover:text-white block">
+    <i class="fas fa-dna p-4 hover:bg-green-400" />
   </span>
-  <span class="cursor-pointer bg-gray-200 w-12 hover:text-gray-500 block">
-    <i class="fas fa-search p-4" />
+  <span class="cursor-pointer w-12 hover:text-white block">
+    <i class="fas fa-search p-4 hover:bg-green-400" />
   </span>
   <!-- <span class="cursor-pointer hover:text-gray-500 px-2 block mb-5 relative">
     <i class="fas fa-users" />

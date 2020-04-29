@@ -21,13 +21,13 @@
         Home
       </span>
     </a>
-    <a href="/editor">
+    <!-- <a href="/editor">
       <span
         class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
-        <!-- <i class="fas fa-edit p-2 bg-gray-800 rounded" /> -->
+       <i class="fas fa-edit p-2 bg-gray-800 rounded" />
         Editor
       </span>
-    </a>
+    </a> -->
     <!-- <span class="px-1 hover:text-white cursor-pointer">
       <i class="fas fa-search p-2 bg-gray-800 rounded" />
     </span> -->
