@@ -2,4 +2,6 @@
   import OmoBooksTable from "./../2-molecules/OmoBooksTable.svelte";
 </script>
 
-<OmoBooksTable />
+<div class="h-full w-full">
+  <OmoBooksTable />
+</div>

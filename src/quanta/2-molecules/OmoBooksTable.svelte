@@ -4,7 +4,7 @@
 
   var model = {
     header: [
-      { title: "ID" },
+      // { title: "ID" },
       { title: "book" },
       { title: "author" },
       { title: "library" },
@@ -50,11 +50,13 @@
   });
 </script>
 
-<OmoTable header={model.header}>
-  {#each model.books as book}
-    <OmoTableBookRow
-      {book}
-      authors={model.authors}
-      libraries={model.libraries} />
-  {/each}
-</OmoTable>
+<div class="h-full w-full bg-yellow-300">
+  <OmoTable header={model.header}>
+    {#each model.books as book}
+      <OmoTableBookRow
+        {book}
+        authors={model.authors}
+        libraries={model.libraries} />
+    {/each}
+  </OmoTable>
+</div>

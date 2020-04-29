@@ -8,7 +8,7 @@
   export let libraries;
 
   async function deleteBook() {
-    if (confirm("Wirklich?"))
+    if (confirm("are you sure?"))
       await graphql(`mutation {deleteBook(ID:"${book.ID}")}`);
   }
 
@@ -69,27 +69,28 @@
 </script>
 
 <tr class="w-full accordion border-b border-grey-light hover:bg-gray-100">
-  <td class="py-2 px-4">{book.ID}</td>
-  <td class="py-2 px-4">
-    <input placeholder="name" bind:value={book.name} />
-
+  <!-- <td class="">{book.ID}</td> -->
+  <td class="">
+    <input class="p-2 w-full" placeholder="name" bind:value={book.name} />
   </td>
-  <td class="py-2 px-4">
-    <Select
-      isCreatable="true"
-      items={authors}
-      bind:selectedValue={book.author}
-      {createItem}
-      {optionIdentifier}
-      {getOptionLabel}
-      {getSelectionLabel}
-      on:select={() => selectValue('author')}
-      on:clear={() => clearValue('author')} />
+  <td class="">
+    <div class="themed">
+      <Select
+        isCreatable="true"
+        items={authors}
+        bind:selectedValue={book.author}
+        {createItem}
+        {optionIdentifier}
+        {getOptionLabel}
+        {getSelectionLabel}
+        on:select={() => selectValue('author')}
+        on:clear={() => clearValue('author')} />
+    </div>
   </td>
 
   <!-- -->
   <!-- on:select={() => selectValue('author')} -->
-  <td class="py-2 px-4">
+  <td class="">
     <Select
       isCreatable="true"
       items={libraries}
@@ -105,7 +106,7 @@
   <td>
     <button
       on:click={deleteBook}
-      class="text-sm bg-orange-400 rounded text-white py-1 px-3">
+      class="text-sm bg-red-500 rounded text-white py-2 px-4">
       delete
     </button>
   </td>

@@ -3,6 +3,7 @@
   import Editor from "./quanta/5-pages/Editor.svelte";
 </script>
 
-<Page />
-
-<Editor />
+<div class="h-full w-full bg-orange-300">
+  <Page />
+  <Editor />
+</div>

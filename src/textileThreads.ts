@@ -84,7 +84,7 @@ export async function seedDB(): Promise<void> {
   });
   await harryPotter.save();
 
-  for (var i = 1; i < 2; i++) {
+  for (var i = 1; i < 20; i++) {
     const jurassicPark = new BookCollection({
       name: "Jurassic Park " + i,
       authorId: i > 1 ? crichton.ID : undefined,
