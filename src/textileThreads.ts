@@ -13,19 +13,30 @@ import {
   pubsub,
   toArray,
 } from "./schemas";
-import { JSONSchema7 } from "json-schema";
 
 export let LibraryCollection: Collection<Library>;
 export let BookCollection: Collection<Book>;
 export let AuthorCollection: Collection<Author>;
 
-export async function initDB(): Promise<void> {
-  const store = new LevelDatastore("db/" + uuid.v4() + ".db");
+export async function initDB(seed: Boolean): Promise<void> {
+  const store = new LevelDatastore("db/db.db");
   const db = new Database(store);
   await db.open();
-  LibraryCollection = await db.newCollection<Library>("Library", LibrarySchema);
-  BookCollection = await db.newCollection<Book>("Book", BookSchema);
-  AuthorCollection = await db.newCollection<Author>("Author", AuthorSchema);
+  console.log("COLLECTIONS", db.collections);
+  if (!db.collections.has("Book")) {
+    // First time created
+    LibraryCollection = await db.newCollection<Library>("Library", LibrarySchema);
+    BookCollection = await db.newCollection<Book>("Book", BookSchema);
+    AuthorCollection = await db.newCollection<Author>("Author", AuthorSchema);
+    if (seed) {
+      await seedDB();
+    }
+  }
+  else {
+    LibraryCollection = db.collections.get("Library") as Collection<Library>;
+    BookCollection = db.collections.get("Book") as Collection<Book>;
+    AuthorCollection = db.collections.get("Author") as Collection<Author>;
+  }
 
   // Subsriptions
   db.on("**", async (update) => {
@@ -61,6 +72,7 @@ export async function initDB(): Promise<void> {
       );
     }
   });
+
   console.log("DB initialised");
 }
 
