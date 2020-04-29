@@ -4,7 +4,6 @@ import {
   GraphQLObjectType,
   GraphQLSchema,
   GraphQLString,
-  GraphQLScalarType,
   GraphQLBoolean,
 } from "graphql";
 import { PubSub } from "graphql-subscriptions";
@@ -33,18 +32,18 @@ const LIBRARY_DELETE = "library_delete";
 const AUTHOR_DELETE = "author_delete";
 const BOOK_DELETE = "book_delete";
 
-export async function toArray<T>(
-  iterator: AsyncIterable<Result<T>>
-): Promise<T[]> {
+export async function toArray<T>(iterator: AsyncIterable<Result<T>>): Promise<T[]> {
   const arr = Array<T>();
   for await (const entry of iterator) {
     arr.push(entry.value);
   }
   return arr;
 }
+
 export let LibrarySchema: JSONSchema7;
 export let BookSchema: JSONSchema7;
 export let AuthorSchema: JSONSchema7;
+
 LibrarySchema = {
   $id: "https://example.com/person.schema.json",
   $schema: "http://json-schema.org/draft-07/schema#",
@@ -180,7 +179,7 @@ export const schema = new GraphQLSchema({
           await author.save();
           return author;
         },
-        type: BookType,
+        type: AuthorType,
       },
       addBook: {
         args: {
@@ -204,8 +203,48 @@ export const schema = new GraphQLSchema({
           await library.save();
           return library;
         },
+        type: LibraryType,
+      },
+      saveAuthor: {
+        args: {
+          ID: { type: GraphQLID },
+          name: { type: GraphQLString },
+        },
+        resolve: async (root: any, { ID, name }) => {
+          const author = await AuthorCollection.findById(ID);
+          author.name = name;
+          await AuthorCollection.save(author);
+          return author;
+        },
+        type: AuthorType,
+      },
+      saveBook: {
+        args: {
+          ID: { type: GraphQLID },
+          name: { type: GraphQLString },
+          authorId: { type: GraphQLString },
+          libraryId: { type: GraphQLString }
+        },
+        resolve: async (root: any, { ID, name, authorId, libraryId }) => {
+          const book = new BookCollection({ ID, name, authorId, libraryId });
+          await book.save();
+          return book;
+        },
         type: BookType,
       },
+      saveLibrary: {
+        args: {
+          ID: { type: GraphQLID },
+          name: { type: GraphQLString },
+        },
+        resolve: async (root: any, { ID, name }) => {
+          const library = new BookCollection({ ID, name });
+          await library.save();
+          return library;
+        },
+        type: LibraryType,
+      },
+
       deleteAuthor: {
         args: {
           ID: { type: GraphQLID },
@@ -257,7 +296,7 @@ export const schema = new GraphQLSchema({
         type: GraphQLList(LibraryType),
       },
     },
-    name: "RootQueryType",
+    name: "query",
   }),
   subscription: new GraphQLObjectType({
     fields: {

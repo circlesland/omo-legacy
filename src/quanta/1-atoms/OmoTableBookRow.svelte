@@ -1,7 +1,9 @@
 <script>
+  import { Author } from "./../../schemas.ts";
   import Select from "svelte-select";
 
   export let book;
+  export let library;
   export let authors;
   export let libraries;
 
@@ -12,61 +14,94 @@
 
   async function selectValue(type) {
     switch (type) {
-      case "name":
-        break;
       case "author":
-        debugger;
-        if (book.author.value) {
-          var author = (await graphql(
-            `{mutation addAuthor(name: '${book.author.label}')}{name ID}`
-          )).addAuthor;
-          book.author = author;
+        if (book.author.ID === undefined) return;
+        if (book.author.ID === null) {
+          book.author = (await graphql(
+            `mutation {addAuthor(name:"${book.author.name}"){ ID name}}`
+          )).data.addAuthor;
         }
-        console.log(book.author);
         break;
+      case "library":
+        if (book.library.ID === undefined) return;
+        if (book.library.ID === null) {
+          book.library = (await graphql(
+            `mutation {addLibrary(name:"${book.library.name}"){ ID name}}`
+          )).data.addLibrary;
+        }
+        break;
+    }
+    await graphql(
+      `mutation {saveBook(ID:"${book.ID}", name:"${book.name}",authorId:"${
+        book.author ? book.author.ID : null
+      }",libraryId:"${
+        book.library ? book.library.ID : null
+      }"){ ID name author{name ID} library{name ID}}}`
+    );
+  }
+
+  async function clearValue(type) {
+    switch (type) {
+      case "author":
+        await graphql(
+          `mutation {saveBook(ID:"${book.ID}", name:"${
+            book.name
+          }",authorId:"null",libraryId:"${
+            book.library ? book.library.ID : null
+          }"){ ID name author{name ID} library{name ID}}}`
+        );
+      case "library":
+        await graphql(
+          `mutation {saveBook(ID:"${book.ID}", name:"${book.name}",authorId:"${
+            book.author ? book.author.ID : null
+          }",libraryId:"null}"){ ID name author{name ID} library{name ID}}}`
+        );
     }
   }
 
+  const createItem = filterText => {
+    return { name: filterText, ID: null };
+  };
   const optionIdentifier = "ID";
-  const getOptionLabel = option => option.name;
+  const getOptionLabel = (option, filterText) =>
+    option.isCreator ? `Create "${filterText}"` : option.name;
   const getSelectionLabel = option => option.name;
 </script>
 
 <tr class="w-full accordion border-b border-grey-light hover:bg-gray-100">
   <td class="py-2 px-4">{book.ID}</td>
   <td class="py-2 px-4">
-    <input
-      placeholder="name"
-      bind:value={book.name}
-      on:select={() => selectValue('name')}
-      on:change={() => selectValue('name')} />
+    <input placeholder="name" bind:value={book.name} />
+
   </td>
   <td class="py-2 px-4">
     <Select
       isCreatable="true"
-      createItem={filterText => {
-        return { label: filterText, value: true };
-      }}
-      bind:selectedValue={book.author}
-      on:select={() => selectValue('author')}
       items={authors}
+      bind:selectedValue={book.author}
+      {createItem}
       {optionIdentifier}
+      {getOptionLabel}
       {getSelectionLabel}
-      {getOptionLabel} />
+      on:select={() => selectValue('author')}
+      on:clear={() => clearValue('author')} />
   </td>
+
+  <!-- -->
+  <!-- on:select={() => selectValue('author')} -->
   <td class="py-2 px-4">
     <Select
       isCreatable="true"
-      createItem={filterText => {
-        return { label: filterText, value: true };
-      }}
-      bind:selectedValue={book.library}
-      on:select={() => selectValue('library')}
       items={libraries}
+      bind:selectedValue={book.library}
+      {createItem}
       {optionIdentifier}
+      {getOptionLabel}
       {getSelectionLabel}
-      {getOptionLabel} />
+      on:select={() => selectValue('library')}
+      on:clear={() => clearValue('library')} />
   </td>
+  <!-- on:select={() => selectValue('library')} -->
   <td>
     <button
       on:click={deleteBook}

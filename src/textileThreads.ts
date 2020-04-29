@@ -84,11 +84,13 @@ export async function seedDB(): Promise<void> {
   });
   await harryPotter.save();
 
-  const jurassicPark = new BookCollection({
-    name: "Jurassic Park",
-    authorId: crichton.ID,
-    libraryId: riverside.ID,
-  });
-  jurassicPark.save();
+  for (var i = 1; i < 2; i++) {
+    const jurassicPark = new BookCollection({
+      name: "Jurassic Park " + i,
+      authorId: i > 1 ? crichton.ID : undefined,
+      libraryId: riverside.ID,
+    });
+    jurassicPark.save();
+  }
   console.log("DB seeded");
 }

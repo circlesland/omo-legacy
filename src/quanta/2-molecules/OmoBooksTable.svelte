@@ -25,11 +25,12 @@
       result => (model.libraries = result.data.libraries)
     ),
     subscribe(
-      "subscription {books {ID name author {name} library {name}}}"
+      "subscription {books {ID name author {ID name} library {ID name}}}"
     ).then(subscription => {
       (async () => {
         for await (let value of subscription) {
           model.books = value.data.books;
+          console.log("books subscription", model.books);
         }
       })();
     });
