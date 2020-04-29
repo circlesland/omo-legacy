@@ -9,11 +9,9 @@
   let currentId;
 
   onMount(() => {
-    curRoute.set(window.location.pathname);
     var urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has("id")) {
-      curId.set(urlParams.get("id"));
-      currentId = urlParams.get("id");
+    if (urlParams.has("route")) {
+      curRoute.set("?route=" + urlParams.get("route"));
     }
     if (!history.state) {
       window.history.replaceState(

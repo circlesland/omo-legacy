@@ -241,7 +241,7 @@ export const schema = new GraphQLSchema({
           name: { type: GraphQLString },
         },
         resolve: async (root: any, { ID, name }) => {
-          let library = await BookCollection.findById(ID);
+          let library = await LibraryCollection.findById(ID);
           if (name !== undefined) library.name = name;
           await LibraryCollection.save(library);
           return library;

@@ -17,6 +17,7 @@ const DEV_PORT = 5000;
 const mode = process.env.NODE_ENV || "development";
 const prod = mode === "production";
 const shouldUseSourceMap = !prod;
+// const publicPath = "/dashboard/graphql/library/";
 const publicPath = "/";
 
 const postCssLoaderConfig = {

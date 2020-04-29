@@ -13,7 +13,6 @@
   }
 
   async function selectValue(type, event) {
-    console.log(event);
     switch (type) {
       case "authorname":
         author.name = authorname.label;
@@ -24,9 +23,14 @@
       case "books":
         if (author.books)
           author.books.forEach(async book => {
-            await graphql(
-              `mutation{saveBook(ID:"${book.ID}",authorId:"${author.ID}"){ID}}`
-            );
+            if (book.ID === null)
+              await graphql(
+                `mutation{addBook(name:"${book.name}",authorId:"${author.ID}"){ID}}`
+              );
+            else
+              await graphql(
+                `mutation{saveBook(ID:"${book.ID}",authorId:"${author.ID}"){ID}}`
+              );
           });
         break;
     }
@@ -38,7 +42,7 @@
     switch (type) {
       case "books":
         await graphql(
-          `mutation {saveBook(ID:"${todelete.ID}",libraryId:"null"){ ID}}`
+          `mutation {saveBook(ID:"${todelete.ID}",authorId:"null"){ ID}}`
         );
     }
   }

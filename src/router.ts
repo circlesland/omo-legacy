@@ -5,16 +5,16 @@ import OmoHome from "./quanta/5-pages/OmoHome.svelte";
 import { writable } from "svelte/store";
 
 const router = [
-  { route: "/", quant: OmoHome, name: null },
-  { route: "/books", quant: OmoBooksTable, name: "books", icon: "fa-book" },
+  { route: "?route=home", quant: OmoHome, name: null },
+  { route: "?route=books", quant: OmoBooksTable, name: "books", icon: "fa-book" },
   {
-    route: "/authors",
+    route: "?route=authors",
     quant: OmoAuthorsTable,
     name: "authors",
     icon: "fa-user-graduate",
   },
   {
-    route: "/libraries",
+    route: "?route=libraries",
     quant: OmoLibrariesTable,
     name: "libraries",
     icon: "fa-book-reader",
@@ -22,5 +22,5 @@ const router = [
 ];
 
 export default router;
-export const curRoute = writable("/books");
+export const curRoute = writable("?route=home");
 export const curId = writable(0);

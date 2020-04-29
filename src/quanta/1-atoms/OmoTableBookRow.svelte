@@ -16,6 +16,9 @@
     switch (type) {
       case "bookname":
         book.name = bookname.label;
+        await graphql(
+          `mutation {saveBook(ID:"${book.ID}", name:"${book.name}"){ ID}}`
+        );
         break;
       case "author":
         if (book.author.ID === undefined) return;
@@ -24,6 +27,9 @@
             `mutation {addAuthor(name:"${book.author.name}"){ ID name}}`
           )).data.addAuthor;
         }
+        await graphql(
+          `mutation {saveBook(ID:"${book.ID}", authorId:"${book.author.ID}"){ ID}}`
+        );
         break;
       case "library":
         if (book.library.ID === undefined) return;
@@ -32,36 +38,29 @@
             `mutation {addLibrary(name:"${book.library.name}"){ ID name}}`
           )).data.addLibrary;
         }
+        await graphql(
+          `mutation {saveBook(ID:"${book.ID}", libraryId:"${book.library.ID}"){ ID}}`
+        );
         break;
     }
-    await graphql(
-      `mutation {saveBook(ID:"${book.ID}", name:"${book.name}",authorId:"${
-        book.author ? book.author.ID : null
-      }",libraryId:"${
-        book.library ? book.library.ID : null
-      }"){ ID name author{name ID} library{name ID}}}`
-    );
   }
 
   async function clearValue(type) {
     switch (type) {
       case "bookname":
-        book.name = null;
+        await graphql(`mutation {saveBook(ID:"${book.ID}", name:"null"){ ID}}`);
         break;
       case "author":
-        book.author = null;
+        await graphql(
+          `mutation {saveBook(ID:"${book.ID}", authorId:"null"){ ID}}`
+        );
         break;
       case "library":
-        book.library = null;
+        await graphql(
+          `mutation {saveBook(ID:"${book.ID}", libraryId:"null"){ ID}}`
+        );
         break;
     }
-    await graphql(
-      `mutation {saveBook(ID:"${book.ID}", name:"${book.name}",authorId:"${
-        book.author ? book.author.ID : null
-      }",libraryId:"${
-        book.library ? book.library.ID : null
-      }"){ ID name author{name ID} library{name ID}}}`
-    );
   }
 
   const createItem = filterText => {
