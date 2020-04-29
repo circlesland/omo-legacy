@@ -44,7 +44,7 @@
       border-gray-200 w-64">
       <OmoList routes={router} />
     </div>
-    <div class="h-full flex-1 overflow-y-scroll py-12 px-16">
+    <div class="h-full flex-1 overflow-y-scroll py-20 px-24">
       <svelte:component this={router.find(x => x.route == $curRoute).quant} />
     </div>
   </main>
