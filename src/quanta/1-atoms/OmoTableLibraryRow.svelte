@@ -52,7 +52,7 @@
 </script>
 
 <tr class="w-full accordion border-b border-grey-light hover:bg-gray-100">
-  <td class="py-2 px-4">
+  <td class="">
     <Select
       isCreatable="true"
       bind:selectedValue={libraryname}
