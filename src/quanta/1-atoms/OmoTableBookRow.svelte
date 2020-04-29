@@ -116,7 +116,7 @@
   <td>
     <button
       on:click={deleteBook}
-      class="text-sm bg-red-500 rounded text-white py-2 px-4">
+      class="text-sm bg-red-400 rounded-full font-bold text-white py-1 px-3">
       delete
     </button>
   </td>
