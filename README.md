@@ -14,7 +14,8 @@ cd omo-quantum
 ...then start the [Webpack DevServer](https://webpack.js.org/configuration/dev-server/):
 
 ```bash
-npm run start
+npm i
+run start
 ```
 
 Download, install and <b>run</b> the textile threads DB deamon (install instructions @textile: https://github.com/textileio/go-threads)
