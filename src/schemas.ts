@@ -211,8 +211,8 @@ export const schema = new GraphQLSchema({
           name: { type: GraphQLString },
         },
         resolve: async (root: any, { ID, name }) => {
-          const author = await AuthorCollection.findById(ID);
-          author.name = name;
+          let author = await AuthorCollection.findById(ID);
+          if (name !== undefined) author.name = name;
           await AuthorCollection.save(author);
           return author;
         },
@@ -226,8 +226,11 @@ export const schema = new GraphQLSchema({
           libraryId: { type: GraphQLString }
         },
         resolve: async (root: any, { ID, name, authorId, libraryId }) => {
-          const book = new BookCollection({ ID, name, authorId, libraryId });
-          await book.save();
+          let book = await BookCollection.findById(ID);
+          if (name !== undefined) book.name = name;
+          if (authorId !== undefined) book.authorId = authorId;
+          if (libraryId !== undefined) book.libraryId = libraryId;
+          await BookCollection.save(book);
           return book;
         },
         type: BookType,
@@ -238,8 +241,9 @@ export const schema = new GraphQLSchema({
           name: { type: GraphQLString },
         },
         resolve: async (root: any, { ID, name }) => {
-          const library = new BookCollection({ ID, name });
-          await library.save();
+          let library = await BookCollection.findById(ID);
+          if (name !== undefined) library.name = name;
+          await LibraryCollection.save(library);
           return library;
         },
         type: LibraryType,
