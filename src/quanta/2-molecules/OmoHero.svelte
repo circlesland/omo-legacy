@@ -6,21 +6,25 @@
   };
 </script>
 
-<div class="flex flex-col text-center mx-auto mb-12">
-  <div class="w-1/5 mx-auto mb-10">
-    <img src={quant.illustration} alt={quant.title} />
-  </div>
+<div class="flex flex-col text-center mx-auto my-6">
+  {#if quant.illustration}
+    <div class="w-1/5 mx-auto mb-10">
+      <img src={quant.illustration} alt={quant.title} />
+    </div>
+  {/if}
   <div class="mx-auto text-center">
     <h1
-      class="uppercase text-5xl text-blue-900 font-bold font-title leading-none
+      class="uppercase text-4xl text-blue-900 font-bold leading-none
       tracking-tight mb-2">
       {quant.title}
     </h1>
-    <div
-      class="text-3xl text-gray-600 font-sans italic font-light tracking-wide
-      mb-6">
-      {quant.subline}
-    </div>
+    {#if quant.subline}
+      <div
+        class="text-xl text-gray-600 font-sans italic font-light tracking-wide
+        mb-6">
+        {quant.subline}
+      </div>
+    {/if}
   </div>
 
 </div>

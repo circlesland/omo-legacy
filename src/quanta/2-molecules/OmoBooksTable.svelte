@@ -60,7 +60,7 @@
   {/each}
 </OmoTable>
 <button
-  class="rounded text-sm py-2 px-4 bg-green-400 text-white"
+  class="rounded text-sm py-2 px-4 bg-green-400 font-bold text-white"
   on:click={async () => await window.graphql('mutation { addBook(name:""){ID}}')}>
   add book
 </button>

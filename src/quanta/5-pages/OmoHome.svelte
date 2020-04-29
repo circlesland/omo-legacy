@@ -1,12 +1,17 @@
 <script>
   import OmoHero from "./../2-molecules/OmoHero";
+  import OmoContributors from "./../2-molecules/OmoContributors";
 
   const quant = {
-    title: "transforming ideas into code",
+    title: "transforming visions into (d)apps",
     subline:
-      "OMO's love to play with opensource, decentralized and modern web technologies",
-    illustration: "/images/the_world_is_mine.svg",
-    button: "GET STARTED"
+      "Imagine you could turn any idea with easy drag and drop building blocks, into modern opensource multiplatform (d)apps",
+    illustration: "/images/the_world_is_mine.svg"
+  };
+  const quant2 = {
+    title: "About OMO's",
+    subline:
+      "OMO's love to play with opensource, decentralized and modern web technologies"
   };
 </script>
 
@@ -22,10 +27,12 @@
       <span class="underline font-bold">decentralized</span>
       ,
       <span class="underline font-bold">privacy preserving</span>
-      encrypted database and schema editor build on
+      encrypted database editor build on
       <a href="https://ipfs.io/" class="text-green-500 font-bold">ipfs</a>
       and
-      <a href="https://textile.io/" class="text-green-500 font-bold">textile</a>
+      <a href="https://textile.io/" class="text-green-500 font-bold">
+        textile threads
+      </a>
       with an typesave ORM-Layer based on
       <a href="https://graphql.org/" class="text-green-500 font-bold">
         graphql
@@ -40,9 +47,14 @@
     </p>
 
     <div class="pt-10">
-      To get started, just select and on the left side a schema and start adding
-      and deleting database entries and update the relationships between the
+      To get started, just select on the left side a schema and start adding and
+      deleting database entries and update the relationships between the
       objects.
     </div>
+  </div>
+
+  <div class="pt-12">
+    <OmoHero quant={quant2} />
+    <OmoContributors />
   </div>
 </div>
