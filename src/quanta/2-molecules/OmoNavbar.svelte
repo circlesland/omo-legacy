@@ -21,6 +21,13 @@
         Home
       </span>
     </a>
+    <a href="/?route=books">
+      <span
+        class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
+        <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->
+        Editor
+      </span>
+    </a>
     <a href="/?route=test">
       <span
         class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">

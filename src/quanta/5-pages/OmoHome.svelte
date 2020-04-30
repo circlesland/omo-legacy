@@ -30,7 +30,7 @@
       <span class="underline font-bold">
         offline first, decentralized and serverless
       </span>
-      encrypted by default database editor build on
+      encrypted by default database and schema editor build on
       <a href="https://ipfs.io/" class="text-green-500 font-bold">ipfs</a>
       and
       <a href="https://textile.io/" class="text-green-500 font-bold">
@@ -53,9 +53,9 @@
   <div class="py-6">
     <OmoHero quant={documentation} />
     <p>
-      To get started, just select on the left side a schema and start adding and
-      deleting database entries and update the relationships between the
-      objects. Every change will update directly and in realtime the textile
+      To get started, just select the editor on the bottom menu to start adding
+      and deleting database entries which will update the relationships between
+      the objects. Every change will change directly and in realtime the textile
       threads DB offline first in your local store.
     </p>
     <b>
