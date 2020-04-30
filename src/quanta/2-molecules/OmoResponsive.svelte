@@ -111,70 +111,65 @@
   }
 </script>
 
-<div class="flex">
-  <div class="w-full" use:watchResize={responsive}>
-    {#if size.r1}
-      <div class="bg-pink-400 w-full h-12 text-center text-white text-xl pt-2">
-        {width}px
-      </div>
-      <div class="grid grid-cols-1 gap-4 p-4">
-        {#each groups as quant}
-          <OmoCardGroup {quant} />
-        {/each}
-      </div>
-    {/if}
-    {#if size.r2}
-      <div class="bg-red-400 w-full h-12 text-center text-white text-xl pt-2">
-        {width}px
-      </div>
-      <div class="grid grid-cols-2 gap-4 p-4">
-        {#each groups as quant}
-          <OmoCardGroup {quant} />
-        {/each}
-      </div>
-    {/if}
-    {#if size.r3}
-      <div
-        class="bg-orange-400 w-full h-12 text-center text-white text-xl pt-2">
-        {width}px
-      </div>
-      <div class="grid grid-cols-3 gap-4 p-4">
-        {#each groups as quant}
-          <OmoCardGroup {quant} />
-        {/each}
-      </div>
-    {/if}
-    {#if size.r4}
-      <div
-        class="bg-yellow-500 w-full h-12 text-center text-white text-xl pt-2">
-        {width}px
-      </div>
-      <div class="grid grid-cols-4 gap-4 p-4">
-        {#each groups as quant}
-          <OmoCardGroup {quant} />
-        {/each}
-      </div>
-    {/if}
-    {#if size.r5}
-      <div class="bg-green-500 w-full h-12 text-center text-white text-xl pt-2">
-        {width}px
-      </div>
-      <div class="grid grid-cols-5 gap-4 p-4">
-        {#each groups as quant}
-          <OmoCardGroup {quant} />
-        {/each}
-      </div>
-    {/if}
-    {#if size.r6}
-      <div class="bg-blue-500 w-full h-12 text-center text-white text-xl pt-2">
-        {width}px
-      </div>
-      <div class="grid grid-cols-6 gap-4 p-4">
-        {#each groups as quant}
-          <OmoCardGroup {quant} />
-        {/each}
-      </div>
-    {/if}
-  </div>
-
+<div class="w-full" use:watchResize={responsive}>
+  {#if size.r1}
+    <div class="bg-pink-400 w-full h-12 text-center text-white text-xl pt-2">
+      {width}px
+    </div>
+    <div class="grid grid-cols-1 gap-4 p-4">
+      {#each groups as quant}
+        <OmoCardGroup {quant} />
+      {/each}
+    </div>
+  {/if}
+  {#if size.r2}
+    <div class="bg-red-400 w-full h-12 text-center text-white text-xl pt-2">
+      {width}px
+    </div>
+    <div class="grid grid-cols-2 gap-4 p-4">
+      {#each groups as quant}
+        <OmoCardGroup {quant} />
+      {/each}
+    </div>
+  {/if}
+  {#if size.r3}
+    <div class="bg-orange-400 w-full h-12 text-center text-white text-xl pt-2">
+      {width}px
+    </div>
+    <div class="grid grid-cols-3 gap-4 p-4">
+      {#each groups as quant}
+        <OmoCardGroup {quant} />
+      {/each}
+    </div>
+  {/if}
+  {#if size.r4}
+    <div class="bg-yellow-500 w-full h-12 text-center text-white text-xl pt-2">
+      {width}px
+    </div>
+    <div class="grid grid-cols-4 gap-4 p-4">
+      {#each groups as quant}
+        <OmoCardGroup {quant} />
+      {/each}
+    </div>
+  {/if}
+  {#if size.r5}
+    <div class="bg-green-500 w-full h-12 text-center text-white text-xl pt-2">
+      {width}px
+    </div>
+    <div class="grid grid-cols-5 gap-4 p-4">
+      {#each groups as quant}
+        <OmoCardGroup {quant} />
+      {/each}
+    </div>
+  {/if}
+  {#if size.r6}
+    <div class="bg-blue-500 w-full h-12 text-center text-white text-xl pt-2">
+      {width}px
+    </div>
+    <div class="grid grid-cols-6 gap-4 p-4">
+      {#each groups as quant}
+        <OmoCardGroup {quant} />
+      {/each}
+    </div>
+  {/if}
 </div>
