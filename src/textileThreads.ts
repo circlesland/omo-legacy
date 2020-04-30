@@ -11,38 +11,46 @@ import {
   AuthorSchema,
   TomatoSchema,
 } from "./schemas";
-export let db: Database;
-export let QuantCollection: Collection<Quant>;
-export let Collections: Map<string, Collection<any>>;
+import { Op } from "@textile/threads-store";
+export var db: Database;
+
+
 export async function initDB(seed: Boolean): Promise<void> {
   const store = new LevelDatastore("db/" + uuid.v4() + ".db");
   db = new Database(store);
   await db.open();
 
   if (!db.collections.has("Quant")) {
-    QuantCollection = await db.newCollection<Quant>("Quant", QuantSchema);
-    if (seed) {
-      await seedDB(db);
-    }
-  } else {
-    QuantCollection = db.collections.get("Quant") as Collection<Quant>;
+    await seedDB(db, seed);
   }
-  Collections = db.collections;
   // Subsriptions
-  db.on("**", async (update) => pubsub.publish(update.collection.toLowerCase() + "_save", {
-    type: update.event.type,
-    collection: db.collections.get(update.collection),
-    id: update.id
-  }));
+  db.on("**", async (update) => {
+    let postfix = "";
+    switch (update.event.type) {
+      case Op.Type.Create: postfix = "added"; break;
+      case Op.Type.Save: postfix = "updated"; break;
+      case Op.Type.Delete: postfix = "deleted"; break;
+    }
+
+    pubsub.publish(update.collection + "_" + postfix, { id: update.id });
+    pubsub.publish(update.collection + "_changed", { id: update.id });
+  });
   console.log("DB initialised");
+
 }
 
-export async function seedDB(db: Database): Promise<void> {
-  const quanta = [
-    { name: "Author", icon: "fa-book", jsonSchema: JSON.stringify(AuthorSchema), collectionName: uuid.v4() },
-    { name: "Book", icon: "fa-book", jsonSchema: JSON.stringify(BookSchema), collectionName: uuid.v4() },
-    { name: "Library", icon: "fa-book", jsonSchema: JSON.stringify(LibrarySchema), collectionName: uuid.v4() },
-  ];
-  await quanta.forEach(async quant => await db.newCollection(quant.collectionName, JSON.parse(quant.jsonSchema)));
-  await QuantCollection.save(...quanta.map(quant => new QuantCollection(quant)));
+export async function seedDB(db: Database, seed): Promise<void> {
+  const quanta = [{ name: "Quant", icon: "fa-book", jsonSchema: JSON.stringify(QuantSchema), collectionName: "Quant" }];
+
+  if (seed)
+    quanta.push(
+      { name: "Author", icon: "fa-book", jsonSchema: JSON.stringify(AuthorSchema), collectionName: uuid.v4() },
+      { name: "Book", icon: "fa-book", jsonSchema: JSON.stringify(BookSchema), collectionName: uuid.v4() },
+      { name: "Library", icon: "fa-book", jsonSchema: JSON.stringify(LibrarySchema), collectionName: uuid.v4() },
+    );
+  for (let i = 0; i < quanta.length; i++)
+    await db.newCollection(quanta[i].collectionName, JSON.parse(quanta[i].jsonSchema));
+
+  let quantCollection = db.collections.get("Quant") as Collection<Quant>;
+  await quantCollection.save(...quanta.map(quant => quantCollection(quant)));
 }
