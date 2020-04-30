@@ -27,6 +27,7 @@
     "isomorphic-ws": "^4.0.1",
     "json-loader": "^0.5.7",
     "json-schema": "^0.2.5",
+    "pluralize": "^8.0.0",
     "streaming-iterables": "^4.1.2",
     "svelte-select": "^3.7.0",
     "svelte-watch-resize": "^1.0.3",
