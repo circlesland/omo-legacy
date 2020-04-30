@@ -32,21 +32,14 @@
 <div class="flex flex-col h-full">
   <header
     class="bg-gray-200 text-sm font-semibold py-2 px-3 text-blue-900 uppercase
-    border-b border-gray-300">
+    border-b border-gray-300 text-center">
     Context Title
   </header>
   <main class="h-full flex-1 flex overflow-hidden">
-    <!-- <div class="h-full border-r border-gray-200">
-        <OmoMenuVertical />
-      </div> -->
-    <div
-      class="h-full overflow-y-scroll bg-gray-100 border-t border-r
-      border-gray-200 w-64">
-      <OmoList routes={router} />
-    </div>
-    <div class="h-full flex-1 overflow-y-scroll py-20 px-24">
-      <svelte:component this={router.find(x => x.route == $curRoute).quant} />
-    </div>
+    <svelte:component
+      this={router.find(x => x.route == $curRoute).quant}
+      {router}
+      curRoute={$curRoute} />
   </main>
   <footer>
     <OmoNavbar />
