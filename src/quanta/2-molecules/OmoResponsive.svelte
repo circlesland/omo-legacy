@@ -1,5 +1,51 @@
 <script>
   import { watchResize } from "svelte-watch-resize";
+  import OmoCardGroup from "./OmoCardGroup.svelte";
+
+  let groups = [
+    {
+      name: "Group 1",
+      follower: "123",
+      description: "group description",
+      image: "https://source.unsplash.com/random",
+      user: "https://randomuser.me/api/portraits/women/21.jpg"
+    },
+    {
+      name: "Group 2",
+      follower: "63",
+      description: "group description",
+      image: "https://source.unsplash.com/random",
+      user: "https://randomuser.me/api/portraits/women/21.jpg"
+    },
+    {
+      name: "Group 3",
+      follower: "346",
+      description: "group description",
+      image: "https://source.unsplash.com/random",
+      user: "https://randomuser.me/api/portraits/women/21.jpg"
+    },
+    {
+      name: "Group 4",
+      follower: "10",
+      description: "group description",
+      image: "https://source.unsplash.com/random",
+      user: "https://randomuser.me/api/portraits/women/21.jpg"
+    },
+    {
+      name: "Group 5",
+      follower: "123450",
+      description: "group description",
+      image: "https://source.unsplash.com/random",
+      user: "https://randomuser.me/api/portraits/women/21.jpg"
+    },
+    {
+      name: "Group 6",
+      follower: "12340",
+      description: "group description",
+      image: "https://source.unsplash.com/random",
+      user: "https://randomuser.me/api/portraits/women/21.jpg"
+    }
+  ];
 
   let width;
 
@@ -65,45 +111,70 @@
   }
 </script>
 
-<div class="w-full" use:watchResize={responsive}>
+<div class="flex">
+  <div class="w-full" use:watchResize={responsive}>
+    {#if size.r1}
+      <div class="bg-pink-400 w-full h-12 text-center text-white text-xl pt-2">
+        {width}px
+      </div>
+      <div class="grid grid-cols-1 gap-4 p-4">
+        {#each groups as quant}
+          <OmoCardGroup {quant} />
+        {/each}
+      </div>
+    {/if}
+    {#if size.r2}
+      <div class="bg-red-400 w-full h-12 text-center text-white text-xl pt-2">
+        {width}px
+      </div>
+      <div class="grid grid-cols-2 gap-4 p-4">
+        {#each groups as quant}
+          <OmoCardGroup {quant} />
+        {/each}
+      </div>
+    {/if}
+    {#if size.r3}
+      <div
+        class="bg-orange-400 w-full h-12 text-center text-white text-xl pt-2">
+        {width}px
+      </div>
+      <div class="grid grid-cols-3 gap-4 p-4">
+        {#each groups as quant}
+          <OmoCardGroup {quant} />
+        {/each}
+      </div>
+    {/if}
+    {#if size.r4}
+      <div
+        class="bg-yellow-500 w-full h-12 text-center text-white text-xl pt-2">
+        {width}px
+      </div>
+      <div class="grid grid-cols-4 gap-4 p-4">
+        {#each groups as quant}
+          <OmoCardGroup {quant} />
+        {/each}
+      </div>
+    {/if}
+    {#if size.r5}
+      <div class="bg-green-500 w-full h-12 text-center text-white text-xl pt-2">
+        {width}px
+      </div>
+      <div class="grid grid-cols-5 gap-4 p-4">
+        {#each groups as quant}
+          <OmoCardGroup {quant} />
+        {/each}
+      </div>
+    {/if}
+    {#if size.r6}
+      <div class="bg-blue-500 w-full h-12 text-center text-white text-xl pt-2">
+        {width}px
+      </div>
+      <div class="grid grid-cols-6 gap-4 p-4">
+        {#each groups as quant}
+          <OmoCardGroup {quant} />
+        {/each}
+      </div>
+    {/if}
+  </div>
 
-  {#if size.r1}
-    <div class="bg-pink-400 w-full h-12 text-center text-white text-xl pt-2">
-      {width}
-    </div>
-  {/if}
-  {#if size.r2}
-    <div class="bg-red-400 w-full h-12 text-center text-white text-xl pt-2">
-      {width}
-    </div>
-  {/if}
-  {#if size.r3}
-    <div class="bg-orange-400 w-full h-12 text-center text-white text-xl pt-2">
-      {width}
-    </div>
-  {/if}
-  {#if size.r4}
-    <div class="bg-yellow-500 w-full h-12 text-center text-white text-xl pt-2">
-      {width}
-    </div>
-  {/if}
-  {#if size.r5}
-    <div class="bg-green-500 w-full h-12 text-center text-white text-xl pt-2">
-      {width}
-    </div>
-  {/if}
-  {#if size.r6}
-    <div class="bg-blue-500 w-full h-12 text-center text-white text-xl pt-2">
-      {width}
-    </div>
-  {/if}
 </div>
-<!-- 
-<OmoResponsive>
-  <div class="bg-yellow-400 w-full h-10" />
-  <div class="bg-orange-500 w-full h-10" />
-  <div class="bg-red-500 w-full h-10" />
-  <div class="bg-pink-500 w-full h-10" />
-  <div class="bg-green-500 w-full h-10" />
-  <div class="bg-blue-500 w-full h-10" />
-</OmoResponsive> -->

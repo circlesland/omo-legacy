@@ -1,6 +1,14 @@
 <script>
   import { watchResize } from "svelte-watch-resize";
 
+  export let quant = {
+    follower: "10",
+    name: "Group Name",
+    description: "group description",
+    image: "https://source.unsplash.com/random",
+    user: "https://randomuser.me/api/portraits/women/21.jpg"
+  };
+
   let width;
 
   let size = {
@@ -65,31 +73,26 @@
   }
 </script>
 
-<div class="w-full" use:watchResize={responsive}>
-  {width}
-  {#if size.r1}
-    <slot name="r1" />
-    <div class="flex flex-col max-w-sm mx-auto rounded shadow">
-      <img class="h-auto w-full object-cover" alt="image" />
-      <h1 class="text-center text-blue-900 text-sm font-bold uppercase">
-        sdsd
-      </h1>
-      <p class="text-gray-600 text-sm mt-1">sddsd</p>
+<a href="/" use:watchResize={responsive}>
+  <div
+    class="bg-white relative shadow rounded-lg text-gray-800 hover:shadow-lg">
+    <div
+      class="right-0 mt-4 rounded-l-full absolute text-center font-bold text-xs
+      text-white px-2 py-1 bg-orange-500">
+      {quant.follower} members
     </div>
-  {/if}
-  {#if size.r2}
-    <slot name="r2" />
-  {/if}
-  {#if size.r3}
-    <slot name="r3" />
-  {/if}
-  {#if size.r4}
-    <slot name="r4" />
-  {/if}
-  {#if size.r5}
-    <slot name="r5" />
-  {/if}
-  {#if size.r6}
-    <slot name="r6" />
-  {/if}
-</div>
+    <img
+      src={quant.image}
+      class="h-40 rounded-lg w-full object-cover object-center" />
+    <div class="flex justify-center">
+      <img
+        src={quant.user}
+        class="rounded-full -mt-12 border-8 object-center object-cover
+        border-white mr-2 h-24 w-24" />
+    </div>
+    <div class="py-2 px-2">
+      <div class="font-bold font-title text-xl text-center">{quant.name}</div>
+      <div class="text-sm font-light text-center my-2">{quant.description}</div>
+    </div>
+  </div>
+</a>
