@@ -40,7 +40,7 @@ export async function initDB(seed: Boolean): Promise<void> {
 }
 
 export async function seedDB(db: Database, seed): Promise<void> {
-  const quanta = [{ name: "Quant", icon: "fa-book", jsonSchema: JSON.stringify(QuantSchema), collectionName: "Quant" }];
+  const quanta: any[] = [{ ID: "Quant", name: "Quant", icon: "fa-book", jsonSchema: JSON.stringify(QuantSchema), collectionName: "Quant" }];
 
   if (seed)
     quanta.push(

@@ -24,32 +24,30 @@
 
     result.data.Quants.forEach(element => {
       router.push({
-        route: `?route=${element.name}`,
+        route: `?route=${element.ID}`,
         quant: OmoSideBarLayout,
         name: element.name
       });
     });
   });
-  subscribe("subscription {Quants {ID name icon collectionName}}").then(
-    subscription => {
-      (async () => {
-        for await (let value of subscription) {
-          router = [
-            { route: "?route=home", quant: OmoHome, name: null },
-            { route: "?route=test", quant: OmoTest, name: "test" }
-          ];
+  subscribe("subscription {Quants {ID name icon }}").then(subscription => {
+    (async () => {
+      for await (let value of subscription) {
+        router = [
+          { route: "?route=home", quant: OmoHome, name: null },
+          { route: "?route=test", quant: OmoTest, name: "test" }
+        ];
 
-          value.data.Quants.forEach(element => {
-            router.push({
-              route: `?route=${element.name}`,
-              quant: OmoSideBarLayout,
-              name: element.name
-            });
+        value.data.Quants.forEach(element => {
+          router.push({
+            route: `?route=${element.ID}`,
+            quant: OmoSideBarLayout,
+            name: element.name
           });
-        }
-      })();
-    }
-  );
+        });
+      }
+    })();
+  });
   onMount(() => {
     var urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("route")) {
