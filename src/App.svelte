@@ -38,8 +38,7 @@
   <main class="h-full flex-1 flex overflow-hidden">
     <svelte:component
       this={router.find(x => x.route == $curRoute).quant}
-      {router}
-      curRoute={$curRoute} />
+      {router} />
   </main>
   <footer>
     <OmoNavbar />

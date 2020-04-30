@@ -228,7 +228,6 @@ export async function getSchema() {
     })
   });
 
-  debugger;
   return schema;
 }
 

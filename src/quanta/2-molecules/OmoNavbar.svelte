@@ -1,4 +1,5 @@
 <script>
+  import { curRoute } from "./../../router.ts";
   import OmoIconsFA from "./../1-atoms/OmoIconsFA.svelte";
 </script>
 
@@ -6,35 +7,35 @@
 
 <div class="pb-0 w-full flex flex-wrap">
   <div class="p-3 w-full text-gray-500 bg-gray-900 shadow-lg ">
-    <a href="/">
+    <button on:click={() => curRoute.set('?route=home')}>
       <span class="pl-1 pr-3 mr-2 border-r border-gray-800">
         <img
           src="/images/logo.png"
           alt="alt placeholder"
           class="h-8 -my-1 inline mx-auto" />
       </span>
-    </a>
-    <a href="/?route=home">
+    </button>
+    <button on:click={() => curRoute.set('?route=home')}>
       <span
         class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
         <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->
         Home
       </span>
-    </a>
-    <a href="/?route=books">
+    </button>
+    <button on:click={() => curRoute.set('?route=books')}>
       <span
         class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
         <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->
         Editor
       </span>
-    </a>
-    <a href="/?route=test">
+    </button>
+    <button on:click={() => curRoute.set('?route=test')}>
       <span
         class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
         <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->
         Test
       </span>
-    </a>
+    </button>
     <!-- <a href="/editor">
       <span
         class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">

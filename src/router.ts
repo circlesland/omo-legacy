@@ -12,26 +12,26 @@ const router = [
   {
     route: "?route=books",
     quant: OmoSideBarLayout,
-    subQuant: OmoBooksTable,
+    subQuant: OmoHome,
     name: "books",
     icon: "fa-book",
   },
   {
     route: "?route=authors",
     quant: OmoSideBarLayout,
-    subQuant: OmoAuthorsTable,
+    subQuant: OmoHome,
     name: "authors",
     icon: "fa-user-graduate",
   },
   {
     route: "?route=libraries",
     quant: OmoSideBarLayout,
-    subQuant: OmoLibrariesTable,
+    subQuant: OmoHome,
     name: "libraries",
     icon: "fa-book-reader",
   },
 ];
 
 export default router;
-export const curRoute = writable("?route=home");
+export var curRoute = writable("?route=home");
 export const curId = writable(0);
