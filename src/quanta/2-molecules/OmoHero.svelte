@@ -8,13 +8,13 @@
 
 <div class="flex flex-col text-center mx-auto my-6">
   {#if quant.illustration}
-    <div class="w-1/5 mx-auto mb-10">
+    <div class="w-1/3 mx-auto mb-10">
       <img src={quant.illustration} alt={quant.title} />
     </div>
   {/if}
   <div class="mx-auto text-center">
     <h1
-      class="uppercase text-4xl text-blue-900 font-bold leading-none
+      class="uppercase text-4xl text-blue-900 font-black leading-none
       tracking-tight mb-2">
       {quant.title}
     </h1>

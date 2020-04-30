@@ -14,11 +14,18 @@
           class="h-8 -my-1 inline mx-auto" />
       </span>
     </a>
-    <a href="/">
+    <a href="/?route=home">
       <span
         class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
         <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->
         Home
+      </span>
+    </a>
+    <a href="/?route=test">
+      <span
+        class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
+        <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->
+        Test
       </span>
     </a>
     <!-- <a href="/editor">
