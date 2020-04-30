@@ -1,13 +1,55 @@
 <script>
-  import router, { curId, curRoute } from "./router.ts";
+  import { Quant } from "./schemas.ts";
+  import { curId, curRoute } from "./router.ts";
   import { onMount } from "svelte";
   import OmoNavbar from "./quanta/2-molecules/OmoNavbar.svelte";
   import OmoList from "./quanta/2-molecules/OmoList.svelte";
   import OmoBooksTable from "./quanta/2-molecules/OmoBooksTable.svelte";
   import OmoMenuVertical from "./quanta/2-molecules/OmoMenuVertical.svelte";
+  import OmoHome from "./quanta/5-pages/OmoHome.svelte";
+  import OmoTest from "./quanta/5-pages/OmoHome.svelte";
+  import OmoSideBarLayout from "./quanta/4-layouts/OmoSideBarLayout.svelte";
+
+  var router = [
+    { route: "?route=home", quant: OmoHome, name: null },
+    { route: "?route=test", quant: OmoTest, name: "test" }
+  ];
 
   let currentId;
+  graphql("{Quants {ID name icon }}").then(result => {
+    router = [
+      { route: "?route=home", quant: OmoHome, name: null },
+      { route: "?route=test", quant: OmoTest, name: "test" }
+    ];
 
+    result.data.Quants.forEach(element => {
+      router.push({
+        route: `?route=${element.name}`,
+        quant: OmoSideBarLayout,
+        name: element.name
+      });
+    });
+  });
+  subscribe("subscription {Quants {ID name icon collectionName}}").then(
+    subscription => {
+      (async () => {
+        for await (let value of subscription) {
+          router = [
+            { route: "?route=home", quant: OmoHome, name: null },
+            { route: "?route=test", quant: OmoTest, name: "test" }
+          ];
+
+          value.data.Quants.forEach(element => {
+            router.push({
+              route: `?route=${element.name}`,
+              quant: OmoSideBarLayout,
+              name: element.name
+            });
+          });
+        }
+      })();
+    }
+  );
   onMount(() => {
     var urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("route")) {

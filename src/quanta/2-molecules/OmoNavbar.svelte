@@ -22,7 +22,7 @@
         Home
       </span>
     </button>
-    <button on:click={() => curRoute.set('?route=books')}>
+    <button on:click={() => curRoute.set('?route=Quant')}>
       <span
         class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
         <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->

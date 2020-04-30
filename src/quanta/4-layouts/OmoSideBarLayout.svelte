@@ -1,4 +1,5 @@
 <script>
+  import OmoCRUDTable from "./../2-molecules/OmoCRUDTable.svelte";
   import OmoList from "./../2-molecules/OmoList.svelte";
   import OmoNavbar from "./../2-molecules/OmoNavbar.svelte";
   import OmoBooksTable from "./../2-molecules/OmoBooksTable.svelte";
@@ -17,5 +18,5 @@
   <OmoList routes={router} />
 </div>
 <div class="h-full flex-1 overflow-y-scroll py-20 px-24">
-  <svelte:component this={router.find(x => x.route == $curRoute).subQuant} />
+  <OmoCRUDTable name={router.find(x => x.route == $curRoute).name} />
 </div>
