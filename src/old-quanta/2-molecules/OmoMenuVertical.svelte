@@ -17,6 +17,7 @@
   };
 </script>
 
+{quant}
 <OmoIconsFA />
 <div
   class="w-16 h-full pt-4 pb-4 bg-gray-200 text-blue-900 text-center shadow-lg">

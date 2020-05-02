@@ -9,11 +9,9 @@ import {
   LibrarySchema,
   BookSchema,
   AuthorSchema,
-  TomatoSchema,
 } from "./schemas";
 import { Op } from "@textile/threads-store";
 export var db: Database;
-
 
 export async function initDB(seed: Boolean): Promise<void> {
   const store = new LevelDatastore("db/" + uuid.v4() + ".db");
@@ -34,13 +32,15 @@ export async function initDB(seed: Boolean): Promise<void> {
 
     pubsub.publish(update.collection + "_" + postfix, { id: update.id });
     pubsub.publish(update.collection + "_changed", { id: update.id });
+    pubsub.publish(update.id + "_" + postfix, { id: update.id });
+    pubsub.publish(update.id + "_changed", { id: update.id });
   });
   console.log("DB initialised");
 
 }
 
 export async function seedDB(db: Database, seed): Promise<void> {
-  const quanta: any[] = [{ ID: "Quant", name: "Quant", icon: "fa-book", jsonSchema: JSON.stringify(QuantSchema), collectionName: "Quant" }];
+  const quanta: any[] = [{ ID: "78a414b4-8557-4790-a863-9e75a89bfbd8", name: "Quant", icon: "fa-book", jsonSchema: JSON.stringify(QuantSchema), collectionName: "Quant" }];
 
   if (seed)
     quanta.push(

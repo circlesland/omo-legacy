@@ -1,9 +1,9 @@
 <script>
-  import quanta from "./../../4-data/quanta.js";
-  import OmoMenuVertical from "./../2-molecules/OmoMenuVertical.svelte";
+  // import quanta from "./../../4-data/quanta.js";
+  // import OmoMenuVertical from "./../2-molecules/OmoMenuVertical.svelte";
 
-  export let currentId;
-  let quant = $quanta.find(item => item.id == currentId);
+  // export let currentId;
+  // let quant = $quanta.find(item => item.id == currentId);
   let thing = { name: "foo", type: "bar", test: "testme" };
 </script>
 
@@ -79,5 +79,5 @@
     </div>
 
   </div>
-  <OmoMenuVertical />
+  <!-- <OmoMenuVertical /> -->
 </div>

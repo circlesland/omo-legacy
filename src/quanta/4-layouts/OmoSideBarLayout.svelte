@@ -18,5 +18,5 @@
   <OmoList routes={router} />
 </div>
 <div class="h-full flex-1 overflow-y-scroll py-20 px-24">
-  <OmoCRUDTable name={router.find(x => x.route == $curRoute).name} />
+  <OmoCRUDTable quantId={router.find(x => x.route == $curRoute).ID} />
 </div>

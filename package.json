@@ -21,6 +21,7 @@
     "apollo-boost": "^0.4.7",
     "datastore-core": "^1.0.0",
     "datastore-level": "^0.14.1",
+    "escape-string-regexp": "^4.0.0",
     "graphql": "^15.0.0",
     "graphql-subscriptions": "^1.1.0",
     "interface-datastore": "^0.8.3",

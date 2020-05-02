@@ -26,7 +26,8 @@
       router.push({
         route: `?route=${element.ID}`,
         quant: OmoSideBarLayout,
-        name: element.name
+        name: element.name,
+        ID: element.ID
       });
     });
   });
@@ -42,7 +43,8 @@
           router.push({
             route: `?route=${element.ID}`,
             quant: OmoSideBarLayout,
-            name: element.name
+            name: element.name,
+            ID: element.ID
           });
         });
       }
