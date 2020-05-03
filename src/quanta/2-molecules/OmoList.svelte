@@ -1,10 +1,24 @@
 <script>
   import OmoListItem from "./../1-atoms/OmoListItem.svelte";
-  export let routes;
+  let quanta = [];
+  graphql("{Quants {ID name icon }}").then(result => {
+    quanta = result.data.Quants;
+  });
+
+  subscribe("subscription {Quants {ID name icon collectionName}}").then(
+    subscription => {
+      (async () => {
+        for await (let value of subscription) {
+          quanta = value.data.Quants;
+        }
+      })();
+    }
+  );
 </script>
 
 <div class="p-4">
-  {#each routes.filter(x => x.name != null) as quant}
+  {#each quanta as quant}
     <OmoListItem {quant} />
   {/each}
+  <button>add</button>
 </div>
