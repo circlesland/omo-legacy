@@ -21,7 +21,6 @@
 </script>
 
 <div class="overflow-hidden overflow-y-auto p-8 sm:p-12 md:p-16 lg:p-24">
-
   <OmoHero {quant} />
 
   <div class=" py-10">

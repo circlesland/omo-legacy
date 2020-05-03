@@ -2,7 +2,6 @@
   import OmoCRUDTable from "./../2-molecules/OmoCRUDTable.svelte";
   import OmoList from "./../2-molecules/OmoList.svelte";
   import OmoNavbar from "./../2-molecules/OmoNavbar.svelte";
-  import OmoBooksTable from "./../2-molecules/OmoBooksTable.svelte";
   import OmoMenuVertical from "./../2-molecules/OmoMenuVertical.svelte";
   import { curRoute } from "./../../router.ts";
 

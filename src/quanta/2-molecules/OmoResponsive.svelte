@@ -47,129 +47,76 @@
     }
   ];
 
+  let quant = {
+    design: {
+      base: {
+        colorbar: "w-full text-center text-white bg-pink-500 text-xs p-1",
+        grid: "grid grid-cols-1 gap-1 p-1"
+      },
+      r1: {
+        colorbar: "w-full text-center text-white bg-red-500 text-sm p-2",
+        grid: "grid grid-cols-2 gap-2 p-2"
+      },
+      r2: {
+        colorbar: "w-full text-center text-white bg-orange-400 text-md p-3",
+        grid: "grid grid-cols-3 gap-2 p-2"
+      },
+      r3: {
+        colorbar: "w-full text-center text-white bg-yellow-400 text-lg p-4",
+        grid: "grid grid-cols-4 gap-4 p-4"
+      },
+      r4: {
+        colorbar: "w-full text-center text-white bg-green-400 text-xl p-5",
+        grid: "grid grid-cols-5 gap-4 p-4"
+      },
+      r5: {
+        colorbar: "w-full text-center text-white bg-blue-400 text-2xl p-6",
+        grid: "grid grid-cols-6 gap-4 p-4"
+      }
+    }
+  };
+
+  let design = {
+    colorbar: "",
+    grid: ""
+  };
+
   let width;
 
-  let size = {
-    r1: true,
-    r2: false,
-    r3: false,
-    r4: false,
-    r5: false,
-    r6: false
+  let breakpoint = {
+    r1: 480,
+    r2: 768,
+    r3: 992,
+    r4: 1280,
+    r5: 1600
   };
 
   function responsive(node) {
     width = node.clientWidth;
-    if (width < 480) {
-      size.r1 = true;
-      size.r2 = false;
-      size.r3 = false;
-      size.r4 = false;
-      size.r5 = false;
-      size.r6 = false;
+    design = quant.design.base;
+    if (width >= breakpoint.r1 && quant.design.r1) {
+      design = quant.design.r1;
     }
-    if (width >= 480 && width < 768) {
-      size.r1 = false;
-      size.r2 = true;
-      size.r3 = false;
-      size.r4 = false;
-      size.r5 = false;
-      size.r6 = false;
+    if (width >= breakpoint.r2 && quant.design.r2) {
+      design = quant.design.r2;
     }
-    if (width >= 768 && width < 992) {
-      size.r1 = false;
-      size.r2 = false;
-      size.r3 = true;
-      size.r4 = false;
-      size.r5 = false;
-      size.r6 = false;
+    if (width >= breakpoint.r3 && quant.design.r3) {
+      design = quant.design.r3;
     }
-    if (width >= 992 && width < 1280) {
-      size.r1 = false;
-      size.r2 = false;
-      size.r3 = false;
-      size.r4 = true;
-      size.r5 = false;
-      size.r6 = false;
+    if (width >= breakpoint.r4 && quant.design.r4) {
+      design = quant.design.r4;
     }
-    if (width >= 1280) {
-      size.r1 = false;
-      size.r2 = false;
-      size.r3 = false;
-      size.r4 = false;
-      size.r5 = true;
-      size.r6 = false;
-    }
-    if (width >= 1600) {
-      size.r1 = false;
-      size.r2 = false;
-      size.r3 = false;
-      size.r4 = false;
-      size.r5 = false;
-      size.r6 = true;
+    if (width >= breakpoint.r5 && quant.design.r5) {
+      design = quant.design.r5;
     }
   }
 </script>
 
 <div class="w-full" use:watchResize={responsive}>
-  {#if size.r1}
-    <div class="bg-pink-400 w-full h-12 text-center text-white text-xl pt-2">
-      {width}px
-    </div>
-    <div class="grid grid-cols-1 gap-4 p-4">
-      {#each groups as quant}
-        <OmoCardGroup {quant} />
-      {/each}
-    </div>
-  {/if}
-  {#if size.r2}
-    <div class="bg-red-400 w-full h-12 text-center text-white text-xl pt-2">
-      {width}px
-    </div>
-    <div class="grid grid-cols-2 gap-4 p-4">
-      {#each groups as quant}
-        <OmoCardGroup {quant} />
-      {/each}
-    </div>
-  {/if}
-  {#if size.r3}
-    <div class="bg-orange-400 w-full h-12 text-center text-white text-xl pt-2">
-      {width}px
-    </div>
-    <div class="grid grid-cols-3 gap-4 p-4">
-      {#each groups as quant}
-        <OmoCardGroup {quant} />
-      {/each}
-    </div>
-  {/if}
-  {#if size.r4}
-    <div class="bg-yellow-500 w-full h-12 text-center text-white text-xl pt-2">
-      {width}px
-    </div>
-    <div class="grid grid-cols-4 gap-4 p-4">
-      {#each groups as quant}
-        <OmoCardGroup {quant} />
-      {/each}
-    </div>
-  {/if}
-  {#if size.r5}
-    <div class="bg-green-500 w-full h-12 text-center text-white text-xl pt-2">
-      {width}px
-    </div>
-    <div class="grid grid-cols-5 gap-4 p-4">
-      {#each groups as quant}
-        <OmoCardGroup {quant} />
-      {/each}
-    </div>
-  {/if}
-  {#if size.r6}
-    <div class="bg-blue-500 w-full h-12 text-center text-white text-xl pt-2">
-      {width}px
-    </div>
-    <div class="grid grid-cols-6 gap-4 p-4">
-      {#each groups as quant}
-        <OmoCardGroup {quant} />
-      {/each}
-    </div>
-  {/if}
+  <div class={design.colorbar}>{width}px</div>
+  <div class={design.grid}>
+    {#each groups as quant}
+      <OmoCardGroup {quant} />
+    {/each}
+  </div>
 </div>
