@@ -1,23 +1,7 @@
 <script>
   import OmoIconsFA from "./../1-atoms/OmoIconsFA.svelte";
-
-  export let quant = {
-    id: "q6",
-    model: {
-      id: "m6",
-      name: "Omo Menu Vertical",
-      image: "/images/samuel.jpg",
-      author: "Samuel Andert",
-      type: "view",
-      group: "omo",
-      tags: "molecule"
-    },
-    design: {},
-    data: []
-  };
 </script>
 
-{quant}
 <OmoIconsFA />
 <div
   class="w-16 h-full pt-4 pb-4 bg-gray-200 text-blue-900 text-center shadow-lg">
