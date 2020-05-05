@@ -4,10 +4,9 @@
   import OmoPartners from "./../2-molecules/OmoPartners";
 
   const quant = {
-    title: "transform your visions into (d)apps",
+    title: "transform visions into (d)apps",
     subline:
-      "imagine you could turn any idea with easy drag and drop lego-like building blocks, into modern opensource multiplatform and resilient serverless (d)apps",
-    illustration: "/images/the_world_is_mine.svg"
+      "imagine you could turn any idea with easy drag and drop lego-like building blocks, into modern opensource multiplatform and resilient serverless (d)apps"
   };
   const contributors = {
     title: "About OMO's",

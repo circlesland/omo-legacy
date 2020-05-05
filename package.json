@@ -1,15 +1,43 @@
 {
-  "name": "svelte-typescript-scss-webpack-app",
-  "version": "1.0.0",
+  "name": "omo",
+  "description": "turn any idea with easy drag and drop lego-like building blocks, into modern opensource multiplatform and resilient serverless (d)apps",
+  "version": "0.4.0",
+  "license": "AGPL-3.0",
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack",
     "build:dev": "cross-env NODE_ENV=development webpack",
     "start": "cross-env NODE_ENV=development webpack-dev-server --mode development --open"
   },
+  "author": {
+    "name": "omo.earth",
+    "email": "team@omo.earth",
+    "url": "https://omo.earth"
+  },
+  "contributors": [
+    {
+      "name": "Samuel Andert",
+      "email": "samuel@omo.earth"
+    },
+    {
+      "name": "Philipp Barthels",
+      "email": "philipp@omo.earth"
+    }
+  ],
+  "homepage": "https://omo.earth",
+  "keywords": [
+    "tailwind",
+    "svelte",
+    "graphql",
+    "textile",
+    "ipfs"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/omoearth/omo-quantum.git"
+  },
+  "bugs": "https://github.com/omoearth/omo-quantum/issues",
+  "main": "src/App.svelte",
   "dependencies": {
-    "@emotion/core": "^10.0.28",
-    "@emotion/styled": "^10.0.27",
-    "@styled-system/css": "^5.1.5",
     "@textile/textile": "0.0.7",
     "@textile/threads-database": "0.1.0",
     "@textile/threads-encoding": "0.1.0",
