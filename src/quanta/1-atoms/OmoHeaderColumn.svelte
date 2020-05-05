@@ -11,7 +11,7 @@
       var uid = uuid.v4();
       await db.newCollection(uid, jsonSchema);
       await graphql(
-        `mutation{saveQuant(ID:"${quant.ID}",jsonSchema:"""${JSON.stringify(
+        `mutation{updateQuant(ID:"${quant.ID}",jsonSchema:"""${JSON.stringify(
           jsonSchema
         )}"""){ID}}`
       );
@@ -19,7 +19,7 @@
       db.collections.delete(uid);
     } else {
       await graphql(
-        `mutation{saveQuant(ID:"${quant.ID}",jsonSchema:"""${JSON.stringify(
+        `mutation{updateQuant(ID:"${quant.ID}",jsonSchema:"""${JSON.stringify(
           jsonSchema
         )}""",collectionName:"${uuid.v4()}"){ID}}`
       );

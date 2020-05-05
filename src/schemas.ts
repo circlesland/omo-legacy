@@ -151,7 +151,7 @@ function getSubscriptions(map: Map<Quant, GraphQLObjectType>): Thunk<GraphQLFiel
     subscriptions[`${quant.name}ById`] = {
       args: { ID: { type: GraphQLID } },
       type: type,
-      subscribe: async (root: any, data: any) => { console.log("subscribe", data); return pubsub.asyncIterator(data.ID + "_changed") },
+      subscribe: async (root: any, data: any) => pubsub.asyncIterator(data.ID + "_changed"),
       resolve: async (payload: any) => { console.log(JSON.stringify(payload)); return await collection.findById(payload.id); }
     };
     subscriptions[quant.name + "Added"] = {
@@ -208,20 +208,11 @@ function getMutations(map: Map<Quant, GraphQLObjectType>): Thunk<GraphQLFieldCon
       },
       type
     };
-    mutations[`save${quant.name}`] = {
-      args,
-      resolve: async (root: any, data: any) => {
-        var entity = await collection.findById(data.ID);
-        Object.keys(data).forEach(key => entity[key] = data[key]);
-        await collection.save(entity);
-        return entity;
-      },
-      type
-    };
     mutations[`update${quant.name}`] = {
       args,
       resolve: async (root: any, data: any) => {
         var entity = await collection.findById(data.ID);
+        Object.keys(data).forEach(key => entity[key] = data[key]);
         await collection.save(entity);
         return entity;
       },
