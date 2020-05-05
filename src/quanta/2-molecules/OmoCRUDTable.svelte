@@ -6,6 +6,7 @@
   import OmoEntryRow from "./../1-atoms/OmoEntryRow.svelte";
   import { Database } from "@textile/threads-database";
   import OmoTable from "./../2-molecules/OmoTable.svelte";
+  import OmoGrid from "./../2-molecules/OmoGrid.svelte";
   export let quantId;
 
   export let model = {

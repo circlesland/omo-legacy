@@ -4,6 +4,8 @@
   import OmoList from "./../2-molecules/OmoList.svelte";
   import OmoNavbar from "./../2-molecules/OmoNavbar.svelte";
   import OmoMenuVertical from "./../2-molecules/OmoMenuVertical.svelte";
+  import OmoGrid from "./../2-molecules/OmoGrid.svelte";
+
   import { curRoute } from "./../../router.ts";
 
   export let router;
@@ -19,4 +21,7 @@
 </div>
 <div class="h-full flex-1 overflow-y-scroll py-20 px-24">
   <OmoQuantTable quantId={router.find(x => x.route == $curRoute).ID} />
+  <div class="py-10">
+    <OmoGrid />
+  </div>
 </div>

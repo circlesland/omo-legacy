@@ -5,7 +5,9 @@
 
 <OmoIconsFA />
 
-<div class="h-12 pb-0 w-full flex flex-wrap">
+<div
+  class="h-12 pb-0 w-full flex flex-wrap "
+  style="font-family: 'Montserrat', sans-serif !important;">
   <div class="w-full text-gray-500 bg-gray-900 shadow-lg ">
     <button on:click={() => curRoute.set('?route=home')}>
       <span class="border-r border-gray-800">
