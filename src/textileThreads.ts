@@ -15,7 +15,7 @@ export var db: Database;
 
 export async function initDB(seed: Boolean): Promise<void> {
   // const store = new LevelDatastore("db/" + uuid.v4() + ".db");
-  const store = new LevelDatastore("db/static.db");
+  const store = new LevelDatastore("db/static2.db");
   db = new Database(store);
   await db.open();
 
@@ -26,9 +26,15 @@ export async function initDB(seed: Boolean): Promise<void> {
   db.on("**", async (update) => {
     let postfix = "";
     switch (update.event.type) {
-      case Op.Type.Create: postfix = "added"; break;
-      case Op.Type.Save: postfix = "updated"; break;
-      case Op.Type.Delete: postfix = "deleted"; break;
+      case Op.Type.Create:
+        postfix = "added";
+        break;
+      case Op.Type.Save:
+        postfix = "updated";
+        break;
+      case Op.Type.Delete:
+        postfix = "deleted";
+        break;
     }
 
     pubsub.publish(update.collection + "_" + postfix, { id: update.id });
@@ -40,17 +46,43 @@ export async function initDB(seed: Boolean): Promise<void> {
 }
 
 export async function seedDB(db: Database, seed): Promise<void> {
-  const quanta: any[] = [{ ID: "78a414b4-8557-4790-a863-9e75a89bfbd8", name: "Quant", icon: "fa-book", jsonSchema: JSON.stringify(QuantSchema), collectionName: 'Quant' }];
+  const quanta: any[] = [
+    {
+      ID: "78a414b4-8557-4790-a863-9e75a89bfbd8",
+      name: "Quant",
+      icon: "fa-book",
+      jsonSchema: JSON.stringify(QuantSchema),
+      collectionName: "Quant",
+    },
+  ];
 
   if (seed)
     quanta.push(
-      { name: "Author", icon: "fa-book", jsonSchema: JSON.stringify(AuthorSchema), collectionName: uuid.v4() },
-      { name: "Book", icon: "fa-book", jsonSchema: JSON.stringify(BookSchema), collectionName: uuid.v4() },
-      { name: "Library", icon: "fa-book", jsonSchema: JSON.stringify(LibrarySchema), collectionName: uuid.v4() },
+      {
+        name: "Author",
+        icon: "fa-book",
+        jsonSchema: JSON.stringify(AuthorSchema),
+        collectionName: uuid.v4(),
+      },
+      {
+        name: "Book",
+        icon: "fa-book",
+        jsonSchema: JSON.stringify(BookSchema),
+        collectionName: uuid.v4(),
+      },
+      {
+        name: "Library",
+        icon: "fa-book",
+        jsonSchema: JSON.stringify(LibrarySchema),
+        collectionName: uuid.v4(),
+      }
     );
   for (let i = 0; i < quanta.length; i++)
-    await db.newCollection(quanta[i].collectionName, JSON.parse(quanta[i].jsonSchema));
+    await db.newCollection(
+      quanta[i].collectionName,
+      JSON.parse(quanta[i].jsonSchema)
+    );
 
   let quantCollection = db.collections.get("Quant") as Collection<Quant>;
-  await quantCollection.save(...quanta.map(quant => quantCollection(quant)));
+  await quantCollection.save(...quanta.map((quant) => quantCollection(quant)));
 }
