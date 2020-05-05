@@ -1,6 +1,6 @@
 <script>
   import OmoQuantTable from "./../2-molecules/OmoQuantTable.svelte";
-  import OmoCRUDTable from "./../2-molecules/OmoCRUDTable.svelte";
+  import OmoQuantGrid from "./../2-molecules/OmoQuantGrid.svelte";
   import OmoList from "./../2-molecules/OmoList.svelte";
   import OmoNavbar from "./../2-molecules/OmoNavbar.svelte";
   import OmoMenuVertical from "./../2-molecules/OmoMenuVertical.svelte";
@@ -20,8 +20,10 @@
   <OmoList routes={router} />
 </div>
 <div class="h-full flex-1 overflow-y-scroll py-20 px-24">
-  <OmoQuantTable quantId={router.find(x => x.route == $curRoute).ID} />
+  <OmoQuantGrid quantId={router.find(x => x.route == $curRoute).ID} />
   <div class="py-10">
     <OmoGrid />
   </div>
+  <OmoQuantTable quantId={router.find(x => x.route == $curRoute).ID} />
+
 </div>
