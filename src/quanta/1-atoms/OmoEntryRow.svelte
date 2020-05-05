@@ -8,22 +8,23 @@
     if (confirm("are you sure?"))
       await graphql(`mutation {delete${entryName}(ID:"${entry.ID}")}`);
   }
-
+  let canSelect = true;
   async function selectValue(key) {
+    if (!canSelect) return;
+    canSelect = false;
     let data = entry[key];
-    if (data.value) {
-      var foo = await graphql(
-        `mutation {update${entryName}(ID:"${
-          entry.find(x => x.key == "ID").value
-        }", ${data.key}:"${data.value}"){ ID }}`
-      );
-      console.log(foo);
-    }
+    var mut = `mutation {save${entryName}(ID:"${
+      entry.find(x => x.key == "ID").value
+    }", ${data.key}:"""${data.value}"""){ ID name}}`;
+    var foo = await graphql(mut);
+    console.log(mut);
+    console.log(foo);
+    canSelect = true;
   }
 
   async function clearValue(key) {
     await graphql(
-      `mutation {update${entryName}(ID:"${
+      `mutation {save${entryName}(ID:"${
         entry.find(x => x.key == "ID").value
       }", ${data.key}:"null"){ ID}}`
     );
@@ -46,19 +47,6 @@
         on:select={() => selectValue(entrykey)} />
     </td>
   {/each}
-  <!-- 
-  <td class="">
-    <Select
-      isCreatable="true"
-      items={libraries}
-      bind:selectedValue={book.library}
-      {createItem}
-      {optionIdentifier}
-      {getOptionLabel}
-      {getSelectionLabel}
-      on:select={() => selectValue('library')}
-      on:clear={() => clearValue('library')} />
-  </td>-->
   <td>
     <button
       on:click={deleteBook}

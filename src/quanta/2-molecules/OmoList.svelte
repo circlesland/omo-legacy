@@ -20,5 +20,4 @@
   {#each quanta as quant}
     <OmoListItem {quant} />
   {/each}
-  <button>add</button>
 </div>
