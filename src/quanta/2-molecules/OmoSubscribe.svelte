@@ -1,11 +1,11 @@
 <script>
   export let quant = {
     data: {
-      title: "Get Our Updates",
+      title: "Follow us on Github",
       subline: "Find out about events and other news",
       email: "team@omo.earth",
       image: "https://source.unsplash.com/random",
-      button: "Subscribe On Github"
+      button: "Github"
     }
   };
 </script>
