@@ -1,21 +1,11 @@
 <script>
   export let quant = {
-    model: {
-      name: "",
-      image: "",
-      author: "",
-      type: ""
-    },
-    design: {
-      layout: ""
-    },
     data: {
-      id: "",
       title: "Get Our Updates",
       subline: "Find out about events and other news",
-      email: "john@mail.com",
+      email: "team@omo.earth",
       image: "https://source.unsplash.com/random",
-      button: "Subscribe"
+      button: "Subscribe On Github"
     }
   };
 </script>

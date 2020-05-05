@@ -1,19 +1,23 @@
 <script>
   export let quant = {
-    id: "q3",
-    component: OmoSteps,
-    model: {
-      id: "m3",
-      name: "Omo Steps",
-      image: "/images/samuel.jpg",
-      author: "Samuel Andert",
-      type: "view",
-      group: "omo",
-      tags: "molecule"
-    },
-    design: {},
     data: {
-      id: "d3"
+      steps: [
+        {
+          image: "/images/city_girl.svg",
+          title: "Step 1",
+          description: "description step 1"
+        },
+        {
+          image: "/images/order_a_car.svg",
+          title: "Step 2",
+          description: "description step 2"
+        },
+        {
+          image: "/images/city_driver.svg",
+          title: "Step 3",
+          description: "description step 2"
+        }
+      ]
     }
   };
 </script>

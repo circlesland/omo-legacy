@@ -1,21 +1,3 @@
-<script>
-  export let quant = {
-    id: "q8",
-    component: OmoPricing,
-    model: {
-      id: "m8",
-      name: "Omo Pricing",
-      image: "/images/samuel.jpg",
-      author: "Samuel Andert",
-      type: "view",
-      group: "omo",
-      tags: "molecule"
-    },
-    design: {},
-    data: []
-  };
-</script>
-
 <div class="w-full m-auto flex flex-col md:flex-row items-center">
   <div class="max-w-sm sm:w-4/5 lg:w-1/3 sm:my-5 my-8 z-0 rounded shadow-lg">
     <div

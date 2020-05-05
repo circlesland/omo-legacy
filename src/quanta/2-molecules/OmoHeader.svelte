@@ -1,18 +1,9 @@
 <script>
   export let quant = {
-    id: "",
-    model: {
-      id: "",
-      name: "",
-      image: "",
-      author: "",
-      type: ""
-    },
     data: {
-      id: "",
-      title: "",
-      subline: "",
-      illustration: ""
+      title: "Header Title",
+      subline: "header subline description",
+      illustration: "/images/through_the_park.svg"
     },
     design: {
       layout: "py-20 bg-gray-100",

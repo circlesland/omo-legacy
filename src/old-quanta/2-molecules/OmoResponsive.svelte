@@ -1,5 +1,0 @@
-<script>
-
-</script>
-
-Responsive Test
