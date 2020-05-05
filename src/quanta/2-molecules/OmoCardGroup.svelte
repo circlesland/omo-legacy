@@ -83,12 +83,14 @@
     </div>
     <img
       src={quant.image}
-      class="h-40 rounded-lg w-full object-cover object-center" />
+      class="h-40 rounded-lg w-full object-cover object-center"
+      alt="image" />
     <div class="flex justify-center">
       <img
         src={quant.user}
         class="rounded-full -mt-12 border-8 object-center object-cover
-        border-white mr-2 h-24 w-24" />
+        border-white mr-2 h-24 w-24"
+        alt="image" />
     </div>
     <div class="py-2 px-2">
       <div class="font-bold font-title text-xl text-center">{quant.name}</div>

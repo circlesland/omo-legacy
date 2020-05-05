@@ -1,5 +1,4 @@
 <script>
-  import Quant from "./../../old-quanta/5-pages/Quant.svelte";
   import OmoEntryRow from "./../1-atoms/OmoEntryRow.svelte";
   import { Database } from "@textile/threads-database";
   import OmoTable from "./../2-molecules/OmoTable.svelte";

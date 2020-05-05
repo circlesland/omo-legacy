@@ -34,7 +34,14 @@
       <span
         class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
         <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->
-        Test
+        Responsive
+      </span>
+    </button>
+    <button on:click={() => curRoute.set('?route=design')}>
+      <span
+        class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
+        <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->
+        Design
       </span>
     </button>
     <!-- <a href="/editor">
