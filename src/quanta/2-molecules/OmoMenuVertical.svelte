@@ -1,13 +1,31 @@
 <script>
   import OmoIconsFA from "./../1-atoms/OmoIconsFA.svelte";
+
+  export let quant = {
+    id: "q6",
+    model: {
+      id: "m6",
+      name: "Omo Menu Vertical",
+      image: "/images/samuel.jpg",
+      author: "Samuel Andert",
+      type: "view",
+      group: "omo",
+      tags: "molecule"
+    },
+    design: {},
+    data: []
+  };
 </script>
 
-<div class="text-blue-900 h-full bg-gray-300 text-center">
-  <span class="cursor-pointer w-12 hover:text-white block">
-    <i class="fas fa-dna p-4 hover:bg-green-400" />
+{quant}
+<OmoIconsFA />
+<div
+  class="w-16 h-full pt-4 pb-4 bg-gray-200 text-blue-900 text-center shadow-lg">
+  <span class="cursor-pointer hover:text-gray-500 px-1 block mb-2">
+    <i class="fas fa-dna p-2 bg-gray-300 rounded" />
   </span>
-  <span class="cursor-pointer w-12 hover:text-white block">
-    <i class="fas fa-search p-4 hover:bg-green-400" />
+  <span class="cursor-pointer hover:text-gray-500 px-1 block">
+    <i class="fas fa-search p-2 bg-gray-300 rounded" />
   </span>
   <!-- <span class="cursor-pointer hover:text-gray-500 px-2 block mb-5 relative">
     <i class="fas fa-users" />

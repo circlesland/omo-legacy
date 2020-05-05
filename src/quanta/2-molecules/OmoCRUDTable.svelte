@@ -3,7 +3,6 @@
   import OmoHeaderColumn from "./../1-atoms/OmoHeaderColumn.svelte";
   import OmoTableBody from "./../1-atoms/OmoTableBody.svelte";
   import OmoTableHeader from "./../1-atoms/OmoTableHeader.svelte";
-  import Quant from "./../../old-quanta/5-pages/Quant.svelte";
   import OmoEntryRow from "./../1-atoms/OmoEntryRow.svelte";
   import { Database } from "@textile/threads-database";
   import OmoTable from "./../2-molecules/OmoTable.svelte";

@@ -1,7 +1,5 @@
 ## Get started
 
-To get started checkout http://omo.earth
-
 Install the dependencies...
 
 _Note that you will need to have [Node.js](https://nodejs.org) and npm installed._
@@ -15,7 +13,7 @@ cd omo-quantum
 
 ```bash
 npm i
-run start
+npm start
 ```
 
 Download, install and <b>run</b> the textile threads DB deamon (install instructions @textile: https://github.com/textileio/go-threads)

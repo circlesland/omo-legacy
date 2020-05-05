@@ -4,10 +4,9 @@
   import OmoPartners from "./../2-molecules/OmoPartners";
 
   const quant = {
-    title: "transform your visions into (d)apps",
+    title: "transform visions into (d)apps",
     subline:
-      "imagine you could turn any idea with easy drag and drop lego-like building blocks, into modern opensource multiplatform and resilient serverless (d)apps",
-    illustration: "/images/the_world_is_mine.svg"
+      "imagine you could turn any idea with easy drag and drop lego-like building blocks, into modern opensource multiplatform and resilient serverless (d)apps"
   };
   const contributors = {
     title: "About OMO's",
@@ -18,10 +17,13 @@
     title: "Getting Started",
     subline: "How to play with OMO.earth"
   };
+  const roadmap = {
+    title: "Our Roadmap",
+    subline: "a first draft"
+  };
 </script>
 
 <div class="overflow-hidden overflow-y-auto p-8 sm:p-12 md:p-16 lg:p-24">
-
   <OmoHero {quant} />
 
   <div class=" py-10">
@@ -50,6 +52,22 @@
     </p>
   </div>
   <OmoPartners />
+  <div class="py-8">
+    <OmoHero quant={roadmap} />
+    See our roadmap on
+    <a
+      class="text-green-500 font-bold"
+      href="https://github.com/omoearth/omo-quantum/milestones?direction=asc&sort=title&state=open">
+      Github Milestones
+    </a>
+    If you have feature requests or bug reports let us know on:
+    <a
+      class="text-green-500 font-bold"
+      href="https://github.com/omoearth/omo-quantum/issues">
+      Github Issues
+    </a>
+
+  </div>
   <div class="py-6">
     <OmoHero quant={documentation} />
     <p>

@@ -5,14 +5,15 @@
 
 <OmoIconsFA />
 
-<div class="pb-0 w-full flex flex-wrap">
-  <div class="p-3 w-full text-gray-500 bg-gray-900 shadow-lg ">
+<div class="h-12 pb-0 w-full flex flex-wrap">
+  <div class="w-full text-gray-500 bg-gray-900 shadow-lg ">
     <button on:click={() => curRoute.set('?route=home')}>
-      <span class="pl-1 pr-3 mr-2 border-r border-gray-800">
+      <span class="border-r border-gray-800">
         <img
           src="/images/logo.png"
           alt="alt placeholder"
-          class="h-8 -my-1 inline mx-auto" />
+          class="p-2 inline mx-auto"
+          style="width: 2.75rem; margin-left: 0.15rem" />
       </span>
     </button>
     <button on:click={() => curRoute.set('?route=home')}>
@@ -34,7 +35,14 @@
       <span
         class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
         <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->
-        Test
+        Responsive
+      </span>
+    </button>
+    <button on:click={() => curRoute.set('?route=design')}>
+      <span
+        class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
+        <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->
+        Design
       </span>
     </button>
     <!-- <a href="/editor">
