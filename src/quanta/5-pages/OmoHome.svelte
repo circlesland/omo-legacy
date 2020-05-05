@@ -17,6 +17,10 @@
     title: "Getting Started",
     subline: "How to play with OMO.earth"
   };
+  const roadmap = {
+    title: "Our Roadmap",
+    subline: "a first draft"
+  };
 </script>
 
 <div class="overflow-hidden overflow-y-auto p-8 sm:p-12 md:p-16 lg:p-24">
@@ -48,6 +52,22 @@
     </p>
   </div>
   <OmoPartners />
+  <div class="py-8">
+    <OmoHero quant={roadmap} />
+    See our roadmap on
+    <a
+      class="text-green-500 font-bold"
+      href="https://github.com/omoearth/omo-quantum/milestones?direction=asc&sort=title&state=open">
+      Github Milestones
+    </a>
+    If you have feature requests or bug reports let us know on:
+    <a
+      class="text-green-500 font-bold"
+      href="https://github.com/omoearth/omo-quantum/issues">
+      Github Issues
+    </a>
+
+  </div>
   <div class="py-6">
     <OmoHero quant={documentation} />
     <p>
