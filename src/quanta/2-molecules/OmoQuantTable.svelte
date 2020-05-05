@@ -125,7 +125,7 @@
         item={{ value: key, key: key, type: properties[key].type }}
         {quant} />
     {/each}
-    <OmoHeaderColumn item={{ value: 'actions' }} />
+    <OmoHeaderColumn item={{ value: 'actions' }} {quant} />
   </OmoTableHeader>
   <!-- <OmoTableBody>
     {#each model.entries as entry}
