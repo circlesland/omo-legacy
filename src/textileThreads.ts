@@ -37,7 +37,6 @@ export async function initDB(seed: Boolean): Promise<void> {
     pubsub.publish(update.id + "_changed", { id: update.id });
   });
   console.log("DB initialised");
-
 }
 
 export async function seedDB(db: Database, seed): Promise<void> {

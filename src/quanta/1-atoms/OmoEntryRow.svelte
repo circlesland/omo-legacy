@@ -13,7 +13,7 @@
     if (!canSelect) return;
     canSelect = false;
     let data = entry[key];
-    var mut = `mutation {save${entryName}(ID:"${
+    var mut = `mutation {update${entryName}(ID:"${
       entry.find(x => x.key == "ID").value
     }", ${data.key}:"""${data.value}"""){ ID name}}`;
     var foo = await graphql(mut);
@@ -24,9 +24,17 @@
 
   async function clearValue(key) {
     await graphql(
-      `mutation {save${entryName}(ID:"${
+      `mutation {update${entryName}(ID:"${
         entry.find(x => x.key == "ID").value
       }", ${data.key}:"null"){ ID}}`
+    );
+  }
+
+  async function deleteRow() {
+    await graphql(
+      `mutation {delete${entryName}(ID:"${
+        entry.find(x => x.key == "ID").value
+      }")}`
     );
   }
 </script>
@@ -49,7 +57,7 @@
   {/each}
   <td>
     <button
-      on:click={deleteBook}
+      on:click={deleteRow}
       class="text-sm bg-red-400 rounded-full font-bold text-white py-1 px-3">
       delete
     </button>

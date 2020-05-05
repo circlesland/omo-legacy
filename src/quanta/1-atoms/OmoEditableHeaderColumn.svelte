@@ -9,12 +9,11 @@
     var jsonSchema = JSON.parse(quant.jsonSchema);
     jsonSchema.properties[item.value] = jsonSchema.properties[item.key];
     delete jsonSchema.properties[item.key];
-    debugger;
     if (quant.ID == "78a414b4-8557-4790-a863-9e75a89bfbd8") {
       var uid = uuid.v4();
       await db.newCollection(uid, jsonSchema);
       await graphql(
-        `mutation{saveQuant(ID:"${quant.ID}",jsonSchema:"""${JSON.stringify(
+        `mutation{updateQuant(ID:"${quant.ID}",jsonSchema:"""${JSON.stringify(
           jsonSchema
         )}"""){ID}}`
       );
@@ -22,7 +21,7 @@
       db.collections.delete(uid);
     } else {
       let ffff = await graphql(
-        `mutation{saveQuant(ID:"${quant.ID}",jsonSchema:"""${JSON.stringify(
+        `mutation{updateQuant(ID:"${quant.ID}",jsonSchema:"""${JSON.stringify(
           jsonSchema
         )}""",collectionName:"${uuid.v4()}"){ID}}`
       );

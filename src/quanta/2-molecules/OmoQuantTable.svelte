@@ -15,7 +15,7 @@
     collectionName: ""
   };
   export let entries = [];
-  export let properties = [];
+  export let properties = {};
 
   $: updateHeader(quantId);
   $: updateEntries(properties);
@@ -36,22 +36,25 @@
   }
 
   async function updateEntries(props) {
-    let result = await graphql(
-      `{${pluralize(quant.name)} {${Object.keys(props).join(" ")}}}`
-    );
-    entries = toValues(result.data[pluralize(quant.name)], props);
-    subscribe(
-      `subscription {${pluralize(quant.name)} {${Object.keys(props).join(
-        " "
-      )}}}`
-    ).then(subscription => {
-      (async () => {
-        for await (let value of subscription) {
-          entries = toValues(value.data[pluralize(quant.name)], props);
-        }
-      })();
-    });
+    if (quant.name && Object.keys(props).length > 0) {
+      let result = await graphql(
+        `{${pluralize(quant.name)} {${Object.keys(props).join(" ")}}}`
+      );
+      entries = toValues(result.data[pluralize(quant.name)], props);
+      subscribe(
+        `subscription {${pluralize(quant.name)} {${Object.keys(props).join(
+          " "
+        )}}}`
+      ).then(subscription => {
+        (async () => {
+          for await (let value of subscription) {
+            entries = toValues(value.data[pluralize(quant.name)], props);
+          }
+        })();
+      });
+    }
   }
+
   function toValues(obj, properties) {
     return obj.map(item => {
       return Object.keys(properties).map(key => {
