@@ -2,7 +2,7 @@ import { PubSub } from "graphql-subscriptions";
 import { Result } from "interface-datastore";
 import { db } from "./textileThreads";
 import { JSONSchema7 } from "json-schema";
-import { GraphQLObjectType, GraphQLString, Thunk, GraphQLFieldConfigMap, GraphQLSchema, GraphQLID, GraphQLBoolean, GraphQLList, getIntrospectionQuery, GraphQLNonNull } from "graphql";
+import { GraphQLObjectType, GraphQLString, Thunk, GraphQLFieldConfigMap, GraphQLSchema, GraphQLID, GraphQLBoolean, GraphQLList } from "graphql";
 let pluralize = require('pluralize');
 import { Collection } from "@textile/threads-database";
 
@@ -63,6 +63,14 @@ export const LibrarySchema: JSONSchema7 = {
       description: "The instance's id.",
     },
     name: {
+      type: "string",
+      description: "Branch Name",
+    },
+    dummy1: {
+      type: "string",
+      description: "Branch Name",
+    },
+    dumm2: {
       type: "string",
       description: "Branch Name",
     },
@@ -144,7 +152,7 @@ function getSubscriptions(map: Map<Quant, GraphQLObjectType>): Thunk<GraphQLFiel
       args: { ID: { type: GraphQLID } },
       type: type,
       subscribe: async (root: any, data: any) => { console.log("subscribe", data); return pubsub.asyncIterator(data.ID + "_changed") },
-      resolve: async (id: string) => { debugger; console.log("ID", id); return await collection.findById(id) }
+      resolve: async (payload: any) => { console.log(JSON.stringify(payload)); return await collection.findById(payload.id); }
     };
     subscriptions[quant.name + "Added"] = {
       type: type,
@@ -200,13 +208,20 @@ function getMutations(map: Map<Quant, GraphQLObjectType>): Thunk<GraphQLFieldCon
       },
       type
     };
-
+    mutations[`save${quant.name}`] = {
+      args,
+      resolve: async (root: any, data: any) => {
+        var entity = await collection.findById(data.ID);
+        Object.keys(data).forEach(key => entity[key] = data[key]);
+        await collection.save(entity);
+        return entity;
+      },
+      type
+    };
     mutations[`update${quant.name}`] = {
       args,
       resolve: async (root: any, data: any) => {
-        debugger;
-        var entity = await collection.findById(atob(data.ID));
-        Object.keys(data).forEach(key => entity[key] = atob(data[key]));
+        var entity = await collection.findById(data.ID);
         await collection.save(entity);
         return entity;
       },

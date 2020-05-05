@@ -14,7 +14,8 @@ import { Op } from "@textile/threads-store";
 export var db: Database;
 
 export async function initDB(seed: Boolean): Promise<void> {
-  const store = new LevelDatastore("db/" + uuid.v4() + ".db");
+  // const store = new LevelDatastore("db/" + uuid.v4() + ".db");
+  const store = new LevelDatastore("db/static.db");
   db = new Database(store);
   await db.open();
 
@@ -40,7 +41,7 @@ export async function initDB(seed: Boolean): Promise<void> {
 }
 
 export async function seedDB(db: Database, seed): Promise<void> {
-  const quanta: any[] = [{ ID: "78a414b4-8557-4790-a863-9e75a89bfbd8", name: "Quant", icon: "fa-book", jsonSchema: JSON.stringify(QuantSchema), collectionName: "Quant" }];
+  const quanta: any[] = [{ ID: "78a414b4-8557-4790-a863-9e75a89bfbd8", name: "Quant", icon: "fa-book", jsonSchema: JSON.stringify(QuantSchema), collectionName: 'Quant' }];
 
   if (seed)
     quanta.push(
