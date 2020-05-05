@@ -1,5 +1,4 @@
 <script>
-  import { Author } from "./../../schemas.ts";
   import Select from "svelte-select";
   export let entry;
   export let entryName;
@@ -12,12 +11,11 @@
 
   async function selectValue(key) {
     let data = entry[key];
-    debugger;
     if (data.value) {
       var foo = await graphql(
-        `mutation {update${entryName}(ID:"${btoa(
+        `mutation {update${entryName}(ID:"${
           entry.find(x => x.key == "ID").value
-        )}", ${data.key}:"${btoa(data.value)}"){ ID jsonSchema}}`
+        }", ${data.key}:"${data.value}"){ ID }}`
       );
       console.log(foo);
     }
@@ -29,37 +27,12 @@
         entry.find(x => x.key == "ID").value
       }", ${data.key}:"null"){ ID}}`
     );
-    //   switch (type) {
-    //     case "bookname":
-    //       await graphql(`mutation {saveBook(ID:"${book.ID}", name:"null"){ ID}}`);
-    //       break;
-    //     case "author":
-    //       await graphql(
-    //         `mutation {saveBook(ID:"${book.ID}", authorId:"null"){ ID}}`
-    //       );
-    //       break;
-    //     case "library":
-    //       await graphql(
-    //         `mutation {saveBook(ID:"${book.ID}", libraryId:"null"){ ID}}`
-    //       );
-    //       break;
-    //   }
   }
-
-  // const createItem = filterText => {
-  //   return { name: filterText, ID: null };
-  // };
-
-  // const optionIdentifier = "ID";
-  // const getOptionLabel = (option, filterText) =>
-  //   option.isCreator ? `Create "${filterText}"` : option.name;
-  // const getSelectionLabel = option => option.name;
 </script>
 
 <tr class="w-full accordion border-b border-grey-light hover:bg-gray-100">
   {#each Object.keys(entry) as entrykey}
     <td>
-      <!-- bind:selectedValue={entry[key]} -->
       <Select
         bind:selectedValue={entry[entrykey]}
         isCreatable={true}
@@ -71,7 +44,6 @@
         }}
         on:clear={() => clearValue(entrykey)}
         on:select={() => selectValue(entrykey)} />
-
     </td>
   {/each}
   <!-- 
