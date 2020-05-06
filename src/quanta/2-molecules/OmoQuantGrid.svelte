@@ -94,13 +94,22 @@
   .omo-grid {
     display: grid;
   }
+  .select {
+    --borderRadius: 0;
+    --multiItemBorderRadius: 2px;
+    --multiItemMargin: 8px 5px;
+    --height: 2.5rem;
+  }
+  .back {
+    --background: #ebeff5;
+  }
 </style>
 
 <div class="flex">
   <div class="bg-gray-100 w-64 rounded border">
     <button class="flex justify-between items-center w-full">
       <div class="flex items-center">
-        <i class="fas bg-gray-100 p-3 text-green-400 fa-plus" />
+        <i class="fas p-3 text-green-400 fa-plus" style="background: #EBEFF5" />
         <div class="px-3 py-1 text-sm">Add new key</div>
       </div>
     </button>
@@ -123,7 +132,6 @@
     <button class="flex justify-between items-center w-full">
       <div class="flex items-center">
         <i class="fas text-green-400 bg-gray-100 p-3 fa-plus" />
-
       </div>
     </button>
   </div>
@@ -155,22 +163,22 @@
   class:vertical
   style={gridTemplateVertical}>
   {#each Object.keys(properties) as key}
-    <div style={`grid-area:action-${key}`}>
+    <div class="" style={`grid-area:action-${key}`}>
       <i
         class="fas bg-gray-100 text-red-400 p-3 fa-trash-alt border
         border-color-gray-200" />
     </div>
-    <div style={`grid-area:key-${key}`}>
-      <Select bind:selectedValue={key} />
-    </div>
-    <div style={`grid-area:type-${key}`}>
+    <div class="back select" style={`grid-area:type-${key}`}>
       <Select bind:selectedValue={properties[key].type} />
+    </div>
+    <div class="back select" style={`grid-area:key-${key}`}>
+      <Select bind:selectedValue={key} />
     </div>
   {/each}
 
   {#each entries as row, r}
     {#each row as column}
-      <div class="max-w-xs" style={`grid-area:ds${r}-${column.key}`}>
+      <div class="select max-w-xs" style={`grid-area:ds${r}-${column.key}`}>
         <Select bind:selectedValue={column.value} />
       </div>
     {/each}
