@@ -15,7 +15,7 @@ export var db: Database;
 
 export async function initDB(seed: Boolean): Promise<void> {
   // const store = new LevelDatastore("db/" + uuid.v4() + ".db");
-  const store = new LevelDatastore("db/static2.db");
+  const store = new LevelDatastore("db/static4.db");
   db = new Database(store);
   await db.open();
 
