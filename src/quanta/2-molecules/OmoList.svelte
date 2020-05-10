@@ -1,6 +1,11 @@
 <script>
   import OmoListItem from "./../1-atoms/OmoListItem.svelte";
   let quanta = [];
+  let addbutton = {
+    name: "Add new type",
+    icon: "fa-plus",
+    iconColor: "text-green-400"
+  };
   graphql("{Quants {ID name icon }}").then(result => {
     quanta = result.data.Quants;
   });
@@ -20,4 +25,5 @@
   {#each quanta as quant}
     <OmoListItem {quant} />
   {/each}
+  <OmoListItem quant={addbutton} />
 </div>

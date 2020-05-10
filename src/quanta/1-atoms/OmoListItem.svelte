@@ -7,9 +7,11 @@
 <div class="bg-white w-full rounded border mb-2">
   <button
     on:click={curRoute.set('?route=' + quant.ID)}
-    class="flex justify-between items-center hover:bg-green-400 hover:text-white">
+    class="flex justify-between items-center hover:bg-green-400 hover:text-white
+    w-full">
     <div class="flex items-center">
-      <i class="fas bg-gray-200 text-gray-700 p-3 {quant.icon}" />
+      <i
+        class="fas bg-gray-200 text-gray-700 {quant.iconColor} p-3 {quant.icon}" />
       <div class="px-3 py-1 text-gray-700 text-sm">{quant.name}</div>
     </div>
   </button>

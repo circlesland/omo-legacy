@@ -79,10 +79,11 @@
       });
     });
   }
+
   let vertical = true;
   let gridTemplateVertical = "";
   function getRow(prop) {
-    var foo = `"key-${prop} type-${prop} action-${prop}`;
+    var foo = `"action-${prop} type-${prop} key-${prop}`;
     for (var i = 0; i < entries.length; i++) foo += " ds" + i + "-" + prop;
     foo += `" `;
     return foo;
@@ -90,26 +91,94 @@
 </script>
 
 <style>
-  .grid {
+  .omo-grid {
     display: grid;
+  }
+  .select {
+    --borderRadius: 0;
+    --multiItemBorderRadius: 2px;
+    --multiItemMargin: 8px 5px;
+    --height: 2.5rem;
+  }
+  .back {
+    --background: #ebeff5;
   }
 </style>
 
-<div class="grid" class:vertical style={gridTemplateVertical}>
+<div class="flex">
+  <div class="bg-gray-100 w-64 rounded border">
+    <button class="flex justify-between items-center w-full">
+      <div class="flex items-center">
+        <i class="fas p-3 text-green-400 fa-plus" style="background: #EBEFF5" />
+        <div class="px-3 py-1 text-sm">Add new key</div>
+      </div>
+    </button>
+  </div>
+  <div class="bg-white rounded border ml-12">
+    <button class="flex justify-between items-center w-full">
+      <div class="flex items-center">
+        <i class="fas text-red-400 bg-gray-100 p-3 fa-trash-alt" />
+      </div>
+    </button>
+  </div>
+  <div class="bg-white rounded border">
+    <button class="flex justify-between items-center w-full">
+      <div class="flex items-center">
+        <i class="fas text-orange-400 bg-gray-100 p-3 fa-copy" />
+      </div>
+    </button>
+  </div>
+  <div class="bg-white rounded border mr-48">
+    <button class="flex justify-between items-center w-full">
+      <div class="flex items-center">
+        <i class="fas text-green-400 bg-gray-100 p-3 fa-plus" />
+      </div>
+    </button>
+  </div>
+  <div class="bg-white rounded border">
+    <button class="flex justify-between items-center w-full">
+      <div class="flex items-center">
+        <i class="fas text-red-400 bg-gray-100 p-3 fa-trash-alt" />
+      </div>
+    </button>
+  </div>
+  <div class="bg-white rounded border">
+    <button class="flex justify-between items-center w-full">
+      <div class="flex items-center">
+        <i class="fas text-orange-400 bg-gray-100 p-3 fa-copy" />
+      </div>
+    </button>
+  </div>
+  <div class="bg-white rounded border mr-48">
+    <button class="flex justify-between items-center w-full">
+      <div class="flex items-center">
+        <i class="fas text-green-400 bg-gray-100 p-3 fa-plus" />
+      </div>
+    </button>
+  </div>
+</div>
+
+<div
+  class="omo-grid bg-gray-100 border-gray-300 border rounded"
+  class:vertical
+  style={gridTemplateVertical}>
   {#each Object.keys(properties) as key}
-    <div class="p-1" style={`grid-area:key-${key}`}>
-      <Select bind:selectedValue={key} />
+    <div class="" style={`grid-area:action-${key}`}>
+      <i
+        class="fas bg-gray-100 text-red-400 p-3 fa-trash-alt border
+        border-color-gray-200" />
     </div>
-    <div class="p-1" style={`grid-area:type-${key}`}>
+    <div class="back select" style={`grid-area:type-${key}`}>
       <Select bind:selectedValue={properties[key].type} />
     </div>
-    <div class="p-1" style={`grid-area:action-${key}`}>
-      <button>action</button>
+    <div class="back select" style={`grid-area:key-${key}`}>
+      <Select bind:selectedValue={key} />
     </div>
   {/each}
+
   {#each entries as row, r}
     {#each row as column}
-      <div class="p-1" style={`grid-area:ds${r}-${column.key}`}>
+      <div class="select max-w-xs" style={`grid-area:ds${r}-${column.key}`}>
         <Select bind:selectedValue={column.value} />
       </div>
     {/each}
