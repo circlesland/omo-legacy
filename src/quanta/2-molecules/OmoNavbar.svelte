@@ -33,20 +33,18 @@
         Editor
       </span>
     </button>
-    <button on:click={() => curRoute.set('?route=test')}>
+    <!-- <button on:click={() => curRoute.set('?route=test')}>
       <span
         class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
-        <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->
         Responsive
       </span>
     </button>
     <button on:click={() => curRoute.set('?route=design')}>
       <span
         class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
-        <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->
         Design
       </span>
-    </button>
+    </button> -->
     <!-- <a href="/editor">
       <span
         class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">

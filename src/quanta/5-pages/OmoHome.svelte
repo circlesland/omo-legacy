@@ -179,10 +179,11 @@
       </div>
 
       <OmoRoadmap />
-      <div class="pt-12">
+
+      <!-- <div class="pt-12">
         <OmoHero quant={contributors} />
         <OmoContributors />
-      </div>
+      </div> -->
 
     </div>
   </div>
