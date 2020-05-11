@@ -19,7 +19,7 @@
         {
           version: "v0.3.0 alpha",
           date: "2020 MAR",
-          title: "POC: CRUD on textilo threads",
+          title: "POC: CRUD on textileio threads",
           description: "",
           done: true
         },
@@ -28,7 +28,7 @@
           date: "2020 MAI",
           title: "POC: GraphQL Editor",
           description:
-            "Basic CODA like Schema- and Data-Editor with Graphql subscriptions",
+            "Basic CODA like Schema- and Data-Editor with Graphql subscriptions ontop of textileio threads",
           done: false
         },
         {

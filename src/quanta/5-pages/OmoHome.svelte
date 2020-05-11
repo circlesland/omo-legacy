@@ -146,10 +146,10 @@
           </a>
           <div class="pt-2">Then download omo-quantum from github:</div>
           <div class="my-2 text-gray-600 italic">
-            git clone https://github.com/omoearth/omo-quantum.git
+            git clone https://github.com/omoearth/omo.git
           </div>
 
-          <div class="my-2 text-gray-600 italic">cd omo-quantum</div>
+          <div class="my-2 text-gray-600 italic">cd omo</div>
           <div class="my-2 text-gray-600 italic">npm install</div>
           <div class="my-2 text-gray-600 italic">npm start</div>
           Navigate to
