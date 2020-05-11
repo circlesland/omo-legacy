@@ -28,7 +28,7 @@
           date: "2020 MAI",
           title: "POC: GraphQL Editor",
           description:
-            "Basic CODA like Schema- and Data-Editor with Graphql subscriptions deployed via textile.io buckets",
+            "Basic CODA like Schema- and Data-Editor with Graphql subscriptions",
           done: false
         },
         {
@@ -36,23 +36,23 @@
           date: "2020 JUNE",
           title: "POC: Todo- and Milestone Mini-App",
           description:
-            "Create a basic TodoApp with tasks, users and milestones on a kanban board (based on dynamic js threads)",
+            "Create a basic TodoApp with tasks, users and milestones on a kanban board",
           done: false
         },
         {
           version: "v0.6.0 alpha",
           date: "2020 JULI",
-          title: "POC: Create a basic design system",
+          title: "POC: Quanta-Code Editor",
           description:
-            "Create a basic design system based on omo quanta (svelte components), inspired by 'styled system' and the tailwind syntax.",
+            "Create, edit and compile quanta as web-components with a SVELTE REPL like editor to ipfs and textiel threats",
           done: false
         },
         {
           version: "v0.7.0 alpha",
           date: "2020 AUG",
-          title: "POC: Quanta-Code Editor",
+          title: "POC: Create a basic design system",
           description:
-            "Create, edit and compile quanta as web-components with a SVELTE REPL like editor to ipfs and textiel threats",
+            "Create a basic design system based on omo quanta (svelte components), inspired by 'styled system' and the tailwind syntax.",
           done: false
         },
         {
@@ -67,14 +67,6 @@
           date: "2020 DEZ",
           title: "POC: Flow-Programming Editor",
           description: "",
-          done: false
-        },
-        {
-          version: "v1.0.0 beta",
-          date: "2021+",
-          title: "Launch Beta Platform",
-          description:
-            "Organise global hackathons to re-create open source clones of airbnb, booking, uber, lyft, netflix, disney, takeaway etc",
           done: false
         }
       ]

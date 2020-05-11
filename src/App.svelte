@@ -7,15 +7,11 @@
   import OmoList from "./quanta/2-molecules/OmoList.svelte";
   import OmoMenuVertical from "./quanta/2-molecules/OmoMenuVertical.svelte";
   import OmoHome from "./quanta/5-pages/OmoHome.svelte";
-  import OmoTest from "./quanta/5-pages/OmoTest.svelte";
-  import OmoDesign from "./quanta/5-pages/OmoDesign.svelte";
   import OmoSideBarLayout from "./quanta/4-layouts/OmoSideBarLayout.svelte";
   import Imprint from "./quanta/5-pages/Imprint.svelte";
 
   var router = [
     { route: "?route=home", quant: OmoHome, name: null },
-    { route: "?route=test", quant: OmoTest, name: "test" },
-    { route: "?route=design", quant: OmoDesign, name: "design" },
     { route: "?route=imprint", quant: Imprint, name: "imprint" }
   ];
 
@@ -23,8 +19,6 @@
   graphql("{Quants {ID name icon }}").then(result => {
     router = [
       { route: "?route=home", quant: OmoHome, name: null },
-      { route: "?route=test", quant: OmoTest, name: "test" },
-      { route: "?route=design", quant: OmoDesign, name: "design" },
       { route: "?route=imprint", quant: Imprint, name: "imprint" }
     ];
     result.data.Quants.forEach(element => {
@@ -41,8 +35,6 @@
       for await (let value of subscription) {
         router = [
           { route: "?route=home", quant: OmoHome, name: null },
-          { route: "?route=test", quant: OmoTest, name: "test" },
-          { route: "?route=design", quant: OmoDesign, name: "design" },
           { route: "?route=imprint", quant: Imprint, name: "imprint" }
         ];
 
