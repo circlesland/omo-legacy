@@ -82,12 +82,16 @@
         3
       </span>
     </span> -->
-    <!-- 
-    <span class="cursor-pointer relative float-right">
-      <img
+    <button
+      class="relative cursor-pointer float-right p-3"
+      on:click={() => curRoute.set('?route=imprint')}>
+      <span class="px-1 hover:text-white uppercase text-sm font-bold">
+        <!-- <img
         src="/images/samuel.jpg"
         alt="alt placeholder"
-        class="h-8 inline mx-auto rounded border border-gray-600" />
-    </span> -->
+        class="h-8 inline mx-auto rounded border border-gray-600" /> -->
+        Imprint
+      </span>
+    </button>
   </div>
 </div>
