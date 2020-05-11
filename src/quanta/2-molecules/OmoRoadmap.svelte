@@ -58,7 +58,7 @@
         {
           version: "v0.8.0 alpha",
           date: "2020 OKT",
-          title: "POC: Basic UI-Desinger",
+          title: "POC: Basic UI-Designer",
           description: "Simple Designer-Editor to create different views",
           done: false
         },
