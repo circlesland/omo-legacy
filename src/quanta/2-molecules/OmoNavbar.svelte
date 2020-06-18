@@ -25,14 +25,14 @@
         Home
       </span>
     </button>
-    <button
+  <!--  <button
       on:click={() => curRoute.set('?route=78a414b4-8557-4790-a863-9e75a89bfbd8')}>
       <span
-        class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
+        class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">-->
         <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->
-        Editor
+    <!--    Editor
       </span>
-    </button>
+    </button>-->
     <!-- <button on:click={() => curRoute.set('?route=test')}>
       <span
         class="px-1 hover:text-white cursor-pointer uppercase text-sm font-bold">
