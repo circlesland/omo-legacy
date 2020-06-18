@@ -16,7 +16,7 @@
   ];
 
   let currentId;
-  graphql("{Quants {ID name icon }}").then(result => {
+/*  graphql("{Quants {ID name icon }}").then(result => {
     router = [
       { route: "?route=home", quant: OmoHome, name: null },
       { route: "?route=imprint", quant: Imprint, name: "imprint" }
@@ -48,7 +48,7 @@
         });
       }
     })();
-  });
+  });*/
   onMount(() => {
     var urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("route")) {
