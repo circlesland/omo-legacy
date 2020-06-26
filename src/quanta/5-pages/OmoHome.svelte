@@ -178,7 +178,7 @@
         </div>
       </div>
 
-      <OmoRoadmap />
+     <!-- <OmoRoadmap /> -->
 
       <!-- <div class="pt-12">
         <OmoHero quant={contributors} />
