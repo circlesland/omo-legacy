@@ -9,7 +9,7 @@ assignees: samuelandert
 ---
 
 # How do OMO-Dream Challenges work?
-OMO is the abbreviation for "open minded organization talents". The OMO-Methodoloy is a very simple process definition which strives to empower you to continuously grow towards your dreams in many small iterative steps, while collaborating openly and asynchronously, hand-in-hand with a clear vision.
+OMO is the abbreviation for "open minded organization talents". The Omo-Circle-Methodoloy or OCM is a very simple process definition which strives to empower you to continuously grow towards your dreams in many small iterative steps, while collaborating openly and asynchronously, hand-in-hand with a clear vision.
 In order to stimulate creativity, engagement and fun, every dream will be defined clearly by starting to ask WHY. The more careful and the better the questions are posed, the better will be the results.
 
 ## 1. WHY? Learn about the purpose of your dream
