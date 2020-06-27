@@ -1,7 +1,7 @@
 ---
-name: REPORT PAIN (bug)
+name: Report new pain
 about: Describe your pain (bug) you experience to help omos to become better at improving
-title: 'My pain is ... '
+title: "[PAIN] My experience is ... "
 labels: ''
 assignees: ''
 

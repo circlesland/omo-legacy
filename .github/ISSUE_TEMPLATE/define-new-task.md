@@ -2,7 +2,7 @@
 name: Define new task
 about: Define clear tasks, responsibilities and success metrics
 title: "[TODO] "
-labels: research
+labels: ''
 assignees: ''
 
 ---
