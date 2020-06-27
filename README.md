@@ -13,7 +13,7 @@ _our dream is your dream_
 5) For chatting with us and other omo-sapiens enter our [omo-sapiens chat](https://github.com/orgs/omoearth/teams/omo-sapiens/discussions) 
 
 
-## About our Dream Challenge
+## About the OMO Dream Challenge
 ### How can we thrive towards global sustainable abundance through human-centered systemic process design methodologies?
 This reserach paper is motivated by the exponentially growing demand for increasing the velocity of systemic evolution upgrades by designing and adapting rapid paced governance process patterns for 3 of our most pressing common global challenges, such as:
 - How to reach full abundance for humanity by thriving collaboratively towards common wealth equality
