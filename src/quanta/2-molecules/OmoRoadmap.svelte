@@ -5,68 +5,85 @@
         {
           version: "v0.1.0 alpha",
           date: "2020 JAN",
-          title: "POC: Store web-components on IPFS",
+          title: "PROTOTYPE: Store web-components on IPFS",
           description: "",
           done: true
         },
         {
           version: "v0.2.0 alpha",
           date: "2020 FEB",
-          title: "POC: Svelte Mini-Platform",
+          title: "PROTOTYPE: Svelte Mini-Platform",
           description: "",
           done: true
         },
         {
           version: "v0.3.0 alpha",
           date: "2020 MAR",
-          title: "POC: CRUD on textileio threads",
+          title: "PROTOTYPE: CRUD on textileio threads",
           description: "",
           done: true
         },
         {
           version: "v0.4.0 alpha",
           date: "2020 MAI",
-          title: "POC: GraphQL Editor",
+          title: "PROTOTYPE: GraphQL Editor",
           description:
-            "Basic CODA like Schema- and Data-Editor with Graphql subscriptions ontop of textileio threads",
-          done: false
+            "Basic CODA like Schema- and Data-Editor with Graphql subscriptions on-top of textileio threads",
+          done: true
         },
         {
           version: "v0.5.0 alpha",
-          date: "2020 JUNE",
-          title: "POC: Todo- and Milestone Mini-App",
+          date: "2020 JULI",
+          title: "LAUNCH: First dream profiles",
           description:
-            "Create a basic TodoApp with tasks, users and milestones on a kanban board",
+            "We make interviews with you about your greatest dreams in life and build websites, apps and tools with you to grow your passion",
           done: false
         },
         {
           version: "v0.6.0 alpha",
-          date: "2020 JULI",
-          title: "POC: Quanta-Code Editor",
+          date: "2020 AUG",
+          title: "PROTOTYPE: Crowdsourcing Dreams",
           description:
-            "Create, edit and compile quanta as web-components with a SVELTE REPL like editor to ipfs and textiel threats",
+            "Omo.earth is build on top of the Circles universal basic income currency protocol, which enables us to crowdsource your dreams",
           done: false
         },
         {
           version: "v0.7.0 alpha",
-          date: "2020 AUG",
-          title: "POC: Create a basic design system",
+          date: "2020 SEP",
+          title: "IMPLEMENT: Integrate UBI-Blockchain",
           description:
-            "Create a basic design system based on omo quanta (svelte components), inspired by 'styled system' and the tailwind syntax.",
+            "Integrate and switch to the real Circles-UBI Blockchain Token on xDAI",
           done: false
         },
         {
           version: "v0.8.0 alpha",
           date: "2020 OKT",
-          title: "POC: Basic UI-Designer",
-          description: "Simple Designer-Editor to create different views",
+          title: "POC: Quanta-Code Editor",
+          description:
+            "Create, edit and compile quanta as web-components with a SVELTE REPL like editor to ipfs and the textile threads DB",
           done: false
         },
         {
           version: "v0.9.0 alpha",
+          date: "2020 NOV",
+          title: "POC: Basic UI-Designer",
+          description:
+            "Simple Designer-Editor to create different views, with the help of a basic design system based on svelte components, inspired by 'styled system' and the tailwind syntax",
+          done: false
+        },
+        {
+          version: "v1.0.0 private beta",
           date: "2020 DEZ",
-          title: "POC: Flow-Programming Editor",
+          title: "TEST: Test run beta funding",
           description: "",
+          done: false
+        },
+        {
+          version: "v1.1.0 public",
+          date: "2021 JAN",
+          title: "LAUNCH: The first dream crowdfunds",
+          description:
+            "which will be runnning completely on top of the circles-ubi protocol",
           done: false
         }
       ]

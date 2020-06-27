@@ -4,7 +4,8 @@
     uptitle: "uptitle",
     title: "title",
     subline: "subline",
-    illustration: "/images/the_world_is_mine.svg"
+    illustration: "/images/the_world_is_mine.svg",
+    text: ""
   };
 </script>
 
@@ -28,6 +29,9 @@
         class="text-xl text-gray-600 italic font-light tracking-wide mb-6 py-4">
         {quant.subline}
       </div>
+    {/if}
+    {#if quant.text}
+      <div class="text-gray-700 font-light mb-6 py-4">{quant.text}</div>
     {/if}
   </div>
 
