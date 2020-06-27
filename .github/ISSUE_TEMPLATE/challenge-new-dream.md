@@ -47,7 +47,7 @@ ___
 ### What prototypes are able to trigger and satisfy the intended experience and behaviors in the best ways? 
 _Try to define the fastest, cheapest and most promising way to validate and test your assumptions. This is all about hands on, everything is allowed, be creative, mockups, präsentations, games, interviews, polls, websites etc, the more interactive the better_
 
-**Link your prototypes**
+**Link your prototypes (WIP: pull-requests)**
 
 
 
