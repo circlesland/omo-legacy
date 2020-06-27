@@ -2,7 +2,7 @@
 name: Define new todo
 about: Define clear tasks, responsibilities and success metrics
 title: My responsibility is ...
-labels: TODO
+labels: ''
 assignees: ''
 
 ---
