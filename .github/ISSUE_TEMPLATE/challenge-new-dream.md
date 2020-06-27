@@ -1,8 +1,8 @@
 ---
-name: CHALLENGE new dream
+name: Challenge new dream
 about: this is the default process for building the dreams of omo sapiens (open minded
   organization talents)
-title: 'My dream is ... '
+title: "[CHALLENGE] My dream is ... "
 labels: DREAM
 assignees: ''
 
