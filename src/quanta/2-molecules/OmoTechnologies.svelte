@@ -33,9 +33,9 @@
     },
     {
       id: "6",
-      name: "typescript",
-      image: "/logos/typescript.png",
-      link: "https://www.typescriptlang.org"
+      name: "circles ubi",
+      image: "/logos/circles.png",
+      link: "https://www.joincircles.net"
     }
   ];
 </script>

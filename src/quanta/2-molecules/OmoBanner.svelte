@@ -11,7 +11,7 @@
 </script>
 
 <div
-  class="bg-cover bg-center rounded h-auto text-white py-24 px-16 object-fill"
+  class="bg-cover bg-center rounded h-auto text-white py-48 px-16 object-fill"
   style="background-image: url({quant.image})">
   <div
     class="md:w-2/3 m-auto text-center px-16 py-8 rounded"
