@@ -4,16 +4,18 @@ _our dream is your dream_
 ## Where to find what
 1) For an introduction about omo earth see our [website](http://omo.earth)
 
-2) For an overview about our short-, middle- and long term dream challanges, see our [roadmap](https://github.com/omoearth/omo/projects/4)
+2) For an overview about our short-, middle- and long term dream challenges, see our [roadmap](https://github.com/omoearth/omo/projects/4)
 
 3) For starting your own dream challenges, suggesting ideas, making wishes, reporting pains, defining responsibilities and validating prototypes, choose your [contribution type here](https://github.com/omoearth/omo/issues/new/choose)
 
-4) For collaborating on other omo dreams look around in our [omo-challenges forum](https://github.com/omoearth/omo/issues) and use the tags to filter the topics you are interested in.
+4) For collaborating on other omo dreams look around in our [omo-challenges forum](https://github.com/omoearth/omo/issues) and use the tags to filter the topics you are interested in. f.e. [dreams](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3ADREAM), [wishes](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3AWISH), [pains](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3APAIN), [ideas](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3AIDEA), [prototypes](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3APROTOTYPE), [proposals](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3APROPOSALS)
 
-5) For chatting with us and other omo-sapiens enter our [omo-sapiens chat](https://github.com/orgs/omoearth/teams/omo-sapiens/discussions) 
+5) For chatting with us and other omo-sapiens enter our [omo-sapiens chat](https://github.com/orgs/omoearth/teams/omo-sapiens/discussions)
+
+6) For finding and connecting with other OMO's and to collaborate on each others dreams, use the location tags, such as [earth](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3AEARTH) and [europe](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3ADREAM) for remote friendly coops or city tags for location bounded coops, such as [berlin](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3ABERLIN), [munich](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3AMUNICH) etc
 
 
-## About the OMO Dream Challenge
+## About the OMO Dream Challenges
 ### How can we thrive towards global sustainable abundance through human-centered systemic process design methodologies?
 This reserach paper is motivated by the exponentially growing demand for increasing the velocity of systemic evolution upgrades by designing and adapting rapid paced governance process patterns for 3 of our most pressing common global challenges, such as:
 - How to reach full abundance for humanity by thriving collaboratively towards common wealth equality
