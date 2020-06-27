@@ -14,6 +14,7 @@ _our dream is your dream_
 
 6) For finding and connecting with other OMO's and to collaborate on each others dreams, use the location tags, such as [earth](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3AEARTH) and [europe](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3ADREAM) for remote friendly coops or city tags for location bounded coops, such as [berlin](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3ABERLIN), [munich](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3AMUNICH) etc
 
+7) For seeing what skills are needed to implement a dream, idea, prototpye or proposal, check out our "needs x skill" tags, f.e. [needs-user-experience-skills](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3A%22needs+user+experience+skills%22), [needs-design-system-skills](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3A%22needs+design+system+skills%22), [needs-coding-skills](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3A%22needs+coding+skills%22), [needs-testing-skills](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3A%22needs+testing+skills%22)
 
 ## About the OMO Dream Challenges
 ### How can we thrive towards global sustainable abundance through human-centered systemic process design methodologies?
