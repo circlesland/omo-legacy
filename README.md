@@ -1,3 +1,3 @@
 # welcome to omo-earth
 
-For install instructions see: [omo.earth](http://omo.earth)
+For an instruction see: [omo.earth](http://omo.earth)
