@@ -1,8 +1,8 @@
 ---
 name: Define new task
 about: Define clear tasks, responsibilities and success metrics
-title: "[TODO] "
-labels: ''
+title: I will finish ...
+labels: TODO
 assignees: ''
 
 ---
