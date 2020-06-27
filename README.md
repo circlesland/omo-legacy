@@ -1,9 +1,20 @@
-# welcome to omo-earth
+# welcome to the omo universe
+_our dream is your dream_
 
-For an introduction to omo see: [omo.earth](http://omo.earth)
+## Where to find what
+1) For an introduction about omo earth see our [website](http://omo.earth)
+
+2) For an overview about our short-, middle- and long term dream challanges, see our [roadmap](https://github.com/omoearth/omo/projects/4)
+
+3) For starting your own dream challenges, suggesting ideas, making wishes, reporting pains, defining responsibilities and validating prototypes, choose your [contribution type here](https://github.com/omoearth/omo/issues/new/choose)
+
+4) For collaborating on other omo dreams look around in our [omo-challenges forum](https://github.com/omoearth/omo/issues) and use the tags to filter the topics you are interested in.
+
+5) For chatting with us and other omo-sapiens enter our [omo-sapiens chat](https://github.com/orgs/omoearth/teams/omo-sapiens/discussions) 
 
 
-## How can we thrive towards global sustainable abundance through human-centered systemic process design methodologies?
+## About our Dream Challenge
+### How can we thrive towards global sustainable abundance through human-centered systemic process design methodologies?
 This reserach paper is motivated by the exponentially growing demand for increasing the velocity of systemic evolution upgrades by designing and adapting rapid paced governance process patterns for 3 of our most pressing common global challenges, such as:
 - How to reach full abundance for humanity by thriving collaboratively towards common wealth equality
 - How to sustain our earth and economies by self-upgrading decentralized system-designs and governance
