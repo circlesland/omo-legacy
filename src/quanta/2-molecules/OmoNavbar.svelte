@@ -24,7 +24,7 @@
           class="px-1 text-white text-lg cursor-pointer uppercase text-sm
           font-bold ">
           <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->
-          I want to challenge my dream
+          I am ready to challenge my dreams
         </span>
       </button>
     </a>
