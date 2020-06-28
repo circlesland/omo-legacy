@@ -16,9 +16,9 @@
   };
   const mission = {
     uptitle: "our mission",
-    title: "grow your passion",
+    title: "is to grow your passion",
     subline:
-      "we invest time, resources and money to grow with you together your little seeds of inspiration, into large beautiful trees of fruitful and joyful abundance.",
+      "we invest time and resources to grow with you together your little seeds of inspiration, into large beautiful trees of fruitful and joyful abundance.",
     text:
       "We believe in the power of vision and dreams and have experienced the wonderful and great things passion can enable and build when being shared and pursued collaboratively. Our dream is to inspire and empower you, by developing the social-, technological-, organizational- and economical systems, tools and protocols of tomorrow."
   };
