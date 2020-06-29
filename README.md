@@ -6,7 +6,7 @@ _our dream is your dream_
 
 2) For an overview about our short-, middle- and long term dream challenges, see our [roadmap](https://github.com/omoearth/omo/projects/4)
 
-3) For starting your own dream challenges, suggesting ideas, making wishes, reporting pains, defining responsibilities and validating prototypes, choose your [contribution type here](https://github.com/omoearth/omo/issues/new/choose)
+3) For starting your own dream challenges, suggesting ideas, making wishes, reporting pains, defining responsibilities and validating prototypes, choose your [co-creation type here](https://github.com/omoearth/omo/issues/new/choose)
 
 4) For collaborating on other omo dreams look around in our [omo-challenges forum](https://github.com/omoearth/omo/issues) and use the tags to filter the topics you are interested in. f.e. [questions](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3AQUESTION), [dreams](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3ADREAM), [wishes](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3AWISH), [pains](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3APAIN), [ideas](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3AIDEA), [prototypes](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3APROTOTYPE), [proposals](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3APROPOSALS)
 
