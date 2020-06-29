@@ -6,62 +6,64 @@
   import OmoSteps from "./../2-molecules/OmoSteps";
   import OmoRoadmap from "./../2-molecules/OmoRoadmap";
   import OmoSubscribe from "./../2-molecules/OmoSubscribe";
+  import OmoSquares from "./../2-molecules/OmoSquares";
 
   const vision = {
-    uptitle: "OUR DREAM",
+    uptitle: "OUR VISION",
     title: "is your dream",
     subline:
-      "imagine any knowledge, all software, each hardware and every platform is opensource and at your service to empower you implementing your dreams",
+      "imagine growing your dreams faster than ever before, crowdsourcing openly any knowledge, every service, each software and all tools at full brain power speed",
     image: "/images/thought-catalog-23KdVfc395A-unsplash.jpg"
   };
   const mission = {
     uptitle: "our mission",
-    title: "is to grow your passion",
+    title: "is to grow your passion today",
     subline:
-      "we invest time and resources to grow with you together your little seeds of inspiration, into large beautiful trees of fruitful and joyful abundance.",
+      "experience the growth of addictive passion when opensourcing your dreams to the crowd",
     text:
-      "We believe in the power of vision and dreams and have experienced the wonderful and great things passion can enable and build when being shared and pursued collaboratively. Our dream is to inspire and empower you, by developing the social-, technological-, organizational- and economical systems, tools and protocols of tomorrow."
+      "challenge your dreams publicly and the omo crowd turns the little seeds of inspiration into large trees of fruitful abundance. Omo's starting to share your dreams, will commit time to co-create and build with you the social-, technological-, organizational- and financial systems, tools and protocols to transform your dreams into empowering passions."
   };
   const steps = {
     data: {
       steps: [
         {
           image: "/images/ideas.svg",
-          title: "Vision Maker Process",
+          title: "CHALLENGE YOUR DREAMS",
           description:
-            "Increase the velocity of collaborative innovation by adapting the successful concept of open sourcing your life goals with the omo sapiens life design thinking process"
+            "Increase the velocity of collaborative innovation by open sourcing your dreams and visions through our omo design thinking process "
         },
         {
           image: "/images/app.svg",
-          title: "Dreams-as-a-Service",
+          title: "ITERATE YOUR ASSUMPTIONS",
           description:
-            "Recreate and integrate in a matter of days or weeks any modern services you need for your dreams, like uber, airbnb, booking.com, netflix, udemy, linkedin, takeaway, etc"
+            "Omo's co-create and iterate ideas and interactive prototypes to evaluate your assumptions as early as possible in a matter of days and weeks."
         },
         {
           image: "/images/happy.svg",
-          title: "0% Provision forever",
+          title: "CROWDFUND YOUR PASSIONS",
           description:
-            "Gone are the times of 25%+ provision for just connecting resources. We never take a percentage of your passion, you only share if we are able to create true value for you"
+            "Once evaluated successfully traction picks up magically and embraces the work of your co-creators with crowdfunded early adopter benefits and privileges."
         }
       ]
     }
   };
-  const features = {
-    uptitle: "Our tools",
-    title: "Simple fullstack framework",
+  const process = {
+    uptitle: "Our 5 step evolution circle",
+    title: "a lifelong journey towards abundance",
     subline:
-      "we combine the latest technologies, currencies and economic models to grow today the sustainable tomorrow"
+      "enjoy and build your dreams with us on top of circles the most important and innovative human-centered universal basic income currency of our time"
   };
-  // const why = {
-  //   uptitle: "Our tech stack",
-  //   title: "Simple fullstack framework",
-  //   subline: "we combine the latest technologies of modern web development"
-  // };
+
+  const quote = {
+    text:
+      "OMO EARTHS crowdfunding tools are build on top of the CIRCLES-UBI currency protocol, which introduces a radical new breed of money, based on human centered trust, with the mission to foster human value and innovation power for a greater common good"
+  };
+
   const documentation = {
-    uptitle: "How to play with omo",
-    title: "WIP: Documentation",
+    uptitle: "OUR HANDBOOK",
+    title: "How to play with omo code blocks",
     subline:
-      "A quick introduction of our core tech concepts and how you can interact with it (early alpha)"
+      "WIP: A quick introduction of our core tech concepts and how you can interact with it (EARLY ALPHA) "
   };
   const roadmap = {
     uptitle: "Our roadmap",
@@ -70,10 +72,44 @@
       "our roadmap is fluid and an ever evolving set of technological-, social- and economic- tools, we ideate, iterate and implement over time"
   };
   const contributors = {
-    uptitle: "about omo dreamers",
-    title: "Contributing to the commons",
+    uptitle: "omo co-creators",
+    title: "contributing tools to the commons",
     subline:
-      "OMO contributors love to empower dreamers, entrepreneurs, makers and developers to play with opensource, decentralized and modern technologies and currencies"
+      "Omo co-creators love to empower other dreamers, makers, developers and entrepreneuers, by playing with and adapting opensource, decentralized and modern technologies for a greater common good"
+  };
+  const square1 = {
+    title: "1. Plant 10 Seeds",
+    text:
+      "inspire 10 dream patrons, who commit every week min 1 hour to your dream",
+    illustration: "/illustrations/plant_the_seed.svg"
+  };
+  const square2 = {
+    title: "2. Gather 50+ Votes",
+    text: "to dance and filter out the most promising idea which you will test",
+    illustration: "/illustrations/gather_the _votes.svg"
+  };
+  const square3 = {
+    title: "3. Test 100+ Makers",
+    text: "to evaluate your prototype by crowdfunding 5.000+ Circles (~5k€)",
+    illustration: "/illustrations/evaluate.svg"
+  };
+  const square4 = {
+    title: "4. Inspire 500+ Omos",
+    text:
+      "to pre-order your future services and products for 50.000+ Circles (~50k €)",
+    illustration: "/illustrations/inspire.svg"
+  };
+  const square5 = {
+    title: "5. Trust 1000+ investors",
+    text:
+      "who guarantee you an exchange rate of 1 Circle = 0,50 € (up to 500.000€)",
+    illustration: "/illustrations/trust.svg"
+  };
+  const square6 = {
+    title: "REPEAT THE CIRCLE",
+    text:
+      "inspire 10 dream patrons, who commit every week min 1 hour to your dream",
+    illustration: "/illustrations/plant_the_seed.svg"
   };
 </script>
 
@@ -82,27 +118,24 @@
   <div class="p-8 sm:p-12 md:p-16 lg:p-32">
     <OmoHero quant={mission} />
 
-    <!-- <OmoHero quant={why} /> -->
-
     <OmoSteps quant={steps} />
-    <div class="py-8">
-      <OmoHero quant={roadmap} />
-      <div class="m-auto text-center">
-        for more details see our
-        <a
-          class="text-green-500 font-bold"
-          href="https://github.com/omoearth/omo-quantum/milestones?direction=asc&sort=title&state=open">
-          Github Milestones (currently outdated, will be updated soon),
-        </a>
-        or if you have feature requests and bug reports let us know on:
-        <a
-          class="text-green-500 font-bold"
-          href="https://github.com/omoearth/omo-quantum/issues">
-          Github Issues
-        </a>
-      </div>
-    </div>
-    <OmoRoadmap />
+  </div>
+  <div
+    class="p-8 sm:p-12 md:p-16 lg:p-32 text-2xl text-white bg-orange-400
+    text-center w-full"
+    style="font-family: 'Montserrat', sans-serif !important;">
+    {quote.text}
+  </div>
+  <div class="p-8 sm:p-12 md:p-16 lg:p-32">
+
+    <OmoHero quant={process} />
+
+    <OmoSquares quant={square1} />
+    <OmoSquares quant={square2} />
+    <OmoSquares quant={square3} />
+    <OmoSquares quant={square4} />
+    <OmoSquares quant={square5} />
+    <OmoSquares quant={square6} />
 
     <div class="pt-12">
       <OmoHero quant={contributors} />
@@ -110,50 +143,51 @@
     </div>
 
     <div class="py-24">
-      <OmoHero quant={features} />
-
-      <p class="text-gray-900 mb-6">
-        OMO.earth is an
-        <span class="underline font-bold">
-          offline first, decentralized and user owned
-        </span>
-        encrypted by default dream-designer, app-builder, private database and
-        personal currency based on
-        <a href="https://joincircles.net" class="text-green-500 font-bold">
-          circles universal basic income
-        </a>
-        and
-        <a href="https://ipfs.io/" class="text-green-500 font-bold">ipfs</a>
-        and
-        <a href="https://textile.io/" class="text-green-500 font-bold">
-          textile threads
-        </a>
-        with an typesave ORM-Layer based on
-        <a href="https://graphql.org/" class="text-green-500 font-bold">
-          graphql
-        </a>
-        with default realtime updates via subscriptions, including some reactive
-        UI/UX sugar-syntax with
-        <a href="https://svelte.dev/" class="text-green-500 font-bold">
-          svelte
-        </a>
-        and
-        <a href="https://tailwindcss.com/" class="text-green-500 font-bold">
-          tailwind.css
-        </a>
-      </p>
-
-      <OmoTechnologies />
 
       <div class="py-6">
         <OmoHero quant={documentation} />
-        <p>
+
+        <OmoTechnologies />
+
+        <p class="text-gray-900 mb-6">
+          Omo's technological foundation is an
+          <span class="underline font-bold">
+            offline first, decentralized and user owned
+          </span>
+          encrypted by default dream-designer, app-builder, private datastore
+          and personal currency based on the
+          <a href="https://joincircles.net" class="text-green-500 font-bold">
+            Circles-UBI protocol,
+          </a>
+          <a href="https://ipfs.io/" class="text-green-500 font-bold">
+            IPFS Filesystem
+          </a>
+          and
+          <a href="https://textile.io/" class="text-green-500 font-bold">
+            Textile Threads DB
+          </a>
+          with an typesave ORM-Layer based on
+          <a href="https://graphql.org/" class="text-green-500 font-bold">
+            GraphQL
+          </a>
+          with default realtime updates via subscriptions, including some
+          reactive UI/UX sugar-syntax with
+          <a href="https://svelte.dev/" class="text-green-500 font-bold">
+            Svelte
+          </a>
+          and
+          <a href="https://tailwindcss.com/" class="text-green-500 font-bold">
+            Tailwind
+          </a>
+        </p>
+
+        <!-- <p>
           To get started, just select the editor on the bottom menu to start
           adding and deleting database entries which will update the
           relationships between the objects. Every change will change directly
           and in realtime the textile threads DB offline first in your local
           store. (Currently not working, being re-factored)
-        </p>
+        </p> -->
         <br />
         <div class="pt-12">
           <b class="text-blue-900 text-xl text-bold uppercase">
@@ -166,15 +200,15 @@
           </a>
           and npm installed.
           <br />
-          <span class="underscore py-1">
+          <!-- <span class="underscore py-1">
             Download, install and
             <b>run</b>
           </span>
           the textile threads DB deamon
           <a href="go-threads" class="py-1text-green-500 font-bold">
             https://github.com/textileio/go-threads
-          </a>
-          <div class="pt-2">Then download omo-quantum from github:</div>
+          </a> -->
+          <div class="pt-2">Then download omo from github:</div>
           <div class="my-2 text-gray-600 italic">
             git clone https://github.com/omoearth/omo.git
           </div>

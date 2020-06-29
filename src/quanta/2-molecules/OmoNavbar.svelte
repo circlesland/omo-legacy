@@ -13,18 +13,18 @@
       <img
         src="/images/logo.png"
         alt="alt placeholder"
-        class="p-2 inline mx-auto"
+        class="inline mx-auto"
         style="width: 2.75rem; margin-left: 0.15rem" />
     </button>
   </div>
-  <div class="w-full p-2">
+  <div class="w-full my-1">
     <a href="https://github.com/omoearth/omo/issues/new/choose">
-      <button class="w-full bg-green-500 px-4 py-1">
+      <button class="w-full bg-green-500 px-4 py-3">
         <span
           class="px-1 text-white text-lg cursor-pointer uppercase text-sm
           font-bold ">
           <!-- <i class="fas fa-home p-2 bg-gray-800 rounded" /> -->
-          I am ready to challenge my dreams
+          I am ready to play
         </span>
       </button>
     </a>
