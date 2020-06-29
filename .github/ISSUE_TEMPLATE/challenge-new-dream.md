@@ -29,3 +29,4 @@ ___
 **WHERE NEXT? Accept or reject the implemented proposals, based on its ability to incrementally improve the original intended experience**
 _Link your proposals (pull-requests)_
 
+_Link your research sources_
