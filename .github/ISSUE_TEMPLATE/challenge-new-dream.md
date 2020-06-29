@@ -7,6 +7,7 @@ labels: DREAM
 assignees: samuelandert
 
 ---
+
 **INSPIRE 10 DREAM PATRONS**
 _Assign (on the right side) 10 patrons, who share your dream and are committed to invest every week at least 1 hour into this dream. 
 
