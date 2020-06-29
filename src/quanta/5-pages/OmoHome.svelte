@@ -12,7 +12,7 @@
     uptitle: "OUR VISION",
     title: "is your dream",
     subline:
-      "imagine growing your dreams faster than ever before, crowdsourcing openly any knowledge, every service, each software and all tools at full brain power speed",
+      "imagine growing your dreams faster than ever before, crowdsourcing openly all knowledge, every service, each software and any tools at full brain power speed",
     image: "/images/thought-catalog-23KdVfc395A-unsplash.jpg"
   };
   const mission = {
