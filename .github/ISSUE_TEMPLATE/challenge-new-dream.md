@@ -1,20 +1,20 @@
 ---
-name: Challenge new dream
+name: Challenge new Dream
 about: this is the default process for building the dreams of omo sapiens (open minded
   organization talents)
-title: 'My dream is to inspire ... '
+title: 'My vision is to inspire ... '
 labels: DREAM
 assignees: samuelandert
 
 ---
 
-**INSPIRE 10 DREAM PATRONS**
-_Assign (on the right side) 10 patrons, who share your dream and are committed to invest every week at least 1 hour into this dream. 
+**INSPIRE 3 DREAM PATRONS**
+_Assign (on the right side) 3 patrons, who share your dream and are committed to invest every day min 1 hour into the shared dream. 
 
 **WHY QUESTIONS? Learn about the purpose of your dream**
 _Link the painful experiences, you wish to end_ 
 
-_Link the gainful experiences, you wish to enjoy_ 
+_Link the gainful goals, you wish to enjoy_ 
 
 ___ 
 **HOW QUESTIONS? Brainstorm how you can solve your dream challenge**
