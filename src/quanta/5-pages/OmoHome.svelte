@@ -11,7 +11,7 @@
   const vision = {
     title: "one dream shared",
     subline:
-      "is one quantum leap more powerful than a 1000 obstacles and roadblocks ahead",
+      "is one quantum leap more powerful than the 1000 obstacles and failures ahead",
     image: "/images/thought-catalog-23KdVfc395A-unsplash.jpg"
   };
   const mission = {
