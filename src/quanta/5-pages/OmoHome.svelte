@@ -35,7 +35,7 @@
           image: "/images/app.svg",
           title: "2. PLAY WITH YOUR ASSUMPTIONS",
           description:
-            "Omo's co-create and iterate ideas and interactive prototypes to evaluate your assumptions as early as possible in a matter of days and weeks."
+            "Omo's co-create and iterate ideas and interactive prototypes to evaluate your assumptions a matter of days and weeks with our modular code blocks."
         },
         {
           image: "/images/happy.svg",
