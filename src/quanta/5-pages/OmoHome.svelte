@@ -9,38 +9,37 @@
   import OmoSquares from "./../2-molecules/OmoSquares";
 
   const vision = {
-    uptitle: "OUR VISION",
-    title: "is your dream",
+    title: "one dream shared",
     subline:
-      "imagine growing your dreams faster than ever before, crowdsourcing openly any knowledge, every service, each software and all tools at full brain power speed",
+      "is one quantum leap more powerful than a 1000 obstacles and roadblocks ahead",
     image: "/images/thought-catalog-23KdVfc395A-unsplash.jpg"
   };
   const mission = {
-    uptitle: "our mission",
-    title: "is to grow your passion today",
+    uptitle: "our dream is to",
+    title: "grow your passions week by week",
     subline:
-      "experience the growth of addictive passion when opensourcing your dreams to the crowd",
+      "experience the growth of playful and joyful passion when opensourcing your dreams to the crowd",
     text:
-      "challenge your dreams publicly and the omo crowd turns the little seeds of inspiration into large trees of fruitful abundance. Omo's starting to share your dreams, will commit time to co-create and build with you the social-, technological-, organizational- and financial systems, tools and protocols to transform your dreams into empowering passions."
+      "publicly challenge your dreams to turn your small seeds of inspiration into large trees of fruitful abundance. Intrinsicly, Omos begin to share your dreams and commit their time to co-create with you the social-, technological-, organizational- and financial opensource systems, tools and protocols to transform the shared dreams into empowering and joyful passions."
   };
   const steps = {
     data: {
       steps: [
         {
           image: "/images/ideas.svg",
-          title: "CHALLENGE YOUR DREAMS",
+          title: "1. CHALLENGE YOUR DREAMS",
           description:
             "Increase the velocity of collaborative innovation by open sourcing your dreams and visions through our omo design thinking process "
         },
         {
           image: "/images/app.svg",
-          title: "ITERATE YOUR ASSUMPTIONS",
+          title: "2. PLAY WITH YOUR ASSUMPTIONS",
           description:
             "Omo's co-create and iterate ideas and interactive prototypes to evaluate your assumptions as early as possible in a matter of days and weeks."
         },
         {
           image: "/images/happy.svg",
-          title: "CROWDFUND YOUR PASSIONS",
+          title: "3. CROWDFUND YOUR GOALS",
           description:
             "Once evaluated successfully traction picks up magically and embraces the work of your co-creators with crowdfunded early adopter benefits and privileges."
         }
@@ -56,7 +55,7 @@
 
   const quote = {
     text:
-      "OMO EARTHS crowdfunding tools are build on top of the CIRCLES-UBI currency protocol, which introduces a radical new breed of money, based on human centered trust, with the mission to foster human value and innovation power for a greater common good"
+      "OMO EARTHS crowdsourcing and crowdfunding tools are build on top of the CIRCLES universal basic income currency protocol. Circles introduces a radical new breed of money and a value based on human centered trust, with the mission to empower sustainable human innovation growth for a greater common good"
   };
 
   const documentation = {
@@ -65,9 +64,10 @@
     subline:
       "WIP: A quick introduction of our core tech concepts and how you can interact with it (EARLY ALPHA) "
   };
+
   const roadmap = {
     uptitle: "Our roadmap",
-    title: "One quantum leap at a time",
+    title: "One quantum leap dream at a time",
     subline:
       "our roadmap is fluid and an ever evolving set of technological-, social- and economic- tools, we ideate, iterate and implement over time"
   };

@@ -1,4 +1,5 @@
 <script>
+  import OmoFonts from "./../1-atoms/OmoFonts";
   export let quant = {
     data: {
       title: "Header Title",
@@ -7,16 +8,22 @@
     },
     design: {
       layout: "py-20 bg-gray-100",
-      title: "text-gray-800 font-bold font-title",
+      title: "text-gray-800 omo-font-title",
       subline: "text-gray-500 italic font-light font-sans tracking-wide",
       illustration: "w-1/2"
     }
   };
 </script>
 
+<style>
+  .omo-font-title {
+    font-family: OstrichSansHeavy;
+  }
+</style>
+
 <div
   class="m-auto flex flex-col justify-center text-center {quant.design.layout}">
-  <h2 class="flex-wrap uppercase text-4xl {quant.design.title}">
+  <h2 class="flex-wrap uppercase text-4xl text-gray-800 omo-font-title">
     {quant.data.title}
   </h2>
   {#if quant.data.subline}
