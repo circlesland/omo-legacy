@@ -2,7 +2,7 @@
 name: Validate new PROTOTYPE
 about: Describe this issue template's purpose here.
 title: 'I am validating ... '
-labels: ''
+labels: PROTOTYPE
 assignees: ''
 
 ---
