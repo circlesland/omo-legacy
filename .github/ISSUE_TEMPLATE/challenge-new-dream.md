@@ -11,7 +11,7 @@ assignees: samuelandert
 
 _Describe and tell a small story, how an omo sapiens will navigate in and around your dream world_
 
-- I am imagining ... 
+- I am imagining ... #
 
 _Link the painful experiences, you will end_ 
 
