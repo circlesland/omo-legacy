@@ -2,14 +2,11 @@
 name: Challenge new Dream
 about: this is the default process for building the dreams of omo sapiens (open minded
   organization talents)
-title: 'My vision is to inspire ... '
+title: 'My dream is ... '
 labels: DREAM
 assignees: samuelandert
 
 ---
-
-**INSPIRE 3 DREAM PATRONS**
-_Assign (on the right side) 3 patrons, who share your dream and are committed to invest every day min 1 hour into the shared dream. 
 
 **WHY QUESTIONS? Learn about the purpose of your dream**
 _Link the painful experiences, you wish to end_ 
