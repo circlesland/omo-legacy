@@ -2,7 +2,7 @@
 name: Challenge new Dream
 about: this is the default process for building the dreams of omo sapiens (open minded
   organization talents)
-title: 'My dream is ... '
+title: 'I am dreaming ... '
 labels: DREAM
 assignees: samuelandert
 
