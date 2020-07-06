@@ -7,6 +7,7 @@ labels: DREAM
 assignees: samuelandert
 
 ---
+
 **WHY QUESTIONS? Learn about the purpose of your dream**  
 
 _Describe and tell a small story, how an omo sapiens will navigate in and around your dream world_
