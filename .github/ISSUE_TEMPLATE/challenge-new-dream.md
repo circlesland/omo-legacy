@@ -7,7 +7,6 @@ labels: DREAM
 assignees: samuelandert
 
 ---
-
 **WHY QUESTIONS? Learn about the purpose of your dream**  
 
 _Describe and tell a small story, how an omo sapiens will navigate in and around your dream world_
@@ -56,9 +55,9 @@ _Link your responsibilities_
 - I am responsible for ... #
 
 ___
-**WHERE NEXT? Accept or reject the implemented upgrade proposals, based on its ability to incrementally improve the original pursued gainful experiences**
+**WHERE NEXT? Accept or reject the implemented upgrades, based on its ability to incrementally improve the original pursued gainful experiences**
 
-_Link your proposals (pull-requests)_
+_Link your upgrades (pull-requests)_
 
 1) I implemented ... 
 
