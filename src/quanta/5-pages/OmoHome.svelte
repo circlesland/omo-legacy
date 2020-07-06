@@ -35,7 +35,7 @@
           image: "/images/app.svg",
           title: "2. PLAY WITH YOUR ASSUMPTIONS",
           description:
-            "Omo's co-create and iterate ideas and interactive prototypes to evaluate your assumptions a matter of days and weeks with our modular code blocks."
+            "Omo's co-create and iterate ideas and interactive prototypes to evaluate your assumptions in a matter of days and weeks rather than lost months or years"
         },
         {
           image: "/images/happy.svg",
@@ -55,7 +55,7 @@
 
   const quote = {
     text:
-      "OMO EARTHS crowdsourcing and crowdfunding tools are build on top of the CIRCLES universal basic income currency protocol. Circles introduces a radical new breed of money and a value based on human centered trust, with the mission to empower sustainable human innovation growth for a greater common good"
+      "OMO EARTHS crowdsourcing and crowdfunding tools are build on top of the CIRCLES universal basic income currency protocol. Circles introduces a radical new breed of money and a value system based on human centered trust, with the mission to empower sustainable human innovation growth for a greater common good"
   };
 
   const documentation = {
