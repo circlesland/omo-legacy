@@ -38,6 +38,7 @@
   "bugs": "https://github.com/omoearth/omo-quantum/issues",
   "main": "src/App.svelte",
   "dependencies": {
+    "@textile/hub": "^0.2.2",
     "@textile/textile": "0.0.7",
     "@textile/threads-database": "0.1.0",
     "@textile/threads-encoding": "0.1.0",
@@ -52,6 +53,7 @@
     "apollo-boost": "^0.4.7",
     "datastore-core": "^1.0.0",
     "datastore-level": "^0.14.1",
+    "dotenv": "^8.2.0",
     "escape-string-regexp": "^4.0.0",
     "graphql": "^15.0.0",
     "graphql-subscriptions": "^1.1.0",

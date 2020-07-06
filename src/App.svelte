@@ -16,21 +16,22 @@
   ];
 
   let currentId;
-/*  graphql("{Quants {ID name icon }}").then(result => {
+  graphql("{Quants {_id name icon }}").then(result => {
     router = [
       { route: "?route=home", quant: OmoHome, name: null },
       { route: "?route=imprint", quant: Imprint, name: "imprint" }
     ];
     result.data.Quants.forEach(element => {
+      console.log(element._id + " " + element.name);
       router.push({
-        route: `?route=${element.ID}`,
+        route: `?route=${element._id}`,
         quant: OmoSideBarLayout,
         name: element.name,
-        ID: element.ID
+        ID: element._id
       });
     });
   });
-  subscribe("subscription {Quants {ID name icon }}").then(subscription => {
+  subscribe("subscription {Quants {_id name icon }}").then(subscription => {
     (async () => {
       for await (let value of subscription) {
         router = [
@@ -48,7 +49,7 @@
         });
       }
     })();
-  });*/
+  });
   onMount(() => {
     var urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("route")) {

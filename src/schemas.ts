@@ -1,20 +1,12 @@
 import { PubSub } from "graphql-subscriptions";
 import { Result } from "interface-datastore";
-import { db } from "./textileThreads";
 import { JSONSchema7 } from "json-schema";
 import { GraphQLObjectType, GraphQLString, Thunk, GraphQLFieldConfigMap, GraphQLSchema, GraphQLID, GraphQLBoolean, GraphQLList } from "graphql";
 let pluralize = require('pluralize');
-import { Collection } from "@textile/threads-database";
+import { TextileThread } from "./textileThreads";
 
 export const pubsub = new PubSub();
 
-export async function toArray<T>(iterator: AsyncIterable<Result<T>>): Promise<T[]> {
-  const arr = Array<T>();
-  for await (const entry of iterator) {
-    arr.push(entry.value);
-  }
-  return arr;
-}
 export interface Quant {
   ID: string;
   name: string;
@@ -27,9 +19,9 @@ export const QuantSchema: JSONSchema7 = {
   $schema: "http://json-schema.org/draft-07/schema#",
   title: "Library",
   type: "object",
-  required: ["ID"],
+  required: ["_id"],
   properties: {
-    ID: {
+    _id: {
       type: "string",
       description: "The instance's id.",
     },
@@ -56,9 +48,9 @@ export const LibrarySchema: JSONSchema7 = {
   $schema: "http://json-schema.org/draft-07/schema#",
   title: "Library",
   type: "object",
-  required: ["ID"],
+  required: ["_id"],
   properties: {
-    ID: {
+    _id: {
       type: "string",
       description: "The instance's id.",
     },
@@ -81,9 +73,9 @@ export const BookSchema: JSONSchema7 = {
   $schema: "http://json-schema.org/draft-07/schema#",
   title: "Book",
   type: "object",
-  required: ["ID"],
+  required: ["_id"],
   properties: {
-    ID: {
+    _id: {
       type: "string",
       description: "The instance's id.",
     },
@@ -98,9 +90,9 @@ export const AuthorSchema: JSONSchema7 = {
   $schema: "http://json-schema.org/draft-07/schema#",
   title: "Author",
   type: "object",
-  required: ["ID"],
+  required: ["_id"],
   properties: {
-    ID: {
+    _id: {
       type: "string",
       description: "The instance's id.",
     },
@@ -111,13 +103,14 @@ export const AuthorSchema: JSONSchema7 = {
   },
 };
 export async function getSchema() {
-  let quantCollection = db.collections.get("Quant") as Collection<Quant>;
-  var quanta = await toArray(await quantCollection.find());
+
+  const textileThread = TextileThread.getInstance(null);
+  var quanta = await textileThread.getQuanta();
   quanta = quanta.filter(x => x.name && x.jsonSchema && x.collectionName && x.name != "null" && x.jsonSchema != "null" && x.collectionName != "null");
 
   quanta.forEach(async quant => {
-    if (!db.collections.has(quant.collectionName) && quant.collectionName && quant.jsonSchema) {
-      await db.newCollection(quant.collectionName, JSON.parse(quant.jsonSchema))
+    if (!textileThread.collections.has(quant.collectionName, []) && quant.collectionName && quant.jsonSchema) {
+      await textileThread.collections.newCollection(quant.collectionName, JSON.parse(quant.jsonSchema))
     }
   })
   let map = getQuantTypeMap(quanta);
@@ -139,30 +132,30 @@ export async function getSchema() {
   return schema;
 }
 function getSubscriptions(map: Map<Quant, GraphQLObjectType>): Thunk<GraphQLFieldConfigMap<any, any>> {
+  const textileThread = TextileThread.getInstance(null);
   var subscriptions: Thunk<GraphQLFieldConfigMap<any, any>> = {};
   map.forEach((type, quant) => {
-    let collection = db.collections.get(quant.collectionName) as Collection;
 
     subscriptions[pluralize(quant.name)] = {
       type: GraphQLList(type),
       subscribe: async () => pubsub.asyncIterator(quant.collectionName + "_changed"),
-      resolve: async () => await toArray(await collection.find())
+      resolve: async () => await textileThread.collections.find(quant.collectionName, {})
     };
     subscriptions[`${quant.name}ById`] = {
       args: { ID: { type: GraphQLID } },
       type: type,
       subscribe: async (root: any, data: any) => pubsub.asyncIterator(data.ID + "_changed"),
-      resolve: async (payload: any) => { console.log(JSON.stringify(payload)); return await collection.findById(payload.id); }
+      resolve: async (payload: any) => { console.log(JSON.stringify(payload)); return await textileThread.collections.findById(quant.collectionName, payload.id); }
     };
     subscriptions[quant.name + "Added"] = {
       type: type,
       subscribe: async () => pubsub.asyncIterator(quant.collectionName + "_added"),
-      resolve: async (id: string) => await collection.findById(id)
+      resolve: async (id: string) => await textileThread.collections.findById(quant.collectionName, id)
     };
     subscriptions[quant.name + "Updated"] = {
       type: type,
       subscribe: async () => pubsub.asyncIterator(quant.collectionName + "_updated"),
-      resolve: async (id: string) => await collection.findById(id)
+      resolve: async (id: string) => await textileThread.collections.findById(quant.collectionName, id)
     };
     subscriptions[quant.name + "Deleted"] = {
       type: GraphQLID,
@@ -174,47 +167,45 @@ function getSubscriptions(map: Map<Quant, GraphQLObjectType>): Thunk<GraphQLFiel
 }
 function getQueries(map: Map<Quant, GraphQLObjectType>): Thunk<GraphQLFieldConfigMap<any, any>> {
   var queries: Thunk<GraphQLFieldConfigMap<any, any>> = {};
-
+  var textileThread = TextileThread.getInstance();
   map.forEach((type, quant) => {
-    let collection = db.collections.get(quant.collectionName) as Collection;
-
     queries[pluralize(quant.name)] = {
       type: GraphQLList(type),
       resolve: async () => {
-        return await toArray(await collection.find())
+        return await textileThread.collections.find(quant.collectionName, {})
       }
     };
 
     queries[quant.name + 'ById'] = {
       type,
       args: { ID: { type: GraphQLID } },
-      resolve: async (root: any, payload: any) => await collection.findById(payload.ID)
+      resolve: async (root: any, payload: any) => await textileThread.collections.findById(quant.collectionName, payload.ID)
     };
   })
   return queries;
 }
 function getMutations(map: Map<Quant, GraphQLObjectType>): Thunk<GraphQLFieldConfigMap<any, any>> {
   var mutations: Thunk<GraphQLFieldConfigMap<any, any>> = {};
+  const textileThread = TextileThread.getInstance(null);
+
   map.forEach((type, quant) => {
-    let collection = db.collections.get(quant.collectionName) as Collection<any>;
     let schema = JSON.parse(quant.jsonSchema);
     let args = getArguments(schema);
     mutations[`add${quant.name}`] = {
       args,
       resolve: async (root: any, data: any) => {
-        var entity = await new collection(data);
-        await collection.insert(entity);
-        return entity;
+        await textileThread.collections.add(quant.collectionName, data);
+        return data;
       },
       type
     };
     mutations[`update${quant.name}`] = {
       args,
       resolve: async (root: any, data: any) => {
-        var entity = await collection.findById(data.ID);
+        var entity = await textileThread.collections.findById(quant.collectionName, data.ID);
         Object.keys(data).forEach(key => entity[key] = data[key]);
-        await collection.save(entity);
-        return entity;
+        await textileThread.collections.update(quant.collectionName, data);
+        return data;
       },
       type
     };
@@ -223,14 +214,12 @@ function getMutations(map: Map<Quant, GraphQLObjectType>): Thunk<GraphQLFieldCon
       resolve: async (root: any, data: any) => {
         var entity;
         if (data.ID) {
-          entity = await collection.findById(data.ID);
+          entity = await textileThread.collections.findById(quant.collectionName, data.ID);
           Object.keys(data).forEach(key => entity[key] = data[key]);
-          await collection.save(entity);
+          await textileThread.collections.add(quant.collectionName, data);
           return entity;
         } else {
-          entity = await new collection(data);
-          await collection.insert(entity);
-
+          await textileThread.collections.update(quant.collectionName, data);
         }
         return entity;
       },
@@ -240,7 +229,7 @@ function getMutations(map: Map<Quant, GraphQLObjectType>): Thunk<GraphQLFieldCon
       args: { ID: { type: GraphQLID } },
       resolve: async (root: any, data: any) => {
         try {
-          await collection.delete(data.ID);
+          await textileThread.collections.delete(quant.collectionName, [data.ID]);
           return true;
         }
         catch (e) {

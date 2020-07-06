@@ -1,8 +1,8 @@
 ---
-name: Define new responsibility
+name: Define new TODO
 about: Define clear tasks, responsibilities and success metrics
-title: My responsibility is ...
-labels: RESPONSIBILITY
+title: I am responsible ...
+labels: ''
 assignees: ''
 
 ---

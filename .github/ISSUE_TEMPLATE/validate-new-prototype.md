@@ -1,8 +1,8 @@
 ---
-name: Validate new Prototype
+name: Validate new PROTOTYPE
 about: Describe this issue template's purpose here.
-title: 'My prototype is ... '
-labels: ''
+title: 'I am validating ... '
+labels: PROTOTYPE
 assignees: ''
 
 ---
