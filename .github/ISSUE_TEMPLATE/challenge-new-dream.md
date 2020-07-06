@@ -1,5 +1,5 @@
 ---
-name: Challenge new Dream
+name: Challenge new DREAM
 about: this is the default process for building the dreams of omo sapiens (open minded
   organization talents)
 title: 'I am dreaming ... '
