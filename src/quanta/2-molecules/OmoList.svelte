@@ -6,11 +6,11 @@
     icon: "fa-plus",
     iconColor: "text-green-400"
   };
-  graphql("{Quants {ID name icon }}").then(result => {
+  graphql("{Quants {_id name icon }}").then(result => {
     quanta = result.data.Quants;
   });
 
-  subscribe("subscription {Quants {ID name icon collectionName}}").then(
+  subscribe("subscription {Quants {_id name icon collectionName}}").then(
     subscription => {
       (async () => {
         for await (let value of subscription) {

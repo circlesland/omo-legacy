@@ -11,6 +11,9 @@ const CopyPlugin = require("copy-webpack-plugin");
 const merge = require("webpack-merge");
 const preprocess = require("svelte-preprocess");
 
+
+const dotenv = require('dotenv').config({ path: __dirname + '/.env' });
+
 const path = require("path");
 const DEV_PORT = 5000;
 
@@ -152,9 +155,12 @@ module.exports = {
 					: {}
 			)
 		),
-		new webpack.DefinePlugin({
-			"process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
-			PUBLIC_URL: JSON.stringify(publicPath)
+		// new webpack.DefinePlugin({
+		// 	"process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
+		// 	PUBLIC_URL: JSON.stringify(publicPath)
+		// }),
+				new webpack.DefinePlugin({
+			"process.env": JSON.stringify(dotenv.parsed)
 		}),
 		!prod && new CaseSensitivePathsPlugin(),
 		prod &&

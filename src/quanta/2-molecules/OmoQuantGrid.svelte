@@ -34,11 +34,11 @@
 
   async function updateHeader(id) {
     quant = (await graphql(
-      `{QuantById(ID:"${id}"){ID, jsonSchema, name, collectionName}}`
+      `{QuantById(ID:"${id}"){_id, jsonSchema, name, collectionName}}`
     )).data.QuantById;
     properties = JSON.parse(quant.jsonSchema).properties;
     subscribe(
-      `subscription {QuantById(ID:"${id}"){ID, jsonSchema, name, collectionName}}`
+      `subscription {QuantById(ID:"${id}"){_id, jsonSchema, name, collectionName}}`
     ).then(async subscription => {
       for await (let value of subscription) {
         quant = value.data.QuantById;
@@ -53,7 +53,7 @@
         `{${pluralize(quant.name)} {${Object.keys(props).join(" ")}}}`
       );
       entries = toValues(result.data[pluralize(quant.name)], props);
-      updateCss(enries);
+      updateCss(entries);
       subscribe(
         `subscription {${pluralize(quant.name)} {${Object.keys(props).join(
           " "
