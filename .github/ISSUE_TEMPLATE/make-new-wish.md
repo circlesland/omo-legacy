@@ -1,8 +1,8 @@
 ---
-name: Make new Wish
+name: Make new WISH (Feature)
 about: Describe the feeling you wish to experience
-title: 'My wish is to feel ... '
-labels: ''
+title: 'I am enjoying ... '
+labels: WISH (feature)
 assignees: ''
 
 ---
