@@ -1,5 +1,5 @@
 ---
-name: Report new Pain (Bug)
+name: Report new PAIN (Bug)
 about: Describe your pain (bug) you experience to help omos to become better at improving
 title: 'My experience is ... '
 labels: PAIN (Bug)
