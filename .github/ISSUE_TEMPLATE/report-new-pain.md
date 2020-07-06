@@ -2,7 +2,7 @@
 name: Report new pain (bug)
 about: Describe your pain (bug) you experience to help omos to become better at improving
 title: 'My experience is ... '
-labels: PAIN
+labels: ''
 assignees: ''
 
 ---
