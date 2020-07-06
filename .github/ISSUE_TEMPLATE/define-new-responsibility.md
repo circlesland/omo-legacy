@@ -1,7 +1,7 @@
 ---
-name: Define new responsibility
+name: Define new Responsibility
 about: Define clear tasks, responsibilities and success metrics
-title: My responsibility is ...
+title: I am responsible for ...
 labels: RESPONSIBILITY
 assignees: ''
 
