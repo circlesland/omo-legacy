@@ -7,12 +7,11 @@ labels: DREAM
 assignees: samuelandert
 
 ---
-
 **WHY QUESTIONS? Learn about the purpose of your dream**  
 
 _Describe and tell a small story, how an omo sapiens will navigate in and around your dream world_
 
-I am imagining ... 
+- I am imagining ... 
 
 _Link the painful experiences, you will end_ 
 
@@ -38,11 +37,11 @@ ___
 
 _Link your prototypes_
 
-1. I validating ... #
+1. I am validating ... #
 
-2. I validating ... #
+2. I am validating ... #
 
-3. I validating ... #
+3. I am validating ... #
 
 ___
 **WHO QUESTIONS? Who is the most talented and best taking over the responsibilities to implement your dreams?** 
