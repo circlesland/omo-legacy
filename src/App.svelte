@@ -16,40 +16,40 @@
   ];
 
   let currentId;
-  graphql("{Quants {_id name icon }}").then(result => {
-    router = [
-      { route: "?route=home", quant: OmoHome, name: null },
-      { route: "?route=imprint", quant: Imprint, name: "imprint" }
-    ];
-    result.data.Quants.forEach(element => {
-      console.log(element._id + " " + element.name);
-      router.push({
-        route: `?route=${element._id}`,
-        quant: OmoSideBarLayout,
-        name: element.name,
-        ID: element._id
-      });
-    });
-  });
-  subscribe("subscription {Quants {_id name icon }}").then(subscription => {
-    (async () => {
-      for await (let value of subscription) {
-        router = [
-          { route: "?route=home", quant: OmoHome, name: null },
-          { route: "?route=imprint", quant: Imprint, name: "imprint" }
-        ];
+  // graphql("{Quants {_id name icon }}").then(result => {
+  //   router = [
+  //     { route: "?route=home", quant: OmoHome, name: null },
+  //     { route: "?route=imprint", quant: Imprint, name: "imprint" }
+  //   ];
+  //   result.data.Quants.forEach(element => {
+  //     console.log(element._id + " " + element.name);
+  //     router.push({
+  //       route: `?route=${element._id}`,
+  //       quant: OmoSideBarLayout,
+  //       name: element.name,
+  //       ID: element._id
+  //     });
+  //   });
+  // });
+  // subscribe("subscription {Quants {_id name icon }}").then(subscription => {
+  //   (async () => {
+  //     for await (let value of subscription) {
+  //       router = [
+  //         { route: "?route=home", quant: OmoHome, name: null },
+  //         { route: "?route=imprint", quant: Imprint, name: "imprint" }
+  //       ];
 
-        value.data.Quants.forEach(element => {
-          router.push({
-            route: `?route=${element.ID}`,
-            quant: OmoSideBarLayout,
-            name: element.name,
-            ID: element.ID
-          });
-        });
-      }
-    })();
-  });
+  //       value.data.Quants.forEach(element => {
+  //         router.push({
+  //           route: `?route=${element.ID}`,
+  //           quant: OmoSideBarLayout,
+  //           name: element.name,
+  //           ID: element.ID
+  //         });
+  //       });
+  //     }
+  //   })();
+  // });
   onMount(() => {
     var urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has("route")) {
