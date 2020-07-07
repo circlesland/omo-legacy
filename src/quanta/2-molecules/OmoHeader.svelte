@@ -9,7 +9,8 @@
     design: {
       layout: "py-20 bg-gray-100",
       title: "text-gray-800 omo-font-title",
-      subline: "text-gray-500 italic font-light font-sans tracking-wide",
+      subline:
+        "text-gray-500 omo-font-title italic font-light font-sans tracking-wide",
       illustration: "w-1/2"
     }
   };
