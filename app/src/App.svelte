@@ -1,6 +1,34 @@
-<script>
+<script lang="ts">
+  import OmoTheme from "./OmoTheme.svelte";
+  import Compositor from "./blocks/Compositor.svelte";
+
   export let name;
   name = "omo earth starter";
+
+  let App = {
+      layout: {
+          areas: "'main' 'footer'",
+          columns: "1fr",
+          rows: "1fr 4rem",
+      },
+      component: "Compositor",
+      children: [
+          {
+              area: "main",
+              component: "OmoBanner",
+              data: {
+                  title: "follow your dreams",
+                  image: "/images/inspire.jpg",
+                  action: "javascript:navigate('omoauth')",
+                  button: "Start dreaming",
+              },
+          },
+          {
+              area: "footer",
+              component: "OmoNav",
+          },
+      ],
+  };
 </script>
 
 <style>
@@ -17,6 +45,6 @@
   }
 </style>
 
-<h1>Hello {name}!</h1>
-<a class="btn-blue" href="/">Button blue</a>
-<a class="btn-red" href="/">Button red</a>
+<OmoTheme />
+<Compositor composition={App} />
+

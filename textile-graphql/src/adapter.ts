@@ -2,6 +2,6 @@ export class Adapter
 {
     constructor()
     {
-        console.log("Deine Mudda!");
+        console.log("Hello World!");
     }
 }

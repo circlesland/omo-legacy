@@ -1,10 +1,25 @@
 import App from './App.svelte';
-import {Adapter} from "@omo/textile-graphql/dist/adapter"
+import {Registrar} from "./ComponentRegistrar";
+import {Adapter} from "@omo/textile-graphql/dist/adapter";
 
+declare global {
+    interface Window {
+        registrar: Registrar;
+        //o: Quantum;
+    }
+}
 
-new Adapter();
-const app = new App({
-    target: document.body,
-});
+var adapter = new Adapter();
+var app;
+async function start()
+{
+    window.registrar = new Registrar();
+//  window.o = await Quantum.leap();
+    app = new App({
+        target: document.body
+    });
+}
+
+start();
 
 export default app;
