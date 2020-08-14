@@ -9,7 +9,7 @@ declare global {
     }
 }
 
-var adapter = new Adapter();
+var adapter = Adapter.create();
 var app;
 async function start()
 {
