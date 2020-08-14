@@ -1,0 +1,29 @@
+{
+  "name": "omo-dapp-starter",
+  "version": "1.0.0",
+  "dependencies": {
+    "@omo/textile-graphql": "../textile-graphql"
+  },
+  "devDependencies": {
+    "cross-env": "^5.2.0",
+    "css-loader": "^2.1.1",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "postcss": "^6.0.19",
+    "postcss-loader": "^2.1.1",
+    "serve": "^11.3.2",
+    "style-loader": "^0.23.1",
+    "stylelint-config-recommended": "^3.0.0",
+    "svelte": "^3.24.1",
+    "svelte-loader": "^2.13.6",
+    "tailwindcss": "^1.6.2",
+    "ts-loader": "^8.0.2",
+    "typescript": "^3.9.7",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "scripts": {
+    "build": "cross-env NODE_ENV=production webpack",
+    "dev": "webpack-dev-server --content-base public"
+  }
+}

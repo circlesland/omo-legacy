@@ -1,0 +1,9 @@
+{
+  "name": "@omo/textile-graphql",
+  "version": "1.0.0",
+  "devDependencies": {
+    "typescript": "^3.9.7"
+  },
+  "scripts": {
+  }
+}
