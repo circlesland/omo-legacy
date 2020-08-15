@@ -2,32 +2,32 @@
   import OmoTheme from "./OmoTheme.svelte";
   import Compositor from "./blocks/Compositor.svelte";
 
-  export let name;
+  export let name: string;
   name = "omo earth starter";
 
   let App = {
-      layout: {
-          areas: "'main' 'footer'",
-          columns: "1fr",
-          rows: "1fr 4rem",
+    layout: {
+      areas: "'main' 'footer'",
+      columns: "1fr",
+      rows: "1fr 4rem",
+    },
+    component: "Compositor",
+    children: [
+      {
+        area: "main",
+        component: "OmoBanner",
+        data: {
+          title: "follow your dreams",
+          image: "/images/inspire.jpg",
+          action: "javascript:navigate('omoauth')",
+          button: "Start dreaming",
+        },
       },
-      component: "Compositor",
-      children: [
-          {
-              area: "main",
-              component: "OmoBanner",
-              data: {
-                  title: "follow your dreams",
-                  image: "/images/inspire.jpg",
-                  action: "javascript:navigate('omoauth')",
-                  button: "Start dreaming",
-              },
-          },
-          {
-              area: "footer",
-              component: "OmoNav",
-          },
-      ],
+      {
+        area: "footer",
+        component: "OmoNav",
+      },
+    ],
   };
 </script>
 
@@ -47,4 +47,3 @@
 
 <OmoTheme />
 <Compositor composition={App} />
-

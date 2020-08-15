@@ -4,7 +4,7 @@ const webpack = require('webpack')
 const dotenv = require('dotenv').config({ path: __dirname + '/.env' })
 
 const mode = process.env.NODE_ENV || 'development'
-const prod = mode === 'production'
+const IS_DEV = process.env.NODE_ENV === 'development'
 
 module.exports = {
   entry: {
@@ -29,8 +29,9 @@ module.exports = {
         use: {
           loader: 'svelte-loader',
           options: {
-            emitCss: true,
-            hotReload: true,
+            emitCss: !IS_DEV,
+            hotReload: IS_DEV,
+            preprocess: require('./svelte.config.js').preprocess,
           },
         },
       },
@@ -61,5 +62,5 @@ module.exports = {
       'process.env': JSON.stringify(dotenv.parsed),
     }),
   ],
-  devtool: prod ? false : 'source-map',
+  devtool: IS_DEV ? 'source-map' : false,
 }
