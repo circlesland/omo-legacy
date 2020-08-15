@@ -4,7 +4,12 @@ rm -f package-lock.json
 npm i
 npx tsc
 
-cd textile-adapter || exit
+cd ../textile-adapter || exit
+rm -f package-lock.json
+npm i
+npx tsc
+
+cd ../events || exit
 rm -f package-lock.json
 npm i
 npx tsc

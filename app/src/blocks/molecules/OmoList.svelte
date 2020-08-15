@@ -1,21 +1,26 @@
 <script lang="ts">
+    import { Action } from "../../ComponentRegistrar";
+
 /**
      * TODO: Support ArrayLike and async iterators as item source.
      */
-    export let items = [{
+    export let items: (object & {_id:string, $schemaId:string})[] = [{
+        _id: "1",
         $schemaId: "https://example.com/message.schema.json",
         message: "Test 1"
     },{
+        _id: "2",
         $schemaId: "https://example.com/test.schema.json",
         test: "Test 2"
     },{
+        _id: "3",
         $schemaId: "https://example.com/message.schema.json",
         message: "Test 3"
     }];
 
     export let selected = null;
 
-    let actions = [];
+    let actions : Action[] = [];
     let w = window;
 
     function select(item) {
@@ -26,7 +31,7 @@
             return;
         }
 
-        const foundActions = w.registrar.findActionsForItem(selected);
+        const foundActions = w.o.registry.findActionsForItem(selected);
         if (!foundActions || foundActions.length === 0){
             return;
         }
@@ -38,20 +43,20 @@
 <style>
 </style>
 
-{#if !items || items.length == 0}
+{#if !items || items.length === 0}
   <!-- TODO: Display "No entries" message or similar -->
 {:else}
       {#each items as item}
-        {#if item == selected}
+        {#if selected && item._id === selected._id}
             <div style="background:#009; color:#fff;" on:click={select(item)}>
                 <svelte:component
-                        this={w.registrar.findListItem(item)}
+                        this={w.o.registry.findListItem(item)}
                         data={item} />
             </div>
         {:else}
             <div on:click={select(item)}>
                 <svelte:component
-                        this={w.registrar.findListItem(item)}
+                        this={w.o.registry.findListItem(item)}
                         data={item} />
             </div>
         {/if}
