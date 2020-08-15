@@ -9,7 +9,7 @@ rm -f package-lock.json
 npm i
 npx tsc
 
-cd ../ubi || exit
+cd ../circles || exit
 rm -f package-lock.json
 npm i
 npx tsc

@@ -4,7 +4,7 @@
   "dependencies": {
     "@omo/textile-graphql": "../textile-graphql",
     "@omo/identity": "../identity",
-    "@omo/ubi": "../ubi"
+    "@omo/circles": "../circles"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
