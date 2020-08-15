@@ -42,11 +42,19 @@
   <!-- TODO: Display "No entries" message or similar -->
 {:else}
       {#each items as item}
-      <div on:click={select(item)}>
-          <svelte:component
-                  this={w.registrar.findListItem(item)}
-                  data={item} />
-      </div>
+        {#if item == selected}
+            <div style="background:#009; color:#fff;" on:click={select(item)}>
+                <svelte:component
+                        this={w.registrar.findListItem(item)}
+                        data={item} />
+            </div>
+        {:else}
+            <div on:click={select(item)}>
+                <svelte:component
+                        this={w.registrar.findListItem(item)}
+                        data={item} />
+            </div>
+        {/if}
       {/each}
       {#each actions as action}
           <span on:click={action.action}>Action: {action.title}</span>
