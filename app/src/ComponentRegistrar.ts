@@ -7,11 +7,13 @@ import OmoNav from "./blocks/molecules/OmoNav.svelte";
 import OmoMessage from "./blocks/molecules/OmoMessage.svelte";
 import OmoTest from "./blocks/molecules/OmoTest.svelte";
 
+export type Action = { title:string, action: () => void };
+
 export class Registrar {
   private _moleculeNameToMoleculeMap: Map<string, any> = new Map();
   private _schemaToListItemMoleculeMap: Map<string, any> = new Map();
 
-  private _actions: Map<string, () => void> = new Map();
+  private _schemaToActionMap: Map<string, Action[]> = new Map();
 
   constructor() {
 
@@ -23,11 +25,27 @@ export class Registrar {
     this._moleculeNameToMoleculeMap.set("OmoNav", OmoNav);
     this._moleculeNameToMoleculeMap.set("Compositor", Compositor);
 
-    this._actions.set("test", () => alert("test!"));
+    this._schemaToActionMap.set("https://example.com/message.schema.json", [{
+      title: "Test 1",
+      action: () => alert("Test 1!")
+    },{
+      title: "Test 2",
+      action: () => alert("Test 2!")
+    }]);
   }
 
   findBlockByName(name:string) {
     return this._moleculeNameToMoleculeMap.get(name);
+  }
+
+  findActionsForItem(item:any) {
+    const schemaId = item.$schemaId;
+    if (!schemaId) {
+      console.warn("Cannot find a list item for object:", item);
+      return null;
+    }
+
+    return this._schemaToActionMap.get(schemaId);
   }
 
   findListItem(item:any) {
