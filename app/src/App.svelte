@@ -1,35 +1,35 @@
 <script lang="ts">
-    import OmoTheme from "./OmoTheme.svelte";
-    import Compositor from "./blocks/Compositor.svelte";
-    import OmoList from "./blocks/molecules/OmoList.svelte";
+  import OmoTheme from "./OmoTheme.svelte";
+  import Compositor from "./blocks/Compositor.svelte";
+  import OmoList from "./blocks/molecules/OmoList.svelte";
 
-    export let name;
-    name = "omo earth starter";
+  export let name: string;
+  name = "omo earth starter";
 
-    let App = {
-        layout: {
-            areas: "'main' 'footer'",
-            columns: "1fr",
-            rows: "1fr 4rem",
+  let App = {
+    layout: {
+      areas: "'main' 'footer'",
+      columns: "1fr",
+      rows: "1fr 4rem",
+    },
+    component: "Compositor",
+    children: [
+      {
+        area: "main",
+        component: "OmoBanner",
+        data: {
+          title: "follow your dreams",
+          image: "/images/inspire.jpg",
+          action: "javascript:navigate('omoauth')",
+          button: "Start dreaming",
         },
-        component: "Compositor",
-        children: [
-            {
-                area: "main",
-                component: "OmoBanner",
-                data: {
-                    title: "follow your dreams",
-                    image: "/images/inspire.jpg",
-                    action: "javascript:navigate('omoauth')",
-                    button: "Start dreaming",
-                },
-            },
-            {
-                area: "footer",
-                component: "OmoNav",
-            },
-        ],
-    };
+      },
+      {
+        area: "footer",
+        component: "OmoNav",
+      },
+    ],
+  };
 </script>
 
 <style>
@@ -47,6 +47,5 @@
 </style>
 
 <OmoTheme />
-<OmoList></OmoList>
+<OmoList />
 <Compositor composition={App} />
-
