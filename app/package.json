@@ -4,7 +4,8 @@
   "dependencies": {
     "@omo/textile-graphql": "../textile-graphql",
     "@omo/identity": "../identity",
-    "@omo/circles": "../circles"
+    "@omo/circles": "../circles",
+    "@omo/textile-adapter": "../textile-adapter"
   },
   "devDependencies": {
     "@tsconfig/svelte": "^1.0.10",
