@@ -1,5 +1,5 @@
 <script lang="ts">
-    /**
+/**
      * TODO: Support ArrayLike and async iterators as item source.
      */
     export let items = [{
@@ -13,7 +13,26 @@
         message: "Test 3"
     }];
 
+    export let selected = null;
+
+    let actions = [];
     let w = window;
+
+    function select(item) {
+        selected = item;
+        actions = [];
+
+        if (!selected) {
+            return;
+        }
+
+        const foundActions = w.registrar.findActionsForItem(selected);
+        if (!foundActions || foundActions.length === 0){
+            return;
+        }
+
+        actions = foundActions;
+    }
 </script>
 
 <style>
@@ -23,8 +42,13 @@
   <!-- TODO: Display "No entries" message or similar -->
 {:else}
       {#each items as item}
+      <div on:click={select(item)}>
           <svelte:component
                   this={w.registrar.findListItem(item)}
                   data={item} />
+      </div>
+      {/each}
+      {#each actions as action}
+          <span on:click={action.action}>Action: {action.title}</span>
       {/each}
 {/if}
