@@ -1,5 +1,5 @@
 {
-  "name": "@omo/ubi",
+  "name": "@omo/circles",
   "version": "1.0.0",
   "devDependencies": {
     "typescript": "^3.9.7"

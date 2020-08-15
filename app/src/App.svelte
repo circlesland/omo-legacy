@@ -1,6 +1,7 @@
 <script lang="ts">
   import OmoTheme from "./OmoTheme.svelte";
   import Compositor from "./blocks/Compositor.svelte";
+  import OmoList from "./blocks/molecules/OmoList.svelte";
 
   export let name: string;
   name = "omo earth starter";
@@ -46,4 +47,5 @@
 </style>
 
 <OmoTheme />
+<OmoList />
 <Compositor composition={App} />

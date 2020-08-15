@@ -4,7 +4,6 @@ import {ModelQuant} from "../data/modelQuant";
 export const Message: JSONSchema = {
   $id: "https://example.com/message.schema.json",
   $schema: "http://json-schema.org/draft-07/schema#",
-  _$schemaId: "schema:omo.message",
   title: "message",
   type: "object",
   required: ["_id"],

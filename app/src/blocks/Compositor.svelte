@@ -22,7 +22,7 @@
     style="grid-area: {composition.area}; display: grid; grid-template-columns:
     'minmax(1fr)'; grid-template-rows: 'minmax(1fr)'; overflow: hidden;">
     <svelte:component
-      this={w.registrar.molecules.get(composition.component)}
+      this={w.registrar.findBlockByName(composition.component)}
       data={composition.data} />
   </section>
 {:else}
