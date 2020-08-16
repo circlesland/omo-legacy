@@ -5,33 +5,37 @@ import Compositor from "./blocks/Compositor.svelte";
 import OmoBanner from "./blocks/molecules/OmoBanner.svelte";
 import OmoNav from "./blocks/molecules/OmoNav.svelte";
 import OmoMessage from "./blocks/molecules/OmoMessage.svelte";
-import OmoTest from "./blocks/molecules/OmoTest.svelte";
 
-export type Action = { title:string, action: () => void };
+export type Action = { name: string, title:string, action: () => void };
 
 export class Registrar {
   private _moleculeNameToMoleculeMap: Map<string, any> = new Map();
   private _schemaToListItemMoleculeMap: Map<string, any> = new Map();
-
   private _schemaToActionMap: Map<string, Action[]> = new Map();
+  private _actionNameToActionMap: Map<string, Action> = new Map<string, Action>();
 
   constructor() {
 
     // TODO: Specify the mapping from entities to list item molecules
     this._schemaToListItemMoleculeMap.set("https://example.com/message.schema.json", OmoMessage);
-    this._schemaToListItemMoleculeMap.set("https://example.com/test.schema.json", OmoTest);
 
     this._moleculeNameToMoleculeMap.set("OmoBanner", OmoBanner);
     this._moleculeNameToMoleculeMap.set("OmoNav", OmoNav);
-    this._moleculeNameToMoleculeMap.set("Compositor", Compositor);
 
-    this._schemaToActionMap.set("https://example.com/message.schema.json", [{
-      title: "Test 1",
-      action: () => alert("Test 1!")
-    },{
-      title: "Test 2",
-      action: () => alert("Test 2!")
-    }]);
+    const actions: Action[] = [{
+      name: "actions:omo.shell.layout.delete",
+      title: "Delete block",
+      action: () => {
+        alert("Delete Block.")
+      }
+    }];
+    actions.forEach(a => this._actionNameToActionMap.set(a.name, a));
+
+    this._moleculeNameToMoleculeMap.set("Compositor", Compositor);
+  }
+
+  findActionByName(name:string) {
+    return this._actionNameToActionMap.get(name);
   }
 
   findBlockByName(name:string) {

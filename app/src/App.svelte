@@ -7,64 +7,30 @@
   export let name: string;
   name = "omo earth starter";
 
-  const left = {
-    area: "left",
-    component: "OmoBanner",
-    data: {
-      title: "follow your dreams",
-      image: "/images/inspire.jpg",
-      action: "javascript:navigate('omoauth')",
-      button: "Start dreaming",
-    },
-  };
-  const right = {
-    area: "right",
-    component: "OmoBanner",
-    data: {
-      title: "follow your dreams",
-      image: "/images/inspire.jpg",
-      action: "javascript:navigate('omoauth')",
-      button: "Start dreaming",
-    },
-  };
-  const preFooter = {
-    layout: {
-      areas: "'left right'",
-      columns: "1fr 1fr",
-      rows: "1fr",
-    },
-    area: "pre-footer",
-    component: "Compositor",
-    children: [left, right],
-  };
-  const footer = {
-    area: "footer",
-    component: "OmoNav",
-  };
-  const banner = {
-    area: "main",
-    component: "OmoBanner",
-    data: {
-      title: "follow your dreams",
-      image: "/images/inspire.jpg",
-      action: "javascript:navigate('omoauth')",
-      button: "Start dreaming",
-    },
-  };
-
   let App = {
-    layout: {
-      areas: "'main' 'pre-footer' 'footer'",
-      columns: "1fr",
-      rows: "1fr 15rem 4rem",
-    },
-    component: "Compositor",
-    children: [banner, preFooter, footer],
+      layout: {
+          areas: "'main' 'footer'",
+          columns: "1fr",
+          rows: "1fr 4rem",
+      },
+      component: "Compositor",
+      children: [
+          {
+              area: "main",
+              component: "OmoBanner",
+              data: {
+                  title: "follow your dreams",
+                  image: "/images/inspire.jpg",
+                  action: "javascript:navigate('omoauth')",
+                  button: "Start dreaming",
+              },
+          },
+          {
+              area: "footer",
+              component: "OmoNav",
+          },
+      ],
   };
-
-  debugger;
-  var foo = new TextileAdapter();
-  foo.init();
 </script>
 
 <OmoTheme />

@@ -10,7 +10,6 @@ module.exports = {
   entry: {
     bundle: ['./src/index.ts', './src/styles.css'],
   },
-  devtool: 'inline-source-map',
   resolve: {
     alias: {
       svelte: path.resolve('node_modules', 'svelte'),
@@ -48,8 +47,8 @@ module.exports = {
       },
       {
         test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
+        use: ['ts-loader', 'source-map-loader'],
+        //exclude: /node_modules/,
       },
     ],
   },
@@ -63,5 +62,6 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(dotenv.parsed),
     }),
-  ]
+  ],
+  devtool: IS_DEV ? 'source-map' : false,
 }
