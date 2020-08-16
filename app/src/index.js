@@ -1,7 +1,5 @@
 import App from './App.svelte';
 import { Registrar } from "./ComponentRegistrar";
-import { Adapter } from "@omo/textile-graphql/dist/adapter";
-var adapter = Adapter.create();
 var app;
 async function start() {
     window.registrar = new Registrar();
@@ -12,4 +10,4 @@ async function start() {
 }
 start();
 export default app;
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJpbmRleC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxPQUFPLEdBQUcsTUFBTSxjQUFjLENBQUM7QUFDL0IsT0FBTyxFQUFFLFNBQVMsRUFBRSxNQUFNLHNCQUFzQixDQUFDO0FBU2pELElBQUksR0FBRyxDQUFDO0FBQ1IsS0FBSyxVQUFVLEtBQUs7SUFDaEIsTUFBTSxDQUFDLFNBQVMsR0FBRyxJQUFJLFNBQVMsRUFBRSxDQUFDO0lBQ25DLG9DQUFvQztJQUNwQyxHQUFHLEdBQUcsSUFBSSxHQUFHLENBQUM7UUFDVixNQUFNLEVBQUUsUUFBUSxDQUFDLElBQUk7S0FDeEIsQ0FBQyxDQUFDO0FBQ1AsQ0FBQztBQUVELEtBQUssRUFBRSxDQUFDO0FBRVIsZUFBZSxHQUFHLENBQUMifQ==

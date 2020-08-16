@@ -5,5 +5,9 @@
     "typescript": "^3.9.7"
   },
   "scripts": {},
-  "dependencies": {}
+  "dependencies": {
+    "@textile/hub": "^0.5.2",
+    "@textile/threads": "^0.3.8",
+    "@textile/threads-database": "^0.7.1"
+  }
 }

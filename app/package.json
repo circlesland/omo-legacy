@@ -2,7 +2,6 @@
   "name": "omo-dapp-starter",
   "version": "1.0.0",
   "dependencies": {
-    "@omo/textile-graphql": "../textile-graphql",
     "@omo/identity": "../identity",
     "@omo/circles": "../circles",
     "@omo/textile-adapter": "../textile-adapter"

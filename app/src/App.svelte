@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { TextileAdapter } from "@omo/textile-adapter/dist/TextileAdapter";
   import OmoTheme from "./OmoTheme.svelte";
   import Compositor from "./blocks/Compositor.svelte";
   import OmoList from "./blocks/molecules/OmoList.svelte";
@@ -30,21 +31,9 @@
       },
     ],
   };
+  var foo = new TextileAdapter();
+  foo.init();
 </script>
-
-<style>
-  h1 {
-    color: purple;
-  }
-
-  .btn-red {
-    @apply bg-red-500 text-white font-bold py-2 px-4 rounded;
-  }
-
-  .btn-red:hover {
-    @apply bg-red-700;
-  }
-</style>
 
 <OmoTheme />
 <OmoList />

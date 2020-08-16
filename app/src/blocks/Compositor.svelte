@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Composition } from "../interfaces/composition";
 
-  export let composition;
+  export let composition: any;
 
   let w = window;
 </script>
