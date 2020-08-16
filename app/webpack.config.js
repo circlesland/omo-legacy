@@ -10,6 +10,7 @@ module.exports = {
   entry: {
     bundle: ['./src/index.ts', './src/styles.css'],
   },
+  devtool: 'inline-source-map',
   resolve: {
     alias: {
       svelte: path.resolve('node_modules', 'svelte'),

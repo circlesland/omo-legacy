@@ -62,6 +62,7 @@
     children: [banner, preFooter, footer],
   };
 
+  debugger;
   var foo = new TextileAdapter();
   foo.init();
 </script>

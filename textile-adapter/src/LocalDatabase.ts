@@ -11,7 +11,9 @@ export class LocalDatabase {
     }
 
     static async init(name: string, keyInfo: KeyInfo, identity: Libp2pCryptoIdentity) {
+
         let db = await Database.withKeyInfo(keyInfo, name);
+        debugger;
         await db.start(identity, {
             collections: [
                 { name: "test1", schema: Quant },
