@@ -55,6 +55,7 @@ module.exports = {
   },
   mode: process.env.NODE_ENV,
   plugins: [
+    new webpack.SourceMapDevToolPlugin({}),
     new ExtractTextPlugin({
       filename: 'styles.css',
       disable: process.env.NODE_ENV === 'development',
@@ -62,6 +63,5 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env': JSON.stringify(dotenv.parsed),
     }),
-  ],
-  devtool: IS_DEV ? 'source-map' : false,
+  ]
 }
