@@ -17,7 +17,6 @@ export class TextileAdapter {
     }
 
     async init() {
-        debugger;
         let localDB = await LocalDatabase.init("localDB", {
             key: process.env.GROUP_API_KEY || '',
             secret: process.env.GROUP_API_SECRET || ''
