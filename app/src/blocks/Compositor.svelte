@@ -1,8 +1,7 @@
 <script lang="ts">
   import { Composition } from "../interfaces/composition";
 
-  export let composition: any;
-
+  export let composition: Composition;
   let w = window;
 </script>
 
@@ -17,15 +16,15 @@
   }
 </style>
 
-{#if !composition.children || composition.children.length == 0}
+{#if composition && (!composition.children || composition.children.length === 0)}
   <section
     style="grid-area: {composition.area}; display: grid; grid-template-columns:
     'minmax(1fr)'; grid-template-rows: 'minmax(1fr)'; overflow: hidden;">
     <svelte:component
-      this={w.registrar.findBlockByName(composition.component)}
+      this={w.o.registry.findBlockByName(composition.component)}
       data={composition.data} />
   </section>
-{:else}
+{:else if composition}
 
   <section
     class="compositor"

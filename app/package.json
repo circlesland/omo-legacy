@@ -4,6 +4,7 @@
   "dependencies": {
     "@omo/identity": "../identity",
     "@omo/circles": "../circles",
+    "@omo/events": "../events",
     "@omo/textile-adapter": "../textile-adapter"
   },
   "devDependencies": {

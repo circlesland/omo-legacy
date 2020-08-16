@@ -5,6 +5,12 @@ rm -f package-lock.json
 npm i
 npx tsc
 
+cd ../events || exit
+rm -r -f dist
+rm -f package-lock.json
+npm i
+npx tsc
+
 cd ../identity || exit
 rm -r -f dist
 rm -f package-lock.json
