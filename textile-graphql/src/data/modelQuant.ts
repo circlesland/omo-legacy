@@ -61,6 +61,7 @@ export class ModelQuant {
         if (this.isManyToMany) return "";
         return `${pluralize(this.typeName(this.name))}: [${this.typeName(this.name)}]
         ${this.typeName(this.name)}ById(_id:String): ${this.typeName(this.name)}
+        ${this.typeName(this.name)}ByName(name:String): ${this.typeName(this.name)}
         `;
     }
 
@@ -73,6 +74,12 @@ export class ModelQuant {
             resolve: async () => await collection.find({})
         };
         query[this.typeName(this.name) + 'ById'] = async (_:any, obj:any) => await collection.findById(obj._id);
+        query[this.typeName(this.name) + 'ByName'] = async (_:any, obj:any) => (await collection.all()).filter((o:any) => {
+            console.log("o:", o);
+            console.log("obj:", obj);
+            console.log("_:", _);
+            return o.name == obj.name
+        });
     }
 
     async addTypeResolver(typeResolvers: any, quantRegistry: QuantRegistry) {

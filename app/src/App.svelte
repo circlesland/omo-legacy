@@ -7,6 +7,8 @@
   export let name: string;
   name = "omo earth starter";
 
+  //const root = o.graphQL.query("")
+
   let App = {
       layout: {
           areas: "'main' 'footer'",

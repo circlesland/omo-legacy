@@ -31,8 +31,9 @@ export class OmoSeeder
 
             const main = await this.addBlockLeaf(banner._id, [], layout._id);
             const footer = await this.addBlockLeaf(nav._id, [], layout._id);
-            const app = await this.addBlockContainer(layout._id, [], [main._id, footer._id]);
-        } catch (e)
+            const app = await this.addBlockContainer(layout._id, [], [main._id, footer._id],  "home");
+        }
+        catch (e)
         {
             console.log("SEEDING FAILED!", e);
         }
@@ -55,16 +56,23 @@ export class OmoSeeder
         return (<any>await this.mutate(`addBlock(area: "${area}", componentId: "${componentId}", actionsIds: [${actions}])  {_id area layout{_id} component{_id} }`)).addBlock;
     }
 
-    private async addBlockContainer(layoutId:string, actionIDs:string[], childrenIDs:string[], area?:string) : Promise<{_id:string, name:string}> {
+    private async addBlockContainer(layoutId:string, actionIDs:string[], childrenIDs:string[], name?:string, area?:string) : Promise<{_id:string, name:string}> {
         const actions = actionIDs.map(o => "\"" + o + "\"").join(",");
         const children = childrenIDs.map(o => "\"" + o + "\"").join(",");
+        const mutationFields = [];
         if (area)
         {
-            return (<any>await this.mutate(`addBlock(area: "${area}", layoutId: "${layoutId}", componentId: "${this.compositorId}", actionsIds: [${actions}], childrenIds: [${children}])  {_id area layout{_id} component{_id}}`)).addBlock;
-        } else
-        {
-            return (<any>await this.mutate(`addBlock(layoutId: "${layoutId}", componentId: "${this.compositorId}", actionsIds: [${actions}], childrenIds: [${children}])  {_id area layout{_id} component{_id}}`)).addBlock;
+            mutationFields.push(`area: "${area}"`);
         }
+        if (name)
+        {
+            mutationFields.push(`name: "${name}"`);
+        }
+
+        let optionalFields = mutationFields.join(",");
+        optionalFields = optionalFields.length > 0 ? optionalFields + ", " : "";
+        const muation = `addBlock(${optionalFields} layoutId: "${layoutId}", componentId: "${this.compositorId}", actionsIds: [${actions}], childrenIds: [${children}])  {_id area name layout{_id} component{_id}}`;
+        return this.mutate(muation);
     }
 
     private async mutate<T extends (object & {_id:string})>(mutation:string) : Promise<T> {

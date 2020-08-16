@@ -56,6 +56,9 @@ export const Block: JSONSchema = {
     _id: {
       type: "string",
     },
+    name: {
+      type: "string",
+    },
     layout: {
       $ref: "#/definitions/manyToOne",
       description: "Layout"
