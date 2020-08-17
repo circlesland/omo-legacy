@@ -1,5 +1,15 @@
 <script lang="ts">
   import IconsFontAwesome from "./../atoms/IconsFontAwesome.svelte";
+  import {Manifest} from "../../interfaces/manifest"
+
+  export const manifest:Manifest = {
+    name: "OmoNav",
+    properties: [{
+      name: "parameterizedActionIds",
+      schema: "string[]",
+      isOptional: false
+    }]
+  };
 
   // import ActionsList from "./ActionsList.svelte";
   //import OmoModal from "./OmoModal.svelte";

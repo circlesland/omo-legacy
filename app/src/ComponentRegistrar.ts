@@ -4,7 +4,6 @@
 import ViewCompositor from "./blocks/ViewCompositor.svelte";
 import OmoBanner from "./blocks/molecules/OmoBanner.svelte";
 import OmoNav from "./blocks/molecules/OmoNav.svelte";
-import OmoMessage from "./blocks/molecules/OmoMessage.svelte";
 
 export type Action = { name: string, title:string, action: () => void };
 
@@ -15,10 +14,6 @@ export class Registrar {
   private _actionNameToActionMap: Map<string, Action> = new Map<string, Action>();
 
   constructor() {
-
-    // TODO: Specify the mapping from entities to list item molecules
-    this._schemaToListItemMoleculeMap.set("https://example.com/message.schema.json", OmoMessage);
-
     this._moleculeNameToMoleculeMap.set("OmoBanner", OmoBanner);
     this._moleculeNameToMoleculeMap.set("OmoNav", OmoNav);
 

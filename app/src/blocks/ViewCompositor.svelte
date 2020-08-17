@@ -1,5 +1,11 @@
 <script lang="ts">
   import { Composition } from "../interfaces/composition";
+  import {Manifest} from "../interfaces/manifest"
+
+  export const manifest:Manifest = {
+    name: "ViewCompositor",
+    properties: []
+  };
 
   export let composition: Composition;
   let w = window;
@@ -21,7 +27,7 @@
     style="grid-area: {composition.area}; display: grid; grid-template-columns:
     'minmax(1fr)'; grid-template-rows: 'minmax(1fr)'; overflow: hidden;">
     <svelte:component
-      this={w.o.registry.findBlockByName(composition.component)}
+      this={w.o.registry.findBlockByName(composition.component.name)}
       data={composition.data} />
   </section>
 {:else if composition}

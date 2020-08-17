@@ -1,5 +1,6 @@
 export interface Property
 {
+  _id:string,
   /**
    * The name of the property like: "title", "description", "image" etc.
    */
@@ -16,23 +17,10 @@ export interface Property
   isOptional:boolean
 }
 
-export interface Action
-{
-  name: string,
-  direction: string
-}
-
 export interface Manifest {
-  /**
-   * Can either be 'initial' or 'runtime'.
-   */
-  type: string,
+  name: string,
   /**
    * Specifies the inputs, a component needs to function properly.
    */
-  properties: Property[],
-  /**
-   * Specifies which Actions a component can send or receive.
-   */
-  actions: Action[]
+  properties: Property[]
 }

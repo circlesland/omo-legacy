@@ -1,21 +1,21 @@
 <script lang="ts">
     import {Manifest} from "../../interfaces/manifest"
 
-    export const manifests:Manifest = [{
-        type: "initial",
+    export const manifest:Manifest = {
+      name: "OmoButton",
 
-        /*
-        Example:
-        Imagine a "Navigate" action, that requires a string-property named "route".
-        The button should send an event of this type to let the user change the current page.
-         */
         properties: [{
             name: "parameterizedActionId",
             schema: "string",
             description: "Specifies the pre-filled action that should be sent by the button.",
             isOptional: false
         }]
-    }];
+    };
+
+    export let data = {
+      action: "",
+      button: ""
+    }
 </script>
 
 <a href={data.action}

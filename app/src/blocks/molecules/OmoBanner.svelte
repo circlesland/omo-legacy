@@ -1,4 +1,23 @@
 <script lang="ts">
+  import {Manifest} from "../../interfaces/manifest"
+
+  export const manifest:Manifest = {
+    name: "OmoBanner",
+    properties: [{
+      name: "title",
+      schema: "string",
+      isOptional: false
+    },{
+      name: "image",
+      schema: "string",
+      isOptional: true
+    },{
+      name: "parameterizedActionId",
+      schema: "string",
+      isOptional: true
+    }]
+  };
+
   export let data = {
     title: "one quantum leap a time",
     image: "https://source.unsplash.com/random",
