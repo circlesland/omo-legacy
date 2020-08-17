@@ -52,7 +52,7 @@
   //   });
   // });
 
-  export let navitems = [
+  let navitems = [
     {
       icon: "fa-user-shield",
       text: "OmoSafe",
