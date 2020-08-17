@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { TextileAdapter } from "@omo/textile-adapter/dist/TextileAdapter";
   import OmoTheme from "./OmoTheme.svelte";
   import Compositor from "./blocks/Compositor.svelte";
   import OmoList from "./blocks/molecules/OmoList.svelte";
@@ -7,7 +6,13 @@
   export let name: string;
   name = "omo earth starter";
 
-  //const root = o.graphQL.query("")
+  async function a() {
+      const root = await o.textile.graphQL.query('BlockByName(name:"home"){_id name component {_id name } children{_id name component { _id name } layout { _id name areas columns rows }}}');
+      const home = root.data.BlockByName.children.find(o => o.name === "home"); // TODO: This should be done by the query. WTF?
+      console.log(home);
+  }
+
+  a();
 
   let App = {
       layout: {

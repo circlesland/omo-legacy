@@ -65,7 +65,8 @@ export class ModelQuant {
         `;
     }
 
-    async addQueryResolver(query: any, quantRegistry: QuantRegistry) {
+    async addQueryResolver(query: any, quantRegistry: QuantRegistry)
+    {
         if (this.isManyToMany) return "";
         StopWatch.start("GET COLLECTION");
         var collection = await quantRegistry.getCollection(this.collectionName);
@@ -73,13 +74,22 @@ export class ModelQuant {
         query[pluralize(this.typeName(this.name))] = {
             resolve: async () => await collection.find({})
         };
-        query[this.typeName(this.name) + 'ById'] = async (_:any, obj:any) => await collection.findById(obj._id);
-        query[this.typeName(this.name) + 'ByName'] = async (_:any, obj:any) => (await collection.all()).filter((o:any) => {
-            console.log("o:", o);
-            console.log("obj:", obj);
-            console.log("_:", _);
-            return o.name == obj.name
-        });
+        query[this.typeName(this.name) + 'ById'] = async (_: any, obj: any) => await collection.findById(obj._id);
+        query[this.typeName(this.name) + 'ByName'] = async (_: any, obj: any) =>
+        {
+            const filtered = (await collection.all()).filter((o: any) =>
+            {
+                console.log("o:", o);
+                console.log("obj:", obj);
+                console.log("_:", _);
+                return o.name == obj.name
+            });
+
+            console.log("Filtered:", filtered);
+            return [filtered];
+        }
+
+        console.log("QUERY:", query);
     }
 
     async addTypeResolver(typeResolvers: any, quantRegistry: QuantRegistry) {
