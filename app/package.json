@@ -1,6 +1,31 @@
 {
-  "name": "omo-dapp-starter",
-  "version": "1.0.0",
+  "name": "@omo/earth",
+  "description": "turn any idea with easy drag and drop lego-like building blocks, into modern opensource multiplatform and resilient serverless (d)apps",
+  "version": "0.7.0",
+  "license": "AGPL-3.0",
+  "author": {
+    "name": "omo.earth",
+    "email": "team@omo.earth",
+    "url": "https://omo.earth"
+  },
+  "homepage": "https://omo.earth",
+  "keywords": [
+    "tailwind",
+    "svelte",
+    "graphql",
+    "textile",
+    "ipfs"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/omoearth/omo.git"
+  },
+  "bugs": "https://github.com/omoearth/omo/issues",
+  "main": "src/App.svelte",
+  "scripts": {
+    "build": "cross-env NODE_ENV=production webpack",
+    "dev": "webpack-dev-server --content-base public"
+  },
   "dependencies": {
     "@omo/identity": "../identity",
     "@omo/circles": "../circles",
@@ -30,9 +55,5 @@
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0"
-  },
-  "scripts": {
-    "build": "cross-env NODE_ENV=production webpack",
-    "dev": "webpack-dev-server --content-base public"
   }
 }
