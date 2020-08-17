@@ -1,9 +1,4 @@
 <script lang="ts">
-    if (!window.counter)
-        window.counter = 1;
-    else
-        window.counter++;
-
   export let data = {
     title: "one quantum leap a time",
     image: "https://source.unsplash.com/random",
@@ -15,7 +10,6 @@
 <div
   class="bg-cover bg-center object-fill"
   style="background-image: url({data.image})">
-  {window.counter}
   <div class="h-full flex flex-col justify-center">
     <div class="flex flex-wrap w-5/6 md:w-2/3 m-auto">
       <div
