@@ -1,6 +1,6 @@
 <script lang="ts">
   import OmoTheme from "./OmoTheme.svelte";
-  import Compositor from "./blocks/Compositor.svelte";
+  import ViewCompositor from "./blocks/ViewCompositor.svelte";
   import OmoList from "./blocks/molecules/OmoList.svelte";
 
   export let name: string;
@@ -41,4 +41,4 @@
 </script>
 
 <OmoTheme />
-<Compositor composition={App} />
+<ViewCompositor composition={App} />

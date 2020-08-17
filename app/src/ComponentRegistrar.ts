@@ -1,7 +1,7 @@
 //
 // Elements
 //
-import Compositor from "./blocks/Compositor.svelte";
+import ViewCompositor from "./blocks/ViewCompositor.svelte";
 import OmoBanner from "./blocks/molecules/OmoBanner.svelte";
 import OmoNav from "./blocks/molecules/OmoNav.svelte";
 import OmoMessage from "./blocks/molecules/OmoMessage.svelte";
@@ -31,7 +31,7 @@ export class Registrar {
     }];
     actions.forEach(a => this._actionNameToActionMap.set(a.name, a));
 
-    this._moleculeNameToMoleculeMap.set("Compositor", Compositor);
+    this._moleculeNameToMoleculeMap.set("Compositor", ViewCompositor);
   }
 
   findActionByName(name:string) {
