@@ -1,10 +1,10 @@
-import {Composition} from "./interfaces/composition";
+import {Component} from "./interfaces/component";
 import {Property} from "./interfaces/manifest";
 import {Adapter} from "@omo/textile-graphql/dist/adapter";
 
 export class ModelCompositor
 {
-  async fromRoot(blockName: string): Promise<Composition>
+  async fromRoot(blockName: string): Promise<Component>
   {
     const block = await ModelCompositor.findBlockByName(blockName, window.o.textile);
     if (!block)
@@ -19,7 +19,7 @@ export class ModelCompositor
       if (!currentBlock)
         throw new Error("An item from the stack was 'undefined'");
 
-      const workingObject:Composition = {
+      const workingObject:Component = {
         component: {
           name: currentBlock.current.component.name,
           properties: currentBlock.current.component.properties
@@ -100,7 +100,7 @@ export class ModelCompositor
   '   }' +
   '}';
 
-  public static async findBlockById(blockId: string, textile:Adapter) : Promise<Composition|undefined>
+  public static async findBlockById(blockId: string, textile:Adapter) : Promise<Component|undefined>
   {
     const root = await textile.graphQL.query(ModelCompositor.allBlocksQuery);
     const foundBlock = (<any>root.data).Blocks.find((o: any) => o._id === blockId); // TODO: This should be done by the query. WTF?
@@ -109,7 +109,7 @@ export class ModelCompositor
     return foundBlock;
   }
 
-  public static async findBlockByName(blockName: string, textile:Adapter) : Promise<Composition|undefined>
+  public static async findBlockByName(blockName: string, textile:Adapter) : Promise<Component|undefined>
   {
     const root = await textile.graphQL.query(ModelCompositor.allBlocksQuery);
     const foundBlock = (<any>root.data).Blocks.find((o: any) => o.name === blockName); // TODO: This should be done by the query. WTF?

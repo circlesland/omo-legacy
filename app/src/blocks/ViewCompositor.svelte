@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Composition } from "../interfaces/composition";
+  import { Component } from "../interfaces/component";
   import {Manifest} from "../interfaces/manifest"
 
   export const manifest:Manifest = {
@@ -7,7 +7,7 @@
     properties: []
   };
 
-  export let composition: Composition;
+  export let composition: Component;
   let w = window;
 </script>
 
