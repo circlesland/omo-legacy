@@ -132,8 +132,8 @@ export class OmoSeeder
   private async page_Home()
   {
     const main = await this.addBlockLeaf(this._componentIDsByName["OmoBanner"], "main", []);
-
-    //const navigateToHome = await this.addParameterizedAction()
+    await this.setBlockProperty(main._id, "title", "Hello world");
+    await this.setBlockProperty(main._id, "image", "https://source.unsplash.com/random");
 
     const footer = await this.addBlockLeaf(this._componentIDsByName["OmoNav"], "footer", []);
     await this.setBlockProperty(footer._id, "parameterizedActionIds", [this.navigateToHomeParameterizedActionId]);
@@ -147,9 +147,19 @@ export class OmoSeeder
       throw new Error("Couldn't find a Block with id " + blockId);
     }
 
-    const propertyValues = block.component.properties.map(async prop => await this.addPropertyValue(prop._id, JSON.stringify(value)));
-    console.log("Settings property values for block", block, propertyValues);
+    const matchingProperty = block.component.properties.find(o => o.name == propertyName);
+    if (!matchingProperty) {
+      throw new Error("Couldn't find a property with the name '" + propertyName + "' in block '" + blockId + "'")
+    }
+
+    const propertyValue = await this.addPropertyValue(matchingProperty._id, value);
+
+    console.log("Settings property value for block", block, propertyValue);
   }
+
+  private strReplaceAll(str:string, search:string, replacement:string) {
+    return str.split(search).join(replacement);
+  };
 
   private async page_Safe()
   {
@@ -205,7 +215,8 @@ export class OmoSeeder
 
   private async addPropertyValue(propertyId: string, value:any) : Promise<{_id:string, _createdAt:string, property:{_id:string, name:string}, value:any}>
   {
-    const mutation = `addPropertyValue(_createdAt: "${new Date().toJSON()}", value: "${value}", propertyId: "${propertyId}")
+    let escapedValue = this.strReplaceAll(JSON.stringify(value), '"', "\\\"");
+    const mutation = `addPropertyValue(_createdAt: "${new Date().toJSON()}", value: "${escapedValue}", propertyId: "${propertyId}")
     { _id _createdAt property { _id name } value }`;
     return (<any>(await this._adapter.graphQL.mutation(mutation)).data).addPropertyValue;
   }

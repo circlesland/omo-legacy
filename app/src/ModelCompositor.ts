@@ -61,25 +61,25 @@ export class ModelCompositor
     return generatedRoot;
   }
 
+  private strReplaceAll(str:string, search:string, replacement:string) {
+    return str.split(search).join(replacement);
+  };
+
   private async findData(properties:Property[])
   {
-    const valueMap: {[propertyName:string]:any} = {};
-    properties.forEach(p => valueMap[p.name] = {});
+    const propertyIdValueMap: {[propertyId:string]:any} = {};
+    const propertyNameValueMap: {[propertyName:string]:any} = {};
+    properties.forEach(p => propertyIdValueMap[p._id] = {});
 
     const query = "PropertyValues {_id property {_id name schema isOptional} value}";
-    const propertyValues = (<any>(await window.o.graphQL.query(query)).data).PropertyValues;
-    propertyValues.forEach((propertyValue:any) => {
-      if (valueMap[propertyValue.property.name]) {
-        valueMap[propertyValue.property.name] = propertyValue.value;
+    const allPropertyValues = (<any>(await window.o.graphQL.query(query)).data).PropertyValues;
+    allPropertyValues.forEach((propertyValue:any) => {
+      if (propertyIdValueMap[propertyValue.property._id]) {
+        propertyNameValueMap[propertyValue.property.name] = JSON.parse(this.strReplaceAll(propertyValue.value, "\\\"", ""));
       }
     });
 
-    const data:{[name:string]:any} = {};
-    Object.keys(valueMap).forEach(propertyName => {
-      data[propertyName] = valueMap[propertyName];
-    });
-
-    return data;
+    return propertyNameValueMap;
   }
 
   public static readonly allBlocksQuery = 'Blocks {' +
