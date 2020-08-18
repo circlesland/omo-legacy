@@ -3,6 +3,7 @@ import OmoBanner from "./blocks/molecules/OmoBanner.svelte";
 import OmoNav from "./blocks/molecules/OmoNav.svelte";
 import OmoButton from "./blocks/atoms/OmoButton.svelte";
 import ViewCompositor from "./blocks/ViewCompositor.svelte";
+import {ModelCompositor} from "./ModelCompositor";
 
 export class OmoSeeder
 {
@@ -44,17 +45,18 @@ export class OmoSeeder
     }
   }
 
+  navigateToHomeParameterizedActionId?:string;
+
   private async seedActions()
   {
     const routeProperty = await this.addProperty("route", "string", false);
-    console.log("seedAction() routeProperty=", routeProperty);
-
     const navigateAction = await this.addAction("omo.shell.navigate", "Navigate", "navigate", [routeProperty._id]);
-    console.log("seedAction() navigateAction=", navigateAction);
-
     const parameterizedAction = await this.createParameterizedAction(navigateAction._id, {
       route: "/home"
     });
+
+    this.navigateToHomeParameterizedActionId = parameterizedAction._id;
+
     console.log("seedAction() parameterizedAction=", parameterizedAction);
   }
 
@@ -134,7 +136,19 @@ export class OmoSeeder
     //const navigateToHome = await this.addParameterizedAction()
 
     const footer = await this.addBlockLeaf(this._componentIDsByName["OmoNav"], "footer", []);
+    await this.setBlockProperty(footer._id, "parameterizedActionIds", [this.navigateToHomeParameterizedActionId]);
     const app = await this.addBlockContainer(this._layoutsByName["main & footer"], [main._id, footer._id], [], "home");
+  }
+
+  private async setBlockProperty(blockId: string, propertyName: string, value: any)
+  {
+    const block = await ModelCompositor.findBlockById(blockId, this._adapter);
+    if (!block) {
+      throw new Error("Couldn't find a Block with id " + blockId);
+    }
+
+    const propertyValues = block.component.properties.map(async prop => await this.addPropertyValue(prop._id, JSON.stringify(value)));
+    console.log("Settings property values for block", block, propertyValues);
   }
 
   private async page_Safe()

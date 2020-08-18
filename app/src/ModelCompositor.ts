@@ -1,11 +1,12 @@
 import {Composition} from "./interfaces/composition";
 import {Property} from "./interfaces/manifest";
+import {Adapter} from "@omo/textile-graphql/dist/adapter";
 
 export class ModelCompositor
 {
   async fromRoot(blockName: string): Promise<Composition>
   {
-    const block = await this.findBlockByName(blockName);
+    const block = await ModelCompositor.findBlockByName(blockName, window.o.textile);
     if (!block)
       throw new Error("Couldn't find a block with the name '" + blockName + "'");
 
@@ -51,7 +52,7 @@ export class ModelCompositor
       {
         await Promise.all(currentBlock.current.children.map(async (child: any) =>
         {
-          const childBlock = await this.findBlockById(child._id);
+          const childBlock = await ModelCompositor.findBlockById(child._id, window.o.textile);
           stack.push({parent: workingObject, current: childBlock});
         }));
       }
@@ -63,13 +64,13 @@ export class ModelCompositor
   private async findData(properties:Property[])
   {
     const valueMap: {[propertyName:string]:any} = {};
-    properties.forEach(p => valueMap[p._id] = {});
+    properties.forEach(p => valueMap[p.name] = {});
 
     const query = "PropertyValues {_id property {_id name schema isOptional} value}";
-    const propertyValues = <any>(await window.o.graphQL.query(query)).data;
+    const propertyValues = (<any>(await window.o.graphQL.query(query)).data).PropertyValues;
     propertyValues.forEach((propertyValue:any) => {
-      if (valueMap[propertyValue.property._id]) {
-        valueMap[propertyValue.property._id] = propertyValue.value;
+      if (valueMap[propertyValue.property.name]) {
+        valueMap[propertyValue.property.name] = propertyValue.value;
       }
     });
 
@@ -81,7 +82,7 @@ export class ModelCompositor
     return data;
   }
 
-  readonly allBlocksQuery = 'Blocks {' +
+  public static readonly allBlocksQuery = 'Blocks {' +
   '_id name area component {' +
   '   _id name properties {' +
   '     _id name schema isOptional' +
@@ -99,18 +100,18 @@ export class ModelCompositor
   '   }' +
   '}';
 
-  private async findBlockById(blockId: string)
+  public static async findBlockById(blockId: string, textile:Adapter) : Promise<Composition|undefined>
   {
-    const root = await window.o.graphQL.query(this.allBlocksQuery);
+    const root = await textile.graphQL.query(ModelCompositor.allBlocksQuery);
     const foundBlock = (<any>root.data).Blocks.find((o: any) => o._id === blockId); // TODO: This should be done by the query. WTF?
     console.log("findBlockById(" + blockId + "):", foundBlock);
 
     return foundBlock;
   }
 
-  private async findBlockByName(blockName: string)
+  public static async findBlockByName(blockName: string, textile:Adapter) : Promise<Composition|undefined>
   {
-    const root = await window.o.graphQL.query(this.allBlocksQuery);
+    const root = await textile.graphQL.query(ModelCompositor.allBlocksQuery);
     const foundBlock = (<any>root.data).Blocks.find((o: any) => o.name === blockName); // TODO: This should be done by the query. WTF?
     console.log("findBlockByName(" + blockName + "):", foundBlock);
 
