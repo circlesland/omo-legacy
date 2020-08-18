@@ -44,10 +44,8 @@ export class QuantRegistry {
   }
 
   async syncAllCollections() {
-    /*
     for (let c of this.collections)
-      SyncedCollection.fakeSyncCollections(c.localCollection, c.remoteCollectionPromise, c.collectionName);
-     */
+      await SyncedCollection.fakeSyncCollections(c.localCollection, c.remoteCollectionPromise, c.collectionName);
   }
 
 

@@ -46,18 +46,22 @@ export class OmoSeeder
   }
 
   navigateToHomeParameterizedActionId?:string;
+  navigateToSafeParameterizedActionId?:string;
 
   private async seedActions()
   {
     const routeProperty = await this.addProperty("route", "string", false);
     const navigateAction = await this.addAction("omo.shell.navigate", "Navigate", "navigate", [routeProperty._id]);
-    const parameterizedAction = await this.createParameterizedAction(navigateAction._id, {
+
+    const navigateHome = await this.createParameterizedAction(navigateAction._id, {
       route: "/home"
     });
+    const navigateSafe = await this.createParameterizedAction(navigateAction._id, {
+      route: "/safe"
+    });
 
-    this.navigateToHomeParameterizedActionId = parameterizedAction._id;
-
-    console.log("seedAction() parameterizedAction=", parameterizedAction);
+    this.navigateToHomeParameterizedActionId = navigateHome._id;
+    this.navigateToSafeParameterizedActionId = navigateSafe._id;
   }
 
   private async seedComponents()
@@ -136,7 +140,7 @@ export class OmoSeeder
     await this.setBlockProperty(main._id, "image", "https://source.unsplash.com/random");
 
     const footer = await this.addBlockLeaf(this._componentIDsByName["OmoNav"], "footer", []);
-    await this.setBlockProperty(footer._id, "parameterizedActionIds", [this.navigateToHomeParameterizedActionId]);
+    await this.setBlockProperty(footer._id, "parameterizedActionIds", [this.navigateToHomeParameterizedActionId, this.navigateToSafeParameterizedActionId]);
     const app = await this.addBlockContainer(this._layoutsByName["main & footer"], [main._id, footer._id], [], "home");
   }
 
