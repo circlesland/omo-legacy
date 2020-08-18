@@ -46,7 +46,7 @@
            */
           console.log(home);
           App = home;
-      }, 2000);
+      }, 10000);
   }
 
   a();

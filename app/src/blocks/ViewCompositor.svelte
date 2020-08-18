@@ -27,7 +27,7 @@
     style="grid-area: {composition.area}; display: grid; grid-template-columns:
     'minmax(1fr)'; grid-template-rows: 'minmax(1fr)'; overflow: hidden;">
     <svelte:component
-      this={w.o.registry.findBlockByName(composition.component.name)}
+      this={w.o.seeder.findComponentByName(composition.component.name)}
       data={composition.data} />
   </section>
 {:else if composition}

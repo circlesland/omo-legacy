@@ -24,14 +24,6 @@ export const Action: JSONSchema = {
         glyph: {
             type: "string",
         },
-        direction: {
-            type: "string",
-            enum: [
-                "send", // The component that uses this action, "sends" ActionInstances of this type
-                "receive", // The component that uses this action, "receives" ActionInstances of this type
-                "duplex" // The component that uses this action, "sends" and "receives" ActionInstances of this type
-            ]
-        },
         properties: {
             $ref: "#/definitions/oneToMany",
             description: "Property"

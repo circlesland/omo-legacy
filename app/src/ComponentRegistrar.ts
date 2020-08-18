@@ -1,22 +1,10 @@
-//
-// Elements
-//
-import ViewCompositor from "./blocks/ViewCompositor.svelte";
-import OmoBanner from "./blocks/molecules/OmoBanner.svelte";
-import OmoNav from "./blocks/molecules/OmoNav.svelte";
-
 export type Action = { name: string, title:string, action: () => void };
 
 export class Registrar {
-  private _moleculeNameToMoleculeMap: Map<string, any> = new Map();
-  private _schemaToListItemMoleculeMap: Map<string, any> = new Map();
   private _schemaToActionMap: Map<string, Action[]> = new Map();
   private _actionNameToActionMap: Map<string, Action> = new Map<string, Action>();
 
   constructor() {
-    this._moleculeNameToMoleculeMap.set("OmoBanner", OmoBanner);
-    this._moleculeNameToMoleculeMap.set("OmoNav", OmoNav);
-
     const actions: Action[] = [{
       name: "actions:omo.shell.layout.delete",
       title: "Delete block",
@@ -25,16 +13,10 @@ export class Registrar {
       }
     }];
     actions.forEach(a => this._actionNameToActionMap.set(a.name, a));
-
-    this._moleculeNameToMoleculeMap.set("Compositor", ViewCompositor);
   }
 
   findActionByName(name:string) {
     return this._actionNameToActionMap.get(name);
-  }
-
-  findBlockByName(name:string) {
-    return this._moleculeNameToMoleculeMap.get(name);
   }
 
   findActionsForItem(item:any) {
@@ -45,17 +27,5 @@ export class Registrar {
     }
 
     return this._schemaToActionMap.get(schemaId);
-  }
-
-  findListItem(item:any) {
-    // TODO: Specify an interface for entities that includes the schema-id.
-
-    const schemaId = item.$schemaId;
-    if (!schemaId) {
-      console.warn("Cannot find a list item for object:", item);
-      return null;
-    }
-
-    return this._schemaToListItemMoleculeMap.get(schemaId);
   }
 }

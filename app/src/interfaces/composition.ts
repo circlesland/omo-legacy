@@ -17,6 +17,6 @@ export interface Composition {
   component: Component;
   children?: Composition[];
   area: string;
-  layout?: Layout /* Alle haben layouts, leafs haben full layout */;
+  layout?: Layout
   actions?: Action[];
 }

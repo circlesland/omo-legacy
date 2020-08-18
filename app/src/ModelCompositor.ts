@@ -25,7 +25,7 @@ export class ModelCompositor
         },
         children: [],
         area: currentBlock.current.area,
-        data: this.findData(currentBlock.current.component.properties)
+        data: await this.findData(currentBlock.current.component.properties)
       };
 
       if (!generatedRoot)
