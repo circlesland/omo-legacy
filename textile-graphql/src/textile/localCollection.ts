@@ -25,7 +25,9 @@ export class LocalCollection<T extends Instance> implements ICollection<T>
       }
     }
     catch (e) {
-      debugger;
+
+      console.error(e);
+      //debugger;
     }
     return arr;
   }

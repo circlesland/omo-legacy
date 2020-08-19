@@ -1,12 +1,13 @@
 import {Component} from "./interfaces/component";
 import {Property} from "./interfaces/manifest";
 import {Adapter} from "@omo/textile-graphql/dist/adapter";
+import {OmoRuntime} from "./omoRuntime";
 
 export class ModelCompositor
 {
   async fromRoot(blockName: string): Promise<Component>
   {
-    const block = await ModelCompositor.findBlockByName(blockName, window.o.textile);
+    const block = await ModelCompositor.findBlockByName(blockName, (await OmoRuntime.get()).textile);
     if (!block)
       throw new Error("Couldn't find a block with the name '" + blockName + "'");
 
@@ -52,7 +53,7 @@ export class ModelCompositor
       {
         await Promise.all(currentBlock.current.children.map(async (child: any) =>
         {
-          const childBlock = await ModelCompositor.findBlockById(child._id, window.o.textile);
+          const childBlock = await ModelCompositor.findBlockById(child._id, (await OmoRuntime.get()).textile);
           stack.push({parent: workingObject, current: childBlock});
         }));
       }
@@ -72,7 +73,7 @@ export class ModelCompositor
     properties.forEach(p => propertyIdValueMap[p._id] = {});
 
     const query = "PropertyValues {_id property {_id name schema isOptional} value}";
-    const allPropertyValues = (<any>(await window.o.graphQL.query(query)).data).PropertyValues;
+    const allPropertyValues = (<any>(await (await OmoRuntime.get()).graphQL.query(query)).data).PropertyValues;
     allPropertyValues.forEach((propertyValue:any) => {
       if (propertyIdValueMap[propertyValue.property._id]) {
         propertyNameValueMap[propertyValue.property.name] = JSON.parse(this.strReplaceAll(propertyValue.value, "\\\"", ""));

@@ -2,7 +2,7 @@
 <script lang="ts">
   import { Component } from "../interfaces/component";
   import {Manifest} from "../interfaces/manifest"
-  import { tick } from 'svelte';
+  import {OmoRuntime} from "../omoRuntime";
 
 
   export const manifest:Manifest = {
@@ -11,21 +11,26 @@
   };
 
   export let composition: Component;
-  let w = window;
+
+  async function refresh(composition:Component, leaf:HTMLElement) {
+    const runtime = (await OmoRuntime.get());
+    if (!composition || !composition.component || !composition.component.name) {
+      return;
+    }
+    const leafTagName = runtime.seeder.findTagNameByComponentName(composition.component.name);
+
+    if (leaf && leaf.getElementsByTagName(leafTagName).length > 0) {
+      let item = leaf.getElementsByTagName(leafTagName).item(0);
+      if (composition.data) {
+        console.log("Setting data on custom element", item, composition.data);
+        item["data"] = composition.data;
+      }
+    }
+  }
 
   let leaf:HTMLElement;
   $: {
-    // TODO: Refactor this hacky "arrow-pattern"
-    if (composition && composition.component && composition.component.name) {
-      const leafTagName = w.o.seeder.findTagNameByComponentName(composition.component.name);
-      if (leaf && leaf.getElementsByTagName(leafTagName).length > 0) {
-        let item = leaf.getElementsByTagName(leafTagName).item(0);
-        if (composition.data) {
-          console.log("Setting data on custom element", item, composition.data);
-          item["data"] = composition.data;
-        }
-      }
-    }
+    refresh(composition, leaf);
   }
 </script>
 
@@ -46,7 +51,10 @@
     'minmax(1fr)'; grid-template-rows: 'minmax(1fr)'; overflow: hidden;">
 
     <div bind:this={leaf}>
-    {@html w.o.seeder.findTagByComponentName(composition.component.name)}
+      {#await OmoRuntime.get()}
+      {:then runtime}
+        {@html runtime.seeder.findTagByComponentName(composition.component.name)}
+    {/await}
     </div>
     <!--
     <svelte:component

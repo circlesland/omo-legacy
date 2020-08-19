@@ -1,8 +1,6 @@
 <svelte:options tag="omo-list" />
 <script lang="ts">
-    import { Action } from "../../ComponentRegistrar";
-
-/**
+    /**
      * TODO: Support ArrayLike and async iterators as item source.
      */
     export let items: (object & {_id:string, $schemaId:string})[] = [{

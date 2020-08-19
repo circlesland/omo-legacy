@@ -2,6 +2,7 @@
 <script lang="ts">
   import IconsFontAwesome from "./../atoms/IconsFontAwesome.svelte";
   import {Manifest} from "../../interfaces/manifest"
+  import {OmoRuntime} from "../../omoRuntime";
 
   export const manifest:Manifest = {
     name: "OmoNav",
@@ -39,7 +40,7 @@
       return;
 
     const items = await Promise.all(lol.map(async id => {
-      const action = await window.o.graphQL.query(`ParameterizedActionById(_id:"${id}") { propertyValues { _id value property { _id name isOptional schema } } action { _id name title glyph } }`);
+      const action = await (await OmoRuntime.get()).graphQL.query(`ParameterizedActionById(_id:"${id}") { propertyValues { _id value property { _id name isOptional schema } } action { _id name title glyph } }`);
       return {
         text: action.data.ParameterizedActionById.action.title,
         icon: action.data.ParameterizedActionById.action.glyph,
