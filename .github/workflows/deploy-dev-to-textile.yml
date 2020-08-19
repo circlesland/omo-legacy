@@ -19,5 +19,5 @@ jobs:
           key: ${{ secrets.TEXTILE_ACCOUNT_KEY }}
           secret: ${{ secrets.TEXTILE_ACCOUNT_SECRET }}
           bucket: "dev"
-          thread: "bafkybx5bwvq6m3hkwkkbm2sa37ate4ix4fstjcjcfsc5q6aorhtr26q"
+          thread: ${{ secrets.TEXTILE_THREAD_DB }}
           path: "app/public/"
