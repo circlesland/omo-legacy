@@ -1,4 +1,4 @@
-name: "Textile Bucket - Deploy to omo.alpha.earth"
+name: "Deploy Dev"
 on:
   push:
     branches:
@@ -20,4 +20,4 @@ jobs:
           secret: ${{ secrets.TEXTILE_ACCOUNT_SECRET }}
           bucket: "dev"
           thread: "bafkybx5bwvq6m3hkwkkbm2sa37ate4ix4fstjcjcfsc5q6aorhtr26q"
-          path: "public/"
+          path: "app/public/"
