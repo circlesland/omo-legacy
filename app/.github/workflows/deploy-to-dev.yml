@@ -1,0 +1,23 @@
+name: "Textile Bucket - Deploy to omo.alpha.earth"
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  bucket_push:
+    runs-on: ubuntu-latest
+    name: push textile bucket
+    steps:
+      - name: push action
+        id: bucket
+        uses: textileio/github-action-buckets@master
+        with:
+          key: ${{ secrets.TEXTILE_ACCOUNT_KEY }}
+          secret: ${{ secrets.TEXTILE_ACCOUNT_SECRET }}
+          bucket: "dev"
+          thread: "bafkybx5bwvq6m3hkwkkbm2sa37ate4ix4fstjcjcfsc5q6aorhtr26q"
+          path: "public/"
