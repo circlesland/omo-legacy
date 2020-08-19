@@ -10,7 +10,6 @@ on:
 jobs:
   bucket_push:
     runs-on: ubuntu-latest
-      name: push textile bucket
     strategy:
       matrix:
         node-version: [12.x]
@@ -23,7 +22,7 @@ jobs:
       - run: cd app
       - run: npm install
       - run: npm run build
-      - run: cd .. 
+      - run: cd ..
 
       - name: push action
         id: bucket
