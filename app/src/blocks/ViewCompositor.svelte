@@ -15,6 +15,7 @@
 
   let leaf:HTMLElement;
   $: {
+    // TODO: Refactor this hacky "arrow-pattern"
     if (composition && composition.component && composition.component.name) {
       const leafTagName = w.o.seeder.findTagNameByComponentName(composition.component.name);
       if (leaf && leaf.getElementsByTagName(leafTagName).length > 0) {

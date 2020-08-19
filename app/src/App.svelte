@@ -37,7 +37,7 @@
 
   async function a() {
 
-      setTimeout(async () => {
+      //setTimeout(async () => {
           const modelCompositor = new ModelCompositor();
           const home = await modelCompositor.fromRoot("home")
 
@@ -45,14 +45,11 @@
           const root = await o.textile.graphQL.query('BlockByName(name:"home"){_id name component {_id name } children{_id name component { _id name } layout { _id name areas columns rows }}}');
           const home = root.data.BlockByName.children.find(o => o.name === "home"); // TODO: This should be done by the query. WTF?
            */
-          console.log(home);
+          //console.log(home);
           App = home;
-      }, 10000);
   }
 
   a();
 </script>
 <omo-theme></omo-theme>
-<!--<OmoTheme />-->
 <omo-view-compositor composition={App}></omo-view-compositor>
-<!--<ViewCompositor composition={App} />-->
