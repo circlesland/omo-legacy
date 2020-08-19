@@ -2,6 +2,8 @@
 <script lang="ts">
   import { Component } from "../interfaces/component";
   import {Manifest} from "../interfaces/manifest"
+  import { tick } from 'svelte';
+
 
   export const manifest:Manifest = {
     name: "ViewCompositor",
@@ -17,14 +19,10 @@
       const leafTagName = w.o.seeder.findTagNameByComponentName(composition.component.name);
       if (leaf && leaf.getElementsByTagName(leafTagName).length > 0) {
         let item = leaf.getElementsByTagName(leafTagName).item(0);
-        console.log("Custom nested element:", item);
-        console.log("Custom nested element attributes:", item.attributes);
         if (composition.data) {
-          Object.keys(composition.data).forEach(key => {
-            item.setAttribute(key, composition.data[key]);
-          })
+          console.log("Setting data on custom element", item, composition.data);
+          item["data"] = composition.data;
         }
-        console.log("Custom nested element attributes after data has been set:", item.attributes);
       }
     }
   }
