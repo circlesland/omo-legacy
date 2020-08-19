@@ -1,0 +1,49 @@
+# Actions 
+
+o.graphql.printSchema()
+
+getting all operations around data in textileDB
+
+o.graphql.
+
+- printSchema
+
+- mutation
+
+- subscribe
+
+- query
+
+
+o.hub.
+
+- deleteThread
+
+- getClient
+
+- hasCollection
+
+- newCollection
+
+- observeUpdate
+
+
+
+
+o.quantum.
+
+- quantaCollection
+
+- threadId
+
+- all
+
+- getCollectionWithoutSchema
+
+- seedDB
+
+
+
+o.store.odentity (dprecated)
+
+- 

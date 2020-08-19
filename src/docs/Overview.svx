@@ -1,0 +1,16 @@
+# Overview
+## Welcome to the omo universe
+_our dream is your dream_
+
+## Where to find what
+1) For an introduction about omo earth see our [website](http://omo.earth)
+
+2) For an overview about our short-, middle- and long term dream challenges, see our [roadmap](https://github.com/omoearth/omo/projects/4)
+
+3) For starting your own dream challenges, suggesting ideas, making wishes, reporting pains, defining responsibilities and validating prototypes, choose your [co-creation type here](https://github.com/omoearth/omo/issues/new/choose)
+
+4) For collaborating on other omo dreams look around in our [omo-challenges forum](https://github.com/omoearth/omo/issues) and use the tags to filter the topics you are interested in. f.e. [questions](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3AQUESTION), [dreams](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3ADREAM), [omo-stories](https://github.com/omoearth/omo/labels/STORY), [wishes](https://github.com/omoearth/omo/labels/WISH%20%28feature%29), [pains](https://github.com/omoearth/omo/labels/PAIN%20%28Bug%29), [ideas](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3AIDEA), [responsibilities](https://github.com/omoearth/omo/labels/RESPONSIBILITY) and [prototypes](https://github.com/omoearth/omo/issues?q=is%3Aissue+is%3Aopen+label%3APROTOTYPE)
+
+5) For chatting with us via telegram and other omo-sapiens enter our [omo chat](https://t.me/joinchat/D99CBBuUXJcWpwjaqRC1HQ)
+
+
