@@ -21,8 +21,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: cd app
-      - run: ls
 
       - name: push action
         id: bucket
@@ -32,4 +30,5 @@ jobs:
           secret: ${{ secrets.TEXTILE_ACCOUNT_SECRET }}
           bucket: "dev"
           thread: "bafkzzpucn72mnmzuxhdf7bjqgi6nlodfsaxncorz6piecpwx3thgmhi"
-          path: "public"
+          path: "app/public"
+          pattern: "**/*"
