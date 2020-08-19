@@ -19,6 +19,12 @@
         let item = leaf.getElementsByTagName(leafTagName).item(0);
         console.log("Custom nested element:", item);
         console.log("Custom nested element attributes:", item.attributes);
+        if (composition.data) {
+          Object.keys(composition.data).forEach(key => {
+            item.setAttribute(key, composition.data[key]);
+          })
+        }
+        console.log("Custom nested element attributes after data has been set:", item.attributes);
       }
     }
   }
