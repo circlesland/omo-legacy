@@ -1,5 +1,5 @@
 <svelte:options tag="omo-theme" />
-<style>
+<style glonal>
   @tailwind base;
   @tailwind components;
   @tailwind utilities;

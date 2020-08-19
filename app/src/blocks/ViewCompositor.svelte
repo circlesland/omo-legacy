@@ -10,6 +10,18 @@
 
   export let composition: Component;
   let w = window;
+
+  let leaf:HTMLElement;
+  $: {
+    if (composition && composition.component && composition.component.name) {
+      const leafTagName = w.o.seeder.findTagNameByComponentName(composition.component.name);
+      if (leaf && leaf.getElementsByTagName(leafTagName).length > 0) {
+        let item = leaf.getElementsByTagName(leafTagName).item(0);
+        console.log("Custom nested element:", item);
+        console.log("Custom nested element attributes:", item.attributes);
+      }
+    }
+  }
 </script>
 
 <style>
@@ -28,7 +40,9 @@
     style="grid-area: {composition.area}; display: grid; grid-template-columns:
     'minmax(1fr)'; grid-template-rows: 'minmax(1fr)'; overflow: hidden;">
 
+    <div bind:this={leaf}>
     {@html w.o.seeder.findTagByComponentName(composition.component.name)}
+    </div>
     <!--
     <svelte:component
       this={w.o.seeder.findComponentByName(composition.component.name)}
@@ -44,4 +58,6 @@
       <omo-view-compositor composition={child}></omo-view-compositor>
     {/each}
   </section>
+{:else}
+  Loading..
 {/if}

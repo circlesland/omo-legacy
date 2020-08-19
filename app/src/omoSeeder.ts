@@ -15,6 +15,7 @@ export class OmoSeeder
   }
 
   private _tagsByComponentName: { [componentName: string]: string } = {};
+  private _tagNamesByComponentName: { [componentName: string]: string } = {};
   private _componentIDsByName: { [name: string]: string } = {};
   private _componentClassByName: { [name: string]: any } = {};
   private _layoutsByName: { [name: string]: string } = {};
@@ -73,9 +74,16 @@ export class OmoSeeder
     await this.registerComponent(OmoNav);
 
     this._tagsByComponentName["ViewCompositor"] = "<omo-view-compositor></omo-view-compositor>";
+    this._tagNamesByComponentName["ViewCompositor"] = "omo-view-compositor";
+
     this._tagsByComponentName["OmoBanner"] = "<omo-banner></omo-banner>";
+    this._tagNamesByComponentName["OmoBanner"] = "omo-banner";
+
     this._tagsByComponentName["OmoButton"] = "<omo-button></omo-button>";
+    this._tagNamesByComponentName["OmoButton"] = "omo-button";
+
     this._tagsByComponentName["OmoNav"] = "<omo-nav></omo-nav>";
+    this._tagNamesByComponentName["OmoNav"] = "omo-nav";
   }
 
   findComponentByName(name:string) {
@@ -84,6 +92,10 @@ export class OmoSeeder
 
   findTagByComponentName(name:string) {
     return this._tagsByComponentName[name];
+  }
+
+  findTagNameByComponentName(name:string) {
+    return this._tagNamesByComponentName[name];
   }
 
   findActionsForObject(item:any) {
