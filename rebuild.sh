@@ -22,7 +22,7 @@ rm -r -f dist
 rm -f package-lock.json
 npm i
 npx tsc
-
+git 
 cd ../circles || exit
 rm -r -f dist
 rm -f package-lock.json
@@ -35,3 +35,4 @@ rm -r -f node_modules/@omo
 rm -f package-lock.json
 npm i
 npx tsc
+npm run build
