@@ -31,18 +31,19 @@ export class SyncedCollection<T extends Instance> implements ICollection<T>
     let remoteCollection = await remoteCollectionPromise;
     let all = await remoteCollection.all();
     await localCollection.createOrSaveMany(all);
-    remoteCollection.observeUpdate(["CREATE"], "", async (instance:any) => {
+    await remoteCollection.observeUpdate(["CREATE"], "", async (instance:any) => {
       if (instance)
         await localCollection.createOrSave(instance.instance);
     });
-    remoteCollection.observeUpdate(["SAVE"], "", async (instance:any) => {
+    await remoteCollection.observeUpdate(["SAVE"], "", async (instance:any) => {
       if (instance)
         await localCollection.createOrSave(instance.instance);
     });
-    // remoteCollection.observeUpdate(["DELETE"], "", async (instance) => {
-    //     console.log("DELETE", instance);
-    //     await localCollection.save(instance);
-    // })
+    /*
+    remoteCollection.observeUpdate(["DELETE"], "", async (instance) => {
+        console.log("DELETE", instance);
+        await localCollection.save(instance);
+    })*/
     console.log(`sync completed with ${collectionName}`)
   }
 

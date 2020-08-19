@@ -1,13 +1,22 @@
-import { JSONSchema } from "@textile/hub";
-import {Component, Layout, Block, Action} from "../schema/block";
+import {JSONSchema} from "@textile/hub";
+import {Block} from "../schema/block";
+import {Component} from "../schema/component";
+import {Layout} from "../schema/layout";
+import {Action} from "../schema/action";
+import {Property} from "../schema/property";
+import {PropertyValue} from "../schema/propertyValue";
+import {ActionInstance} from "../schema/actionInstance";
+import {ParameterizedAction} from "../schema/parameterizedAction";
 
-export interface SeedQuant {
+export interface SeedQuant
+{
   name: string,
   schema: JSONSchema,
   data: any[]
 }
 
-interface Seed {
+interface Seed
+{
   thread: {
     name: string,
     quanta: SeedQuant[]
@@ -36,13 +45,35 @@ const seeds: Seed[] = [{
         name: "Action",
         schema: Action,
         data: []
+      },
+      {
+        name: "ParameterizedAction",
+        schema: ParameterizedAction,
+        data: []
+      },
+      {
+        name: "ActionInstance",
+        schema: ActionInstance,
+        data: []
+      },
+      {
+        name: "Property",
+        schema: Property,
+        data: []
+      },
+      {
+        name: "PropertyValue",
+        schema: PropertyValue,
+        data: []
       }
     ]
   }
 }];
 
-export class Seeder {
-  async getSeed(threadName: string) {
+export class Seeder
+{
+  async getSeed(threadName: string)
+  {
     let thread = seeds.find(x => x.thread.name == threadName);
     console.log("Seeding:", thread);
     if (thread)

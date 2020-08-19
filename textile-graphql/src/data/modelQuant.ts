@@ -136,7 +136,7 @@ export class ModelQuant {
         var collection = await quantRegistry.getCollection(this.collectionName);
         mutation['add' + this.typeName(this.name)] = {
             resolve: async (_:any, data:any) => {
-                var entity: any = {};
+                let entity: any = {};
                 Object.keys(data).forEach(key => {
                     if (this.properties.some(x => x.name == key)) {
                         entity[key] = data[key];
@@ -146,18 +146,18 @@ export class ModelQuant {
                 entity = await collection.create(entity);
 
                 //relations
-                this.oneToOneRelations.forEach(async (relation) => {
+                await Promise.all(this.oneToOneRelations.map(async (relation) => {
                     let value = data[relation.fieldName];
                     if (value) {
                         entity[relation.reference.toLowerCase() + 'Id'] = value;
-                        var refCollection = await quantRegistry.getCollection(relation.reference);
-                        var refEntity = await refCollection.findById(data[relation.fieldName]);
+                        const refCollection = await quantRegistry.getCollection(relation.reference);
+                        const refEntity = await refCollection.findById(data[relation.fieldName]);
                         if (refEntity == null) throw new Error("Referenced item not found");
                         refEntity[this.collectionName.toLowerCase() + 'Id'] = entity._id;
-                        refCollection.save(refEntity);
+                        await refCollection.save(refEntity);
                         delete data[relation.fieldName];
                     }
-                })
+                }));
 
                 this.ManyToOneRelations.forEach(relation => {
                     let value = data[relation.fieldName];
@@ -169,17 +169,11 @@ export class ModelQuant {
                 entity = await collection.save(entity);
 
 
-                this.oneToManyRelations.forEach(async relation => {
+                await Promise.all(this.oneToManyRelations.map(async relation => {
                     let value = data[relation.fieldName];
                     if (value && Array.isArray(value) && value.length != 0) {
                         var refCollection = await quantRegistry.getCollection(relation.reference);
-                        // TODO: This will mess up the order! Might be bad.
                         var entities = await Promise.all(value.map(o => refCollection.findById(o)));
-                        /*var entities = await refCollection.find({
-                            ors: value.map(x => {
-                                return { fieldPath: "_id", value: { string: x } };
-                            })
-                        });*/
                         let updated = entities.map((e: any) => {
                             e[this.collectionName.toLowerCase() + 'Id'] = entity._id;
                             return e;
@@ -187,14 +181,15 @@ export class ModelQuant {
                         await refCollection.saveMany(updated);
                         delete data[relation.fieldName];
                     }
-                })
+                }));
+
                 return entity;
             }
         };
 
         mutation['update' + this.typeName(this.name)] = {
             resolve: async (_:any, data:any) => {
-                var entity = (await collection.findById(data._id));
+                let entity = (await collection.findById(data._id));
                 Object.keys(data).forEach(key => {
                     if (this.properties.some(x => x.name == key)) {
                         entity[key] = data[key];
@@ -204,18 +199,18 @@ export class ModelQuant {
                 entity = await collection.save(entity);
 
                 //relations
-                this.oneToOneRelations.forEach(async (relation) => {
+                await Promise.all(this.oneToOneRelations.map(async (relation) => {
                     let value = data[relation.fieldName];
                     if (value) {
                         entity[relation.reference.toLowerCase() + 'Id'] = value;
-                        var refCollection = await quantRegistry.getCollection(relation.reference);
-                        var refEntity = await refCollection.findById(data[relation.fieldName]);
+                        const refCollection = await quantRegistry.getCollection(relation.reference);
+                        const refEntity = await refCollection.findById(data[relation.fieldName]);
                         if (refEntity == null) throw new Error("Referenced item not found");
                         refEntity[this.collectionName.toLowerCase() + 'Id'] = entity._id;
                         refCollection.save(refEntity);
                         delete data[relation.fieldName];
                     }
-                })
+                }));
 
                 this.ManyToOneRelations.forEach(relation => {
                     console.log("ManyToOneRelations:", relation);
@@ -230,14 +225,13 @@ export class ModelQuant {
                 entity = await collection.save(entity);
 
 
-                this.oneToManyRelations.forEach(async relation => {
+              await Promise.all(this.oneToManyRelations.map(async relation => {
                     console.log("oneToManyRelation:", relation);
-                    debugger;
 
                     let value = data[relation.fieldName];
                     if (value && Array.isArray(value) && value.length != 0) {
-                        var refCollection = await quantRegistry.getCollection(relation.reference);
-                        var entities = await refCollection.find({
+                        const refCollection = await quantRegistry.getCollection(relation.reference);
+                        const entities = await refCollection.find({
                             ors: value.map(x => {
                                 return {
                                     // check wrong local db syntax
@@ -252,7 +246,8 @@ export class ModelQuant {
                         await refCollection.saveMany(updated);
                         delete data[relation.fieldName];
                     }
-                })
+                }));
+
                 return entity;
             }
         };

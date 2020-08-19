@@ -31,7 +31,7 @@
             return;
         }
 
-        const foundActions = w.o.registry.findActionsForItem(selected);
+        const foundActions = w.o.seeder.findActionsForObject(selected);
         if (!foundActions || foundActions.length === 0){
             return;
         }
@@ -50,13 +50,13 @@
         {#if selected && item._id === selected._id}
             <div style="background:#009; color:#fff;" on:click={select(item)}>
                 <svelte:component
-                        this={w.o.registry.findListItem(item)}
+                        this={w.o.seeder.findViewForObject(item)}
                         data={item} />
             </div>
         {:else}
             <div on:click={select(item)}>
                 <svelte:component
-                        this={w.o.registry.findListItem(item)}
+                        this={w.o.seeder.findViewForObject(item)}
                         data={item} />
             </div>
         {/if}
