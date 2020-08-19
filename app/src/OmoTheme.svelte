@@ -1,3 +1,4 @@
+<svelte:options tag="omo-theme" />
 <style>
   @tailwind base;
   @tailwind components;

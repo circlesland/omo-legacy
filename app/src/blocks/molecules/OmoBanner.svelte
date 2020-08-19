@@ -1,3 +1,4 @@
+<svelte:options tag="omo-banner" />
 <script lang="ts">
   import {Manifest} from "../../interfaces/manifest"
 

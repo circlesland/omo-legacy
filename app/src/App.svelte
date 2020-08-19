@@ -1,3 +1,4 @@
+<svelte:options tag="omo-app" />
 <script lang="ts">
   import OmoTheme from "./OmoTheme.svelte";
   import ViewCompositor from "./blocks/ViewCompositor.svelte";
@@ -51,6 +52,7 @@
 
   a();
 </script>
-
-<OmoTheme />
-<ViewCompositor composition={App} />
+<omo-theme></omo-theme>
+<!--<OmoTheme />-->
+<omo-view-compositor composition={App}></omo-view-compositor>
+<!--<ViewCompositor composition={App} />-->

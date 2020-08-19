@@ -1,3 +1,4 @@
+<svelte:options tag="omo-view-compositor" />
 <script lang="ts">
   import { Component } from "../interfaces/component";
   import {Manifest} from "../interfaces/manifest"
@@ -26,9 +27,12 @@
   <section
     style="grid-area: {composition.area}; display: grid; grid-template-columns:
     'minmax(1fr)'; grid-template-rows: 'minmax(1fr)'; overflow: hidden;">
+
+    {@html w.o.seeder.findTagByComponentName(composition.component.name)}
+    <!--
     <svelte:component
       this={w.o.seeder.findComponentByName(composition.component.name)}
-      data={composition.data} />
+      data={composition.data} />-->
   </section>
 {:else if composition}
 
@@ -37,7 +41,7 @@
     style="grid-area: '{composition.area}'; --areas: {composition.layout.areas};
     --columns: {composition.layout.columns}; --rows: {composition.layout.rows}; ">
     {#each composition.children as child}
-      <svelte:self composition={child} />
+      <omo-view-compositor composition={child}></omo-view-compositor>
     {/each}
   </section>
 {/if}

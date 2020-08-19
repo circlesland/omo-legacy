@@ -1,3 +1,4 @@
+<svelte:options tag="omo-button" />
 <script lang="ts">
     import {Manifest} from "../../interfaces/manifest"
 

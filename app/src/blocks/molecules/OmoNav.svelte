@@ -1,3 +1,4 @@
+<svelte:options tag="omo-nav" />
 <script lang="ts">
   import IconsFontAwesome from "./../atoms/IconsFontAwesome.svelte";
   import {Manifest} from "../../interfaces/manifest"

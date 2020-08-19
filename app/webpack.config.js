@@ -32,6 +32,8 @@ module.exports = {
             emitCss: !IS_DEV,
             hotReload: IS_DEV,
             preprocess: require('./svelte.config.js').preprocess,
+            customElement: true,
+            css: true
           },
         },
       },
@@ -55,6 +57,7 @@ module.exports = {
   mode: process.env.NODE_ENV,
   plugins: [
     new webpack.SourceMapDevToolPlugin({}),
+
     new ExtractTextPlugin({
       filename: 'styles.css',
       disable: process.env.NODE_ENV === 'development',

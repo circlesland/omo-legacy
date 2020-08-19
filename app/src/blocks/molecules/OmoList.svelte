@@ -1,3 +1,4 @@
+<svelte:options tag="omo-list" />
 <script lang="ts">
     import { Action } from "../../ComponentRegistrar";
 
