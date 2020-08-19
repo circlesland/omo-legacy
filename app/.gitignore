@@ -106,7 +106,7 @@ dist
 src/**/*.js
 src/**/*.js.map
 
-.textile/
+public/.textile/repo
 
 public/bundle.js
 
