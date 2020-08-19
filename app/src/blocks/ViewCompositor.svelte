@@ -1,14 +1,32 @@
+<svelte:options tag="omo-view-compositor" />
 <script lang="ts">
-  import { Composition } from "../interfaces/composition";
+  import { Component } from "../interfaces/component";
   import {Manifest} from "../interfaces/manifest"
+  import { tick } from 'svelte';
+
 
   export const manifest:Manifest = {
     name: "ViewCompositor",
     properties: []
   };
 
-  export let composition: Composition;
+  export let composition: Component;
   let w = window;
+
+  let leaf:HTMLElement;
+  $: {
+    // TODO: Refactor this hacky "arrow-pattern"
+    if (composition && composition.component && composition.component.name) {
+      const leafTagName = w.o.seeder.findTagNameByComponentName(composition.component.name);
+      if (leaf && leaf.getElementsByTagName(leafTagName).length > 0) {
+        let item = leaf.getElementsByTagName(leafTagName).item(0);
+        if (composition.data) {
+          console.log("Setting data on custom element", item, composition.data);
+          item["data"] = composition.data;
+        }
+      }
+    }
+  }
 </script>
 
 <style>
@@ -26,9 +44,14 @@
   <section
     style="grid-area: {composition.area}; display: grid; grid-template-columns:
     'minmax(1fr)'; grid-template-rows: 'minmax(1fr)'; overflow: hidden;">
+
+    <div bind:this={leaf}>
+    {@html w.o.seeder.findTagByComponentName(composition.component.name)}
+    </div>
+    <!--
     <svelte:component
       this={w.o.seeder.findComponentByName(composition.component.name)}
-      data={composition.data} />
+      data={composition.data} />-->
   </section>
 {:else if composition}
 
@@ -37,7 +60,9 @@
     style="grid-area: '{composition.area}'; --areas: {composition.layout.areas};
     --columns: {composition.layout.columns}; --rows: {composition.layout.rows}; ">
     {#each composition.children as child}
-      <svelte:self composition={child} />
+      <omo-view-compositor composition={child}></omo-view-compositor>
     {/each}
   </section>
+{:else}
+  Loading..
 {/if}
