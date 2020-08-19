@@ -7,6 +7,7 @@
 
   export const manifest:Manifest = {
     name: "ViewCompositor",
+    tag: "omo-view-compositor",
     properties: []
   };
 
@@ -53,13 +54,9 @@
     <div bind:this={leaf}>
       {#await OmoRuntime.get()}
       {:then runtime}
-        {@html runtime.seeder.findTagByComponentName(composition.component.name)}
+        {@html "<" + runtime.seeder.findTagNameByComponentName(composition.component.name) + "\>"}
     {/await}
     </div>
-    <!--
-    <svelte:component
-      this={w.o.seeder.findComponentByName(composition.component.name)}
-      data={composition.data} />-->
   </section>
 {:else if composition}
 

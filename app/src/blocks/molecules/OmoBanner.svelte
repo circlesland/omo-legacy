@@ -4,6 +4,7 @@
 
   export const manifest:Manifest = {
     name: "OmoBanner",
+    tag: "omo-banner",
     properties: [{
       name: "title",
       schema: "string",

@@ -6,6 +6,7 @@
 
   export const manifest:Manifest = {
     name: "OmoNav",
+    tag: "omo-nav",
     properties: [{
       name: "parameterizedActionIds",
       schema: "string[]",

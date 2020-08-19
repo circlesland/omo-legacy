@@ -4,7 +4,7 @@
 
     export const manifest:Manifest = {
       name: "OmoButton",
-
+      tag: "omo-button",
         properties: [{
             name: "parameterizedActionId",
             schema: "string",

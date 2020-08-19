@@ -14,7 +14,6 @@ export class OmoSeeder
     this._adapter = textile;
   }
 
-  private _tagsByComponentName: { [componentName: string]: string } = {};
   private _tagNamesByComponentName: { [componentName: string]: string } = {};
   private _componentIDsByName: { [name: string]: string } = {};
   private _componentClassByName: { [name: string]: any } = {};
@@ -72,26 +71,10 @@ export class OmoSeeder
     await this.registerComponent(OmoBanner);
     await this.registerComponent(OmoButton);
     await this.registerComponent(OmoNav);
-
-    this._tagsByComponentName["ViewCompositor"] = "<omo-view-compositor></omo-view-compositor>";
-    this._tagNamesByComponentName["ViewCompositor"] = "omo-view-compositor";
-
-    this._tagsByComponentName["OmoBanner"] = "<omo-banner></omo-banner>";
-    this._tagNamesByComponentName["OmoBanner"] = "omo-banner";
-
-    this._tagsByComponentName["OmoButton"] = "<omo-button></omo-button>";
-    this._tagNamesByComponentName["OmoButton"] = "omo-button";
-
-    this._tagsByComponentName["OmoNav"] = "<omo-nav></omo-nav>";
-    this._tagNamesByComponentName["OmoNav"] = "omo-nav";
   }
 
   findComponentByName(name:string) {
     return this._componentClassByName[name];
-  }
-
-  findTagByComponentName(name:string) {
-    return this._tagsByComponentName[name];
   }
 
   findTagNameByComponentName(name:string) {
@@ -142,6 +125,8 @@ export class OmoSeeder
     }));
     this._componentClassByName[instance.manifest.name] = componentClass;
     const component = await this.addComponent(instance.manifest.name, properties);
+
+    this._tagNamesByComponentName[instance.manifest.name] = instance.manifest.tag;
 
     // remove the dom elements
     shadowElement.remove();
