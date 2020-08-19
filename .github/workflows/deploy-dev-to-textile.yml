@@ -20,4 +20,4 @@ jobs:
           secret: ${{ secrets.TEXTILE_ACCOUNT_SECRET }}
           bucket: "dev"
           thread: "bafkzzpucn72mnmzuxhdf7bjqgi6nlodfsaxncorz6piecpwx3thgmhi"
-          path: "/app/public/"
+          path: "/app/public"
