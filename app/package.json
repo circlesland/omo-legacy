@@ -31,7 +31,8 @@
     "@omo/circles": "../circles",
     "@omo/events": "../events",
     "@omo/textile-adapter": "../textile-adapter",
-    "@omo/textile-graphql": "../textile-graphql"
+    "@omo/textile-graphql": "../textile-graphql",
+    "zen-observable-ts": "^0.8.21"
   },
   "devDependencies": {
     "@tsconfig/svelte": "^1.0.10",

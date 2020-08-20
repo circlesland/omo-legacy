@@ -6,25 +6,28 @@ import {
   parse,
   ExecutionResult
 } from "graphql";
-import { Quant } from "./quant";
-import { QuantRegistry } from "../quant/quantRegistry";
-import { ModelHelper } from "./modelHelper";
-import { makeExecutableSchema } from '@graphql-tools/schema';
+import {Quant} from "./quant";
+import {QuantRegistry} from "../quant/quantRegistry";
+import {ModelHelper} from "./modelHelper";
+import {makeExecutableSchema} from '@graphql-tools/schema';
 import Observable from "zen-observable";
-import { StopWatch } from "../stopWatch";
+import {StopWatch} from "../stopWatch";
 
-export class GraphQL {
+export class GraphQL
+{
   private graphQLSchema: GraphQLSchema;
   modelHelper: ModelHelper;
   registry: QuantRegistry;
 
-  private constructor(registry: QuantRegistry, schema: GraphQLSchema) {
+  private constructor(registry: QuantRegistry, schema: GraphQLSchema)
+  {
     this.graphQLSchema = schema;
     this.modelHelper = registry.modelHelper;
     this.registry = registry;
   }
 
-  static async init(registry: QuantRegistry): Promise<GraphQL> {
+  static async init(registry: QuantRegistry): Promise<GraphQL>
+  {
     StopWatch.start("threads");
     var quanta = registry.modelHelper.quanta;
     StopWatch.stop("threads");
@@ -40,18 +43,22 @@ export class GraphQL {
     return graphql;
   }
 
-  getSchema(): GraphQLSchema {
+  getSchema(): GraphQLSchema
+  {
     return this.graphQLSchema;
   }
 
-  printSchema(): string {
+  printSchema(): string
+  {
     return printSchema(this.graphQLSchema);
   }
 
-  async execute(query:string) {
+  async execute(query: string)
+  {
     const result = await graphql(this.getSchema(), query);
 
-    if (result.errors) {
+    if (result.errors)
+    {
       console.error("An error occurred while executing '" + query + "':");
       throw result.errors;
     }
@@ -62,10 +69,12 @@ export class GraphQL {
   /**
    * @param query example await o.graphql.query('Books {_id name}')
    */
-  async query(query:string) {
+  async query(query: string)
+  {
     const result = await graphql(this.getSchema(), `query { ${query}}`);
 
-    if (result.errors) {
+    if (result.errors)
+    {
       console.error("An error occurred while executing '" + query + "':");
       throw result.errors;
     }
@@ -77,10 +86,11 @@ export class GraphQL {
    *
    * @param query example await o.graphql.mutation('addBook(name:"testbuch"){_id name}')
    */
-  async mutation(query:string)
+  async mutation(query: string)
   {
     const result = await graphql(this.getSchema(), `mutation { ${query} }`);
-    if (result.errors) {
+    if (result.errors)
+    {
       console.error("An error occurred while executing '" + query + "':");
       throw result.errors;
     }
@@ -88,7 +98,8 @@ export class GraphQL {
     return result;
   }
 
-  private static async updateGraphQLSchema(quanta: Quant[], registry: QuantRegistry): Promise<GraphQLSchema> {
+  private static async updateGraphQLSchema(quanta: Quant[], registry: QuantRegistry): Promise<GraphQLSchema>
+  {
     StopWatch.start("modelHelper");
     let modelHelper = registry.modelHelper;
     StopWatch.stop("modelHelper");
@@ -100,25 +111,33 @@ export class GraphQL {
     StopWatch.start("resolvers");
     var resolvers: any = await modelHelper.getGraphQLResolvers(registry);
     StopWatch.stop("resolvers");
-    return makeExecutableSchema({ typeDefs, resolvers });
+    return makeExecutableSchema({typeDefs, resolvers});
   }
 
-  async* concat(initialValue: any, iterable: AsyncIterableIterator<any>) {
+  async* concat(initialValue: any, iterable: AsyncIterableIterator<any>)
+  {
     yield initialValue;
-    for await (let element of iterable) {
+    for await (let element of iterable)
+    {
       yield element;
     }
   }
 
-  subscribe(query:string): Observable<any> {
-    return new Observable(observer => {
-      this.query(query).then(queryResult => {
+  queryAndSubscribe(query: string): Observable<any>
+  {
+    return new Observable(observer =>
+    {
+      this.query(query).then(queryResult =>
+      {
         observer.next(queryResult);
 
         this.getSubscription(`subscription { ${query}}`).then(
-          subscription => {
-            (async () => {
-              for await (let value of subscription) {
+          subscription =>
+          {
+            (async () =>
+            {
+              for await (let value of subscription)
+              {
                 observer.next(value);
               }
             })();
@@ -128,7 +147,27 @@ export class GraphQL {
     });
   }
 
-  private async getSubscription(query:string) {
+  subscribe(query: string): Observable<any>
+  {
+    return new Observable<any>((observer) =>
+    {
+      this.getSubscription(`subscription { ${query}}`).then(
+        subscription =>
+        {
+          (async () =>
+          {
+            for await (let value of subscription)
+            {
+              observer.next(value);
+            }
+          })();
+        }
+      )
+    });
+  }
+
+  private async getSubscription(query: string)
+  {
     return (await subscribe({
       schema: this.getSchema(),
       document: parse(query),

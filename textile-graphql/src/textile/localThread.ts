@@ -17,6 +17,11 @@ export class LocalThread {
       secret: process.env.GROUP_API_SECRET || ''
     };
     let local = await Database.withKeyInfo(localAuth, threadName, undefined, undefined, true);
+
+    local.emitter.on(["*"], e => {
+      console.log(e);
+    });
+
     var instance = new LocalThread(local);
     return instance;
   }

@@ -3,7 +3,7 @@
   import { Component } from "../interfaces/component";
   import {Manifest} from "../interfaces/manifest"
   import {OmoRuntime} from "../omoRuntime";
-
+  import {ModelCompositor} from "../ModelCompositor";
 
   export const manifest:Manifest = {
     name: "ViewCompositor",
@@ -13,20 +13,32 @@
 
   export let composition: Component;
 
-  async function refresh(composition:Component, leaf:HTMLElement) {
+  async function refreshData(leaf) {
     const runtime = (await OmoRuntime.get());
-    if (!composition || !composition.component || !composition.component.name) {
-      return;
-    }
     const leafTagName = runtime.seeder.findTagNameByComponentName(composition.component.name);
 
     if (leaf && leaf.getElementsByTagName(leafTagName).length > 0) {
       let item = leaf.getElementsByTagName(leafTagName).item(0);
-      if (composition.data) {
-        console.log("Setting data on custom element", item, composition.data);
-        item["data"] = composition.data;
-      }
+      const data = await ModelCompositor.findData(composition.component.properties);
+      console.log("Setting data on custom element", item, data);
+      item["data"] = data;
     }
+  }
+
+  async function refresh(composition:Component, leaf:HTMLElement) {
+    const runtime = (await OmoRuntime.get());
+    if (!window.o) {
+      // TODO: Do this only when in debug mode: window.o = runtime;
+      window.o = runtime;
+    }
+    if (!composition || !composition.component || !composition.component.name) {
+      return;
+    }
+    await refreshData(leaf);
+
+    ModelCompositor.subscribeToBlockChanges(composition._id, runtime.textile).subscribe(async change => {
+      await refreshData(leaf);
+    });
   }
 
   let leaf:HTMLElement;
@@ -53,6 +65,7 @@
 
     <div bind:this={leaf}>
       {#await OmoRuntime.get()}
+        Initializing runtime ..
       {:then runtime}
         {@html "<" + runtime.seeder.findTagNameByComponentName(composition.component.name) + "\>"}
     {/await}

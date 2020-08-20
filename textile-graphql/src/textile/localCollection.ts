@@ -111,6 +111,7 @@ export class LocalCollection<T extends Instance> implements ICollection<T>
   }
 
   async observeUpdate(actionTypes: string[], id: string, callback: any): Promise<void> {
+    console.log("called observeUpdate (actionTypes: " + JSON.stringify(actionTypes) + ", id: " + id + ", callback: " + (callback ? "set" : "not-set") + ")");
     actionTypes.forEach(actionType => {
       let observeType = '*'; // default listen to all
 

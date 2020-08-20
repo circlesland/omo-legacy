@@ -19,6 +19,8 @@ export interface View
 }
 
 export interface Component {
+  _id:string;
+  name:string,
   data?: any;
   component: View;
   children?: Component[];

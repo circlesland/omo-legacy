@@ -146,6 +146,11 @@ export class OmoSeeder
     await this.setBlockProperty(main._id, "title", "Hello world");
     await this.setBlockProperty(main._id, "image", "https://source.unsplash.com/random");
 
+    setTimeout(async () => {
+      // TODO: Remove testcode
+      await this.setBlockProperty(main._id, "title", "Title changed.");
+    }, 10000);
+
     const footer = await this.addBlockLeaf(this._componentIDsByName["OmoNav"], "footer", []);
     await this.setBlockProperty(footer._id, "parameterizedActionIds", [this.navigateToHomeParameterizedActionId, this.navigateToSafeParameterizedActionId]);
     const app = await this.addBlockContainer(this._layoutsByName["main & footer"], [main._id, footer._id], [], "home");
@@ -163,7 +168,11 @@ export class OmoSeeder
       throw new Error("Couldn't find a property with the name '" + propertyName + "' in block '" + blockId + "'")
     }
 
-    const propertyValue = await this.addPropertyValue(matchingProperty._id, value);
+    const propertyValue = await this.addPropertyValue(matchingProperty._id, value, block._id);
+
+    // TODO: This is necessary at the moment to trigger a BlockChanged subscription.
+    await this._adapter.graphQL.mutation(`updateBlock(_id: "${blockId}" name: "${block.name}") { _id name }`);
+
 
     console.log("Settings property value for block", block, propertyValue);
   }
@@ -224,12 +233,19 @@ export class OmoSeeder
     return (<any>(await this._adapter.graphQL.mutation(mutation)).data).addParameterizedAction;
   }
 
-  private async addPropertyValue(propertyId: string, value:any) : Promise<{_id:string, _createdAt:string, property:{_id:string, name:string}, value:any}>
+  private async addPropertyValue(propertyId: string, value:any, blockId?:string) : Promise<{_id:string, _createdAt:string, property:{_id:string, name:string}, value:any}>
   {
     let escapedValue = this.strReplaceAll(JSON.stringify(value), '"', "\\\"");
-    const mutation = `addPropertyValue(_createdAt: "${new Date().toJSON()}", value: "${escapedValue}", propertyId: "${propertyId}")
-    { _id _createdAt property { _id name } value }`;
-    return (<any>(await this._adapter.graphQL.mutation(mutation)).data).addPropertyValue;
+    if (blockId)
+    {
+      const mutation = `addPropertyValue(_createdAt: "${new Date().toJSON()}", value: "${escapedValue}", propertyId: "${propertyId}", blockId: "${blockId}")
+      { _id _createdAt property { _id name } value Block {_id} }`;
+      return (<any>(await this._adapter.graphQL.mutation(mutation)).data).addPropertyValue;
+    } else {
+      const mutation = `addPropertyValue(_createdAt: "${new Date().toJSON()}", value: "${escapedValue}", propertyId: "${propertyId}")
+      { _id _createdAt property { _id name } value }`;
+      return (<any>(await this._adapter.graphQL.mutation(mutation)).data).addPropertyValue;
+    }
   }
 
   private async addLayout(name: string, areas: string, columns: string, rows: string): Promise<{ _id: string, areas: string, columns: string, rows: string }>

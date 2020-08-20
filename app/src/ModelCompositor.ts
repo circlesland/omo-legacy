@@ -2,12 +2,14 @@ import {Component} from "./interfaces/component";
 import {Property} from "./interfaces/manifest";
 import {Adapter} from "@omo/textile-graphql/dist/adapter";
 import {OmoRuntime} from "./omoRuntime";
+import {Observable} from "zen-observable-ts";
 
 export class ModelCompositor
 {
   async fromRoot(blockName: string): Promise<Component>
   {
-    const block = await ModelCompositor.findBlockByName(blockName, (await OmoRuntime.get()).textile);
+    const textile = (await OmoRuntime.get()).textile;
+    const block = await ModelCompositor.findBlockByName(blockName, textile);
     if (!block)
       throw new Error("Couldn't find a block with the name '" + blockName + "'");
 
@@ -21,13 +23,15 @@ export class ModelCompositor
         throw new Error("An item from the stack was 'undefined'");
 
       const workingObject:Component = {
+        _id: currentBlock.current._id,
+        name: currentBlock.current.name,
         component: {
           name: currentBlock.current.component.name,
           properties: currentBlock.current.component.properties
         },
         children: [],
         area: currentBlock.current.area,
-        data: await this.findData(currentBlock.current.component.properties)
+        data: await ModelCompositor.findData(currentBlock.current.component.properties)
       };
 
       if (!generatedRoot)
@@ -62,11 +66,11 @@ export class ModelCompositor
     return generatedRoot;
   }
 
-  private strReplaceAll(str:string, search:string, replacement:string) {
+  public static strReplaceAll(str:string, search:string, replacement:string) {
     return str.split(search).join(replacement);
   };
 
-  private async findData(properties:Property[])
+  public static async findData(properties:Property[])
   {
     const propertyIdValueMap: {[propertyId:string]:any} = {};
     const propertyNameValueMap: {[propertyName:string]:any} = {};
@@ -76,7 +80,7 @@ export class ModelCompositor
     const allPropertyValues = (<any>(await (await OmoRuntime.get()).graphQL.query(query)).data).PropertyValues;
     allPropertyValues.forEach((propertyValue:any) => {
       if (propertyIdValueMap[propertyValue.property._id]) {
-        propertyNameValueMap[propertyValue.property.name] = JSON.parse(this.strReplaceAll(propertyValue.value, "\\\"", ""));
+        propertyNameValueMap[propertyValue.property.name] = JSON.parse(ModelCompositor.strReplaceAll(propertyValue.value, "\\\"", ""));
       }
     });
 
@@ -108,6 +112,40 @@ export class ModelCompositor
     console.log("findBlockById(" + blockId + "):", foundBlock);
 
     return foundBlock;
+  }
+
+  public static subscribeToBlockChanges(blockId: string, textile:Adapter) {
+    const subscription = 'BlockUpdated {' +
+      '_id name area component {' +
+      '   _id name properties {' +
+      '     _id name schema isOptional' +
+      '   }' +
+      '} ' +
+      'propertyValues {' +
+      '   _id value property { _id name isOptional }' +
+      '} ' +
+      'children {' +
+      '   _id name area component { ' +
+      '       _id name properties {' +
+      '         _id name schema isOptional' +
+      '     }' +
+      '   } ' +
+      '}' +
+      'layout { ' +
+      '       _id name areas columns rows ' +
+      '   }' +
+      '}';
+
+    return new Observable(s =>
+    {
+      textile.graphQL.subscribe(subscription).subscribe(next =>
+      {
+        if (next.data.BlockUpdated._id != blockId)
+          return;
+        console.log("Subscribed Block '" + blockId + "' changed:", next);
+        s.next(next.data.BlockUpdated);
+      });
+    });
   }
 
   public static async findBlockByName(blockName: string, textile:Adapter) : Promise<Component|undefined>
