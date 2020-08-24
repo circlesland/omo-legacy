@@ -5,7 +5,9 @@
 <div class="flex flex-wrap md items-center h-screen">
   <div class="bg-white w-full md:w-1/2 h-screen">
     <div class="mx-32">
-      <h1 class="text-6xl font-bold mt-16 text-dark">Welcome Omo</h1>
+      <div class="font-title text-6xl font-bold mt-16 text-dark">
+        Welcome Omo
+      </div>
 
       <!-- country region island -->
       <div class="flex mt-16 font-light text-gray-500">
@@ -38,7 +40,7 @@
   </div>
   <div class="bg-red-600 w-full md:w-1/2 h-screen">
     <img
-      src="https://source.unsplash.com/7H77FWkK_x4/1600x900"
+      src="https://source.unsplash.com/random"
       class="h-screen w-full"
       alt="" />
   </div>

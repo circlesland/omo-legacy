@@ -1,6 +1,6 @@
 module.exports = {
   purge: {
-    enabled: false,
+    enabled: true,
     content: [
       './src/**/*.html',
       './src/**/*.svelte',
@@ -8,6 +8,11 @@ module.exports = {
     ]
   },
   theme: {
+    fontFamily: {
+      'title': ['"Baloo Thambi 2"', 'cursive'],
+      'subtitle': ['"Fira Sans Condensed"', 'sans-serif'],
+      sans: ['"Nunito Sans"', 'sans-serif']
+    },
     extend: {
       colors: {
         primary: '#233D81',
