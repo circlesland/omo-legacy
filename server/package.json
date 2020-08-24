@@ -1,5 +1,5 @@
 {
-  "name": "@omo/application-server",
+  "name": "@omo/server",
   "version": "1.0.0",
   "description": "",
   "keywords": [],
@@ -18,7 +18,7 @@
     "typescript": "^3.9.2"
   },
   "dependencies": {
-    "@abis/data": "../data",
+    "@omo/data": "../data",
     "apollo-server": "^2.13.1",
     "bcrypt": "^4.0.1",
     "graphql": "^15.0.0",

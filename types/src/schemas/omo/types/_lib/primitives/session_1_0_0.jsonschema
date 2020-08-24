@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "omo-schema://omo@abis.internal/types/_lib/primitives/session_1_0_0",
+  "title": "Session",
+  "description": "Contains the json web token and owner agent id",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer"
+    },
+    "jwt": {
+      "type": "string"
+    },
+    "owner": {
+      "type": "integer"
+    },
+    "timezoneOffset": {
+      "type": "integer"
+    },
+    "validTo": {
+      "type": "string"
+    },
+    "createdAt": {
+      "type": "string"
+    }
+  },
+  "required": ["id", ",createdAt", "jwt", "owner"]
+}
