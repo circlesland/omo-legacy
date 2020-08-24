@@ -103,10 +103,14 @@ dist
 # TernJS port file
 .tern-port
 
-src/**/*.js
+
 src/**/*.js.map 
 
+bundle.js
+bundle.js.map 
+bundle.css.map
 
 .textile/
 public/bundle.js
 
+.history
