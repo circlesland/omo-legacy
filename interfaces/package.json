@@ -1,0 +1,15 @@
+{
+  "name": "@omo/interfaces",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "omo.earth",
+  "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "ts-node": "^8.10.1",
+    "typescript": "^3.9.2"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^8.5.1"
+  }
+}

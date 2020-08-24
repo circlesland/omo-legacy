@@ -1,0 +1,42 @@
+scalar DateTime
+scalar Json
+
+type Mutation {
+    signup(firstName:String! lastName:String! emailAddress:String!): SignupResponse!
+    login(emailAddress:String! password:String!) : LoginResponse!
+}
+
+type Subscription {
+    event : Json!
+}
+
+type Query {
+    myProfile: Profile!
+}
+
+type Profile {
+    id: String!
+
+    nickName: String!
+
+    firstName: String!
+    lastName: String!
+
+    emailAddress: String!
+}
+
+interface ActionResponse {
+    success: Boolean!
+    errorMessage: String
+}
+
+type SignupResponse implements ActionResponse {
+    success: Boolean!
+    errorMessage: String
+}
+
+type LoginResponse implements ActionResponse {
+    success: Boolean!
+    errorMessage: String
+    jwt:String!
+}
