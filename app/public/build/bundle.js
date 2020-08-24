@@ -409,19 +409,19 @@ var app = (function () {
     			t3 = text("!");
     			t4 = space();
     			p = element("p");
-    			t5 = text("Visit the\n\t\t");
+    			t5 = text("Visit the\n    ");
     			a = element("a");
     			a.textContent = "Svelte tutorial";
-    			t7 = text("\n\t\tto learn how to build Svelte apps.");
+    			t7 = text("\n    to learn how to build Svelte apps.");
     			attr_dev(h1, "class", "uppercase text-6xl font-hairline text-svelte");
-    			add_location(h1, file, 8, 1, 213);
+    			add_location(h1, file, 11, 2, 217);
     			attr_dev(a, "href", "https://svelte.dev/tutorial");
     			attr_dev(a, "class", "text-blue-500 underline");
-    			add_location(a, file, 11, 2, 329);
+    			add_location(a, file, 14, 4, 338);
     			attr_dev(p, "class", "custom-style svelte-15s8yci");
-    			add_location(p, file, 9, 1, 290);
+    			add_location(p, file, 12, 2, 295);
     			attr_dev(main, "class", "p-4 mx-auto text-center max-w-xl");
-    			add_location(main, file, 7, 0, 164);
+    			add_location(main, file, 10, 0, 167);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
