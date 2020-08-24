@@ -1,14 +1,13 @@
-const plugin = require('tailwindcss/plugin')
-
 module.exports = {
   purge: {
-    enabled: true,
-    content: ['./src/**/*.html', './src/**/*.svelte', './src/**/*.ts'],
+    enabled: false,
+    content: [
+      './src/**/*.html',
+      './src/**/*.svelte',
+      './src/**/*.ts'
+    ]
   },
   theme: {
-    // fontFamily: {
-    //     'title': ['Oswald']
-    // },
     extend: {
       colors: {
         primary: '#233D81',
@@ -24,33 +23,12 @@ module.exports = {
         'smoke-darkest': 'rgba(0, 0, 0, 0.9)',
         'smoke-darker': 'rgba(0, 0, 0, 0.75)',
         'smoke-dark': 'rgba(0, 0, 0, 0.6)',
-        smoke: 'rgba(0, 0, 0, 0.5)',
+        'smoke': 'rgba(0, 0, 0, 0.5)',
         'smoke-light': 'rgba(0, 0, 0, 0.4)',
         'smoke-lighter': 'rgba(0, 0, 0, 0.25)',
         'smoke-lightest': 'rgba(0, 0, 0, 0.1)',
       },
-    },
+    }
   },
   variants: {},
-  // plugins: [
-  //     plugin(function ({
-  //         addComponents
-  //     }) {
-  //         const colors = {
-  //             '.o-text-primary': {
-  //                 color: '#0F1758'
-  //             },
-  //             '.o-bg-primary': {
-  //                 backgroundColor: '#0F1758',
-  //             },
-  //             '.o-text-secondary': {
-  //                 color: '#2AD78B'
-  //             },
-  //             '.o-bg-secondary': {
-  //                 backgroundColor: '#2AD78B'
-  //             },
-  //         }
-  //         addComponents(colors)
-  //     })
-  // ]
 }
