@@ -1,0 +1,30 @@
+{
+  "name": "@omo/application-server",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "omo.earth",
+  "license": "AGPL-3.0-or-later",
+  "scripts": {
+    "generate": "graphql-codegen --config codegen.yml"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "1.13.5",
+    "@graphql-codegen/introspection": "1.13.5",
+    "@graphql-codegen/typescript": "^1.13.5",
+    "@graphql-codegen/typescript-resolvers": "1.13.5",
+    "@types/node": "^14.0.1",
+    "ts-node": "^8.10.1",
+    "typescript": "^3.9.2"
+  },
+  "dependencies": {
+    "@abis/data": "../data",
+    "apollo-server": "^2.13.1",
+    "bcrypt": "^4.0.1",
+    "graphql": "^15.0.0",
+    "graphql-import": "^1.0.2",
+    "ix": "^3.0.2",
+    "jsonwebtoken": "^8.5.1",
+    "subscriptions-transport-ws": "^0.9.16"
+  }
+}

@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs https://pris.ly/d/prisma-schema
+
+datasource db {
+    provider = "postgresql"
+    url      = "postgresql://postgres:postgres@localhost:5432/omo?schema=public"
+}
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+model User {
+  id Int @default(autoincrement()) @id
+
+  createdAt DateTime @default(now())
+  createdBy User? @relation("UserCreatesUsers", fields: [createdByUserId], references: [id])
+  createdByUserId Int?
+
+  updatedAt DateTime?
+
+  email String @unique
+  timezoneOffset Float
+
+  firstName String?
+  lastName String?
+
+  challenge String?
+  passwordHash String?
+
+  createdUsers User[] @relation("UserCreatesUsers")
+  sessions Session[] @relation("UserHasSessions")
+}
+
+model Session {
+ 	id Int      @id @default(autoincrement())
+
+ 	createdByRequestId String
+ 	createdAt DateTime @default(now())
+
+ 	updatedAt DateTime?
+
+ 	timezoneOffset Float?
+
+ 	validTo DateTime
+
+ 	timedOutAt DateTime?
+ 	loggedOutAt DateTime?
+
+ 	revokedAt DateTime?
+ 	revokedReason String?
+
+ 	user User @relation(name: "UserHasSessions", fields: [userId], references: [id])
+ 	userId Int
+}
