@@ -1,5 +1,5 @@
 #!/bin/bash
-cd ./app || exit
+cd ../app || exit
 rm -r -f dist
 rm -r -f node_modules/@omo
 rm -f package-lock.json
