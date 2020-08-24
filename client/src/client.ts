@@ -17,6 +17,8 @@ export class Client
   private _client?: ApolloClient<NormalizedCacheObject>;
   private _initialized = false;
 
+  private _jwt?:string;
+
   public constructor(host: string)
   {
     this._host = host;
@@ -39,12 +41,12 @@ export class Client
       fetch: fetch,
       uri: 'http://' + this._host,
       headers: {
-        authorization: this._session?.jwt
+        authorization: this._jwt
       }
     });
 
     const connectionParams = {
-      authorization: this._session?.jwt,
+      authorization: this._jwt,
       clientTimezoneOffset: new Date().getTimezoneOffset()
     };
 
@@ -74,12 +76,12 @@ export class Client
       defaultOptions: this._defaultOptions
     });
 
-    if (this._session !== undefined)
+    if (this._jwt !== undefined)
     {
       //await this.subscribeToEvents();
 
       this._initialized = true;
-      console.log("Connected. Token is: " + this._session?.jwt);
+      console.log("Connected. Token is: " + this._jwt);
       return;
     }
 
