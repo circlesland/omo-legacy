@@ -1,6 +1,6 @@
 module.exports = {
   purge: {
-    enabled: true,
+    enabled: false,
     content: [
       './src/**/*.html',
       './src/**/*.svelte',
@@ -9,8 +9,8 @@ module.exports = {
   },
   theme: {
     fontFamily: {
-      'title': ['"Baloo Thambi 2"', 'cursive'],
-      'subtitle': ['"Fira Sans Condensed"', 'sans-serif'],
+      'title': ['"Josefin Sans"', 'sans-serif'],
+      'subtitle': ['Exo 2', 'sans-serif'],
       sans: ['"Nunito Sans"', 'sans-serif']
     },
     extend: {

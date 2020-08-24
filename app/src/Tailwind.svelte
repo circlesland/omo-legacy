@@ -1,5 +1,5 @@
 <style global>
-  @import url("https://fonts.googleapis.com/css2?family=Baloo+Thambi+2:wght@800&family=Fira+Sans+Condensed:ital,wght@1,300&family=Nunito+Sans:wght@300&display=swap");
+  @import url("https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@1,300&family=Josefin+Sans:wght@700&family=Nunito+Sans:wght@300&display=swap");
 
   @tailwind base;
   @tailwind utilities;
