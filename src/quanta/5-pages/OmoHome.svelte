@@ -135,7 +135,7 @@
     <OmoSquares quant={square3} />
     <OmoSquares quant={square4} />
     <OmoSquares quant={square5} />
-    <OmoSquares quant={square6} />
+    <OmoSquares quant={square6} />-->
 
     <div class="pt-12">
       <OmoHero quant={contributors} />
