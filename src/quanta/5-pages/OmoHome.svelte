@@ -129,7 +129,7 @@
   <div class="p-8 sm:p-12 md:p-16 lg:p-32">
 
     <OmoHero quant={process} />
-
+<!--
     <OmoSquares quant={square1} />
     <OmoSquares quant={square2} />
     <OmoSquares quant={square3} />
