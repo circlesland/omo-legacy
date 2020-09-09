@@ -112,9 +112,10 @@
       this={router.find(x => x.route == $curRoute).quant}
       {router} />
   </main>
+    <!--
   <footer>
     <OmoNavbar />
-  </footer>
+  </footer>-->
 </div>
 
 <a
