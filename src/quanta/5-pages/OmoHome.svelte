@@ -115,7 +115,7 @@
 
 <div class="overflow-hidden overflow-y-auto">
   <OmoBanner quant={vision} />
-  <div class="p-8 sm:p-12 md:p-16 lg:p-32">
+ <!-- <div class="p-8 sm:p-12 md:p-16 lg:p-32">
     <OmoHero quant={mission} />
 
     <OmoSteps quant={steps} />
@@ -129,13 +129,13 @@
   <div class="p-8 sm:p-12 md:p-16 lg:p-32">
 
     <OmoHero quant={process} />
-<!--
+
     <OmoSquares quant={square1} />
     <OmoSquares quant={square2} />
     <OmoSquares quant={square3} />
     <OmoSquares quant={square4} />
     <OmoSquares quant={square5} />
-    <OmoSquares quant={square6} />-->
+    <OmoSquares quant={square6} />
 
     <div class="pt-12">
       <OmoHero quant={contributors} />
@@ -180,15 +180,8 @@
             Tailwind
           </a>
         </p>
-
-        <!-- <p>
-          To get started, just select the editor on the bottom menu to start
-          adding and deleting database entries which will update the
-          relationships between the objects. Every change will change directly
-          and in realtime the textile threads DB offline first in your local
-          store. (Currently not working, being re-factored)
-        </p> -->
-        <br />
+      
+       
         <div class="pt-12">
           <b class="text-blue-900 text-xl text-bold uppercase">
             Install and play with the code yourself
@@ -200,14 +193,14 @@
           </a>
           and npm installed.
           <br />
-          <!-- <span class="underscore py-1">
+          <span class="underscore py-1">
             Download, install and
             <b>run</b>
           </span>
           the textile threads DB deamon
           <a href="go-threads" class="py-1text-green-500 font-bold">
             https://github.com/textileio/go-threads
-          </a> -->
+          </a> 
           <div class="pt-2">Then download omo from github:</div>
           <div class="my-2 text-gray-600 italic">
             git clone https://github.com/omoearth/omo.git
@@ -225,5 +218,5 @@
       </div>
 
     </div>
-  </div>
+  </div>-->
 </div>
