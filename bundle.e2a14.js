@@ -66761,7 +66761,7 @@ exports.withFilter = with_filter_1.withFilter;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(174);
-module.exports = __webpack_require__(475);
+module.exports = __webpack_require__(474);
 
 
 /***/ }),
@@ -86222,7 +86222,7 @@ module.exports = {
 /* 288 */
 /***/ (function(module) {
 
-module.exports = JSON.parse("{\"_args\":[[\"elliptic@6.5.2\",\"/home/runner/work/omo/omo\"]],\"_from\":\"elliptic@6.5.2\",\"_id\":\"elliptic@6.5.2\",\"_inBundle\":false,\"_integrity\":\"sha512-f4x70okzZbIQl/NSRLkI/+tteV/9WqL98zx+SQ69KbXxmVrmjwsNUPn/gYJJ0sHvEak24cZgHIPegRePAtA/xw==\",\"_location\":\"/elliptic\",\"_phantomChildren\":{},\"_requested\":{\"type\":\"version\",\"registry\":true,\"raw\":\"elliptic@6.5.2\",\"name\":\"elliptic\",\"escapedName\":\"elliptic\",\"rawSpec\":\"6.5.2\",\"saveSpec\":null,\"fetchSpec\":\"6.5.2\"},\"_requiredBy\":[\"/@textile/threads-crypto/secp256k1\",\"/browserify-sign\",\"/create-ecdh\",\"/libp2p-crypto/secp256k1\",\"/secp256k1\",\"/tiny-secp256k1\"],\"_resolved\":\"https://registry.npmjs.org/elliptic/-/elliptic-6.5.2.tgz\",\"_spec\":\"6.5.2\",\"_where\":\"/home/runner/work/omo/omo\",\"author\":{\"name\":\"Fedor Indutny\",\"email\":\"fedor@indutny.com\"},\"bugs\":{\"url\":\"https://github.com/indutny/elliptic/issues\"},\"dependencies\":{\"bn.js\":\"^4.4.0\",\"brorand\":\"^1.0.1\",\"hash.js\":\"^1.0.0\",\"hmac-drbg\":\"^1.0.0\",\"inherits\":\"^2.0.1\",\"minimalistic-assert\":\"^1.0.0\",\"minimalistic-crypto-utils\":\"^1.0.0\"},\"description\":\"EC cryptography\",\"devDependencies\":{\"brfs\":\"^1.4.3\",\"coveralls\":\"^3.0.8\",\"grunt\":\"^1.0.4\",\"grunt-browserify\":\"^5.0.0\",\"grunt-cli\":\"^1.2.0\",\"grunt-contrib-connect\":\"^1.0.0\",\"grunt-contrib-copy\":\"^1.0.0\",\"grunt-contrib-uglify\":\"^1.0.1\",\"grunt-mocha-istanbul\":\"^3.0.1\",\"grunt-saucelabs\":\"^9.0.1\",\"istanbul\":\"^0.4.2\",\"jscs\":\"^3.0.7\",\"jshint\":\"^2.10.3\",\"mocha\":\"^6.2.2\"},\"files\":[\"lib\"],\"homepage\":\"https://github.com/indutny/elliptic\",\"keywords\":[\"EC\",\"Elliptic\",\"curve\",\"Cryptography\"],\"license\":\"MIT\",\"main\":\"lib/elliptic.js\",\"name\":\"elliptic\",\"repository\":{\"type\":\"git\",\"url\":\"git+ssh://git@github.com/indutny/elliptic.git\"},\"scripts\":{\"jscs\":\"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js\",\"jshint\":\"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js\",\"lint\":\"npm run jscs && npm run jshint\",\"test\":\"npm run lint && npm run unit\",\"unit\":\"istanbul test _mocha --reporter=spec test/index.js\",\"version\":\"grunt dist && git add dist/\"},\"version\":\"6.5.2\"}");
+module.exports = JSON.parse("{\"_args\":[[\"elliptic@6.5.2\",\"/home/runner/work/omo-legacy/omo-legacy\"]],\"_from\":\"elliptic@6.5.2\",\"_id\":\"elliptic@6.5.2\",\"_inBundle\":false,\"_integrity\":\"sha512-f4x70okzZbIQl/NSRLkI/+tteV/9WqL98zx+SQ69KbXxmVrmjwsNUPn/gYJJ0sHvEak24cZgHIPegRePAtA/xw==\",\"_location\":\"/elliptic\",\"_phantomChildren\":{},\"_requested\":{\"type\":\"version\",\"registry\":true,\"raw\":\"elliptic@6.5.2\",\"name\":\"elliptic\",\"escapedName\":\"elliptic\",\"rawSpec\":\"6.5.2\",\"saveSpec\":null,\"fetchSpec\":\"6.5.2\"},\"_requiredBy\":[\"/@textile/threads-crypto/secp256k1\",\"/browserify-sign\",\"/create-ecdh\",\"/libp2p-crypto/secp256k1\",\"/secp256k1\",\"/tiny-secp256k1\"],\"_resolved\":\"https://registry.npmjs.org/elliptic/-/elliptic-6.5.2.tgz\",\"_spec\":\"6.5.2\",\"_where\":\"/home/runner/work/omo-legacy/omo-legacy\",\"author\":{\"name\":\"Fedor Indutny\",\"email\":\"fedor@indutny.com\"},\"bugs\":{\"url\":\"https://github.com/indutny/elliptic/issues\"},\"dependencies\":{\"bn.js\":\"^4.4.0\",\"brorand\":\"^1.0.1\",\"hash.js\":\"^1.0.0\",\"hmac-drbg\":\"^1.0.0\",\"inherits\":\"^2.0.1\",\"minimalistic-assert\":\"^1.0.0\",\"minimalistic-crypto-utils\":\"^1.0.0\"},\"description\":\"EC cryptography\",\"devDependencies\":{\"brfs\":\"^1.4.3\",\"coveralls\":\"^3.0.8\",\"grunt\":\"^1.0.4\",\"grunt-browserify\":\"^5.0.0\",\"grunt-cli\":\"^1.2.0\",\"grunt-contrib-connect\":\"^1.0.0\",\"grunt-contrib-copy\":\"^1.0.0\",\"grunt-contrib-uglify\":\"^1.0.1\",\"grunt-mocha-istanbul\":\"^3.0.1\",\"grunt-saucelabs\":\"^9.0.1\",\"istanbul\":\"^0.4.2\",\"jscs\":\"^3.0.7\",\"jshint\":\"^2.10.3\",\"mocha\":\"^6.2.2\"},\"files\":[\"lib\"],\"homepage\":\"https://github.com/indutny/elliptic\",\"keywords\":[\"EC\",\"Elliptic\",\"curve\",\"Cryptography\"],\"license\":\"MIT\",\"main\":\"lib/elliptic.js\",\"name\":\"elliptic\",\"repository\":{\"type\":\"git\",\"url\":\"git+ssh://git@github.com/indutny/elliptic.git\"},\"scripts\":{\"jscs\":\"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js\",\"jshint\":\"jscs benchmarks/*.js lib/*.js lib/**/*.js lib/**/**/*.js test/index.js\",\"lint\":\"npm run jscs && npm run jshint\",\"test\":\"npm run lint && npm run unit\",\"unit\":\"istanbul test _mocha --reporter=spec test/index.js\",\"version\":\"grunt dist && git add dist/\"},\"version\":\"6.5.2\"}");
 
 /***/ }),
 /* 289 */
@@ -108196,12 +108196,6 @@ function readBlob(blob, options) {
 /* 473 */
 /***/ (function(module, exports, __webpack_require__) {
 
-// extracted by mini-css-extract-plugin
-
-/***/ }),
-/* 474 */
-/***/ (function(module, exports, __webpack_require__) {
-
 "use strict";
 
 
@@ -108219,7 +108213,7 @@ module.exports = string => {
 
 
 /***/ }),
-/* 475 */
+/* 474 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -109972,11 +109966,81 @@ const curId = writable(0);
 // CONCATENATED MODULE: ../node_modules/svelte/index.mjs
 
 
+// CONCATENATED MODULE: ./quanta/2-molecules/OmoNavbar.svelte
+/* src/quanta/2-molecules/OmoNavbar.svelte generated by Svelte v3.21.0 */
+
+
+
+
+function create_fragment(ctx) {
+	let div2;
+	let div1;
+	let div0;
+	let button0;
+	let t1;
+	let button1;
+	let dispose;
+
+	return {
+		c() {
+			div2 = internal_element("div");
+			div1 = internal_element("div");
+			div0 = internal_element("div");
+			button0 = internal_element("button");
+			button0.textContent = "Home";
+			t1 = space();
+			button1 = internal_element("button");
+			button1.textContent = "Imprint";
+			attr(button0, "class", "px-1 hover:text-green-400 uppercase text-center text-sm font-bold");
+			attr(button1, "class", "px-1 hover:text-green-400 uppercase text-center text-sm font-bold");
+			attr(div0, "class", "flex justify-center");
+			attr(div1, "class", "w-full my-1");
+			attr(div2, "class", "flex content-center");
+			set_style(div2, "font-family", "'Montserrat', sans-serif", 1);
+		},
+		m(target, anchor, remount) {
+			insert(target, div2, anchor);
+			append(div2, div1);
+			append(div1, div0);
+			append(div0, button0);
+			append(div0, t1);
+			append(div0, button1);
+			if (remount) run_all(dispose);
+
+			dispose = [
+				listen(button0, "click", /*click_handler*/ ctx[0]),
+				listen(button1, "click", /*click_handler_1*/ ctx[1])
+			];
+		},
+		p: noop,
+		i: noop,
+		o: noop,
+		d(detaching) {
+			if (detaching) detach(div2);
+			run_all(dispose);
+		}
+	};
+}
+
+function instance($$self) {
+	const click_handler = () => curRoute.set("?route=home");
+	const click_handler_1 = () => curRoute.set("?route=imprint");
+	return [click_handler, click_handler_1];
+}
+
+class OmoNavbar_svelte_OmoNavbar extends SvelteComponent {
+	constructor(options) {
+		super();
+		init(this, options, instance, create_fragment, safe_not_equal, {});
+	}
+}
+
+/* harmony default export */ var OmoNavbar_svelte = (OmoNavbar_svelte_OmoNavbar);
 // CONCATENATED MODULE: ./quanta/1-atoms/OmoIconsFA.svelte
 /* src/quanta/1-atoms/OmoIconsFA.svelte generated by Svelte v3.21.0 */
 
 
-function create_fragment(ctx) {
+function OmoIconsFA_svelte_create_fragment(ctx) {
 	let link;
 
 	return {
@@ -110000,115 +110064,11 @@ function create_fragment(ctx) {
 class OmoIconsFA_svelte_OmoIconsFA extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, null, create_fragment, safe_not_equal, {});
+		init(this, options, null, OmoIconsFA_svelte_create_fragment, safe_not_equal, {});
 	}
 }
 
 /* harmony default export */ var OmoIconsFA_svelte = (OmoIconsFA_svelte_OmoIconsFA);
-// CONCATENATED MODULE: ./quanta/2-molecules/OmoNavbar.svelte
-/* src/quanta/2-molecules/OmoNavbar.svelte generated by Svelte v3.21.0 */
-
-
-
-
-
-function OmoNavbar_svelte_create_fragment(ctx) {
-	let t0;
-	let div3;
-	let div0;
-	let button0;
-	let t1;
-	let div1;
-	let t3;
-	let div2;
-	let button2;
-	let current;
-	let dispose;
-	const omoiconsfa = new OmoIconsFA_svelte({});
-
-	return {
-		c() {
-			create_component(omoiconsfa.$$.fragment);
-			t0 = space();
-			div3 = internal_element("div");
-			div0 = internal_element("div");
-			button0 = internal_element("button");
-			button0.innerHTML = `<img src="/images/logo.png" alt="alt placeholder" class="inline mx-auto" style="width: 2.75rem; margin-left: 0.15rem">`;
-			t1 = space();
-			div1 = internal_element("div");
-
-			div1.innerHTML = `<a href="https://github.com/omoearth/omo/issues/new/choose"><button class="w-full bg-green-500 px-4 py-3"><span class="px-1 text-white text-lg cursor-pointer uppercase text-sm
-          font-bold ">
-          I am ready to play
-        </span></button></a>`;
-
-			t3 = space();
-			div2 = internal_element("div");
-			button2 = internal_element("button");
-
-			button2.innerHTML = `<span class="px-1 hover:text-white uppercase text-sm font-bold">
-        Imprint
-      </span>`;
-
-			attr(div0, "class", "w-1/4 p-2");
-			attr(div1, "class", "w-full my-1");
-			attr(button2, "class", "relative cursor-pointer float-right py-2");
-			attr(div2, "class", "w-1/4 p-2");
-			attr(div3, "class", "flex content-center bg-gray-200");
-			set_style(div3, "font-family", "'Montserrat', sans-serif", 1);
-		},
-		m(target, anchor, remount) {
-			mount_component(omoiconsfa, target, anchor);
-			insert(target, t0, anchor);
-			insert(target, div3, anchor);
-			append(div3, div0);
-			append(div0, button0);
-			append(div3, t1);
-			append(div3, div1);
-			append(div3, t3);
-			append(div3, div2);
-			append(div2, button2);
-			current = true;
-			if (remount) run_all(dispose);
-
-			dispose = [
-				listen(button0, "click", /*click_handler*/ ctx[0]),
-				listen(button2, "click", /*click_handler_1*/ ctx[1])
-			];
-		},
-		p: noop,
-		i(local) {
-			if (current) return;
-			transition_in(omoiconsfa.$$.fragment, local);
-			current = true;
-		},
-		o(local) {
-			transition_out(omoiconsfa.$$.fragment, local);
-			current = false;
-		},
-		d(detaching) {
-			destroy_component(omoiconsfa, detaching);
-			if (detaching) detach(t0);
-			if (detaching) detach(div3);
-			run_all(dispose);
-		}
-	};
-}
-
-function instance($$self) {
-	const click_handler = () => curRoute.set("?route=home");
-	const click_handler_1 = () => curRoute.set("?route=imprint");
-	return [click_handler, click_handler_1];
-}
-
-class OmoNavbar_svelte_OmoNavbar extends SvelteComponent {
-	constructor(options) {
-		super();
-		init(this, options, instance, OmoNavbar_svelte_create_fragment, safe_not_equal, {});
-	}
-}
-
-/* harmony default export */ var OmoNavbar_svelte = (OmoNavbar_svelte_OmoNavbar);
 // CONCATENATED MODULE: ./quanta/1-atoms/OmoListItem.svelte
 /* src/quanta/1-atoms/OmoListItem.svelte generated by Svelte v3.21.0 */
 
@@ -110421,1754 +110381,44 @@ class OmoMenuVertical_svelte_OmoMenuVertical extends SvelteComponent {
 }
 
 /* harmony default export */ var OmoMenuVertical_svelte = (OmoMenuVertical_svelte_OmoMenuVertical);
-// CONCATENATED MODULE: ./quanta/2-molecules/OmoHero.svelte
-/* src/quanta/2-molecules/OmoHero.svelte generated by Svelte v3.21.0 */
+// CONCATENATED MODULE: ./quanta/5-pages/OmoHome.svelte
+/* src/quanta/5-pages/OmoHome.svelte generated by Svelte v3.21.0 */
 
 
-
-
-function create_if_block_2(ctx) {
-	let div;
-	let img;
-	let img_src_value;
-	let img_alt_value;
-
-	return {
-		c() {
-			div = internal_element("div");
-			img = internal_element("img");
-			if (img.src !== (img_src_value = /*quant*/ ctx[0].illustration)) attr(img, "src", img_src_value);
-			attr(img, "alt", img_alt_value = /*quant*/ ctx[0].title);
-			attr(div, "class", "w-1/3 mx-auto mb-10");
-		},
-		m(target, anchor) {
-			insert(target, div, anchor);
-			append(div, img);
-		},
-		p(ctx, dirty) {
-			if (dirty & /*quant*/ 1 && img.src !== (img_src_value = /*quant*/ ctx[0].illustration)) {
-				attr(img, "src", img_src_value);
-			}
-
-			if (dirty & /*quant*/ 1 && img_alt_value !== (img_alt_value = /*quant*/ ctx[0].title)) {
-				attr(img, "alt", img_alt_value);
-			}
-		},
-		d(detaching) {
-			if (detaching) detach(div);
-		}
-	};
-}
-
-// (27:4) {#if quant.subline}
-function create_if_block_1(ctx) {
-	let div;
-	let t_value = /*quant*/ ctx[0].subline + "";
-	let t;
-
-	return {
-		c() {
-			div = internal_element("div");
-			t = internal_text(t_value);
-			attr(div, "class", "text-xl text-gray-600 italic font-light tracking-wide mb-6 py-4");
-		},
-		m(target, anchor) {
-			insert(target, div, anchor);
-			append(div, t);
-		},
-		p(ctx, dirty) {
-			if (dirty & /*quant*/ 1 && t_value !== (t_value = /*quant*/ ctx[0].subline + "")) set_data(t, t_value);
-		},
-		d(detaching) {
-			if (detaching) detach(div);
-		}
-	};
-}
-
-// (33:4) {#if quant.text}
-function create_if_block(ctx) {
-	let div;
-	let t_value = /*quant*/ ctx[0].text + "";
-	let t;
-
-	return {
-		c() {
-			div = internal_element("div");
-			t = internal_text(t_value);
-			attr(div, "class", "text-gray-700 font-light mb-6 py-4");
-		},
-		m(target, anchor) {
-			insert(target, div, anchor);
-			append(div, t);
-		},
-		p(ctx, dirty) {
-			if (dirty & /*quant*/ 1 && t_value !== (t_value = /*quant*/ ctx[0].text + "")) set_data(t, t_value);
-		},
-		d(detaching) {
-			if (detaching) detach(div);
-		}
-	};
-}
-
-function OmoHero_svelte_create_fragment(ctx) {
-	let div1;
-	let t0;
-	let div0;
-	let p;
-	let t1_value = /*quant*/ ctx[0].uptitle + "";
-	let t1;
-	let t2;
-	let h1;
-	let t3_value = /*quant*/ ctx[0].title + "";
-	let t3;
-	let t4;
-	let t5;
-	let if_block0 = /*quant*/ ctx[0].illustration && create_if_block_2(ctx);
-	let if_block1 = /*quant*/ ctx[0].subline && create_if_block_1(ctx);
-	let if_block2 = /*quant*/ ctx[0].text && create_if_block(ctx);
-
-	return {
-		c() {
-			div1 = internal_element("div");
-			if (if_block0) if_block0.c();
-			t0 = space();
-			div0 = internal_element("div");
-			p = internal_element("p");
-			t1 = internal_text(t1_value);
-			t2 = space();
-			h1 = internal_element("h1");
-			t3 = internal_text(t3_value);
-			t4 = space();
-			if (if_block1) if_block1.c();
-			t5 = space();
-			if (if_block2) if_block2.c();
-			attr(p, "class", "text-gray-500 text-s uppercase py-4 text-green-400 font-bold");
-			attr(h1, "class", "uppercase text-4xl text-blue-900 mb-1");
-			set_style(h1, "font-family", "'Montserrat', sans-serif", 1);
-			attr(div0, "class", "mx-auto text-center");
-			attr(div1, "class", "flex flex-col text-center mx-auto my-6");
-		},
-		m(target, anchor) {
-			insert(target, div1, anchor);
-			if (if_block0) if_block0.m(div1, null);
-			append(div1, t0);
-			append(div1, div0);
-			append(div0, p);
-			append(p, t1);
-			append(div0, t2);
-			append(div0, h1);
-			append(h1, t3);
-			append(div0, t4);
-			if (if_block1) if_block1.m(div0, null);
-			append(div0, t5);
-			if (if_block2) if_block2.m(div0, null);
-		},
-		p(ctx, [dirty]) {
-			if (/*quant*/ ctx[0].illustration) {
-				if (if_block0) {
-					if_block0.p(ctx, dirty);
-				} else {
-					if_block0 = create_if_block_2(ctx);
-					if_block0.c();
-					if_block0.m(div1, t0);
-				}
-			} else if (if_block0) {
-				if_block0.d(1);
-				if_block0 = null;
-			}
-
-			if (dirty & /*quant*/ 1 && t1_value !== (t1_value = /*quant*/ ctx[0].uptitle + "")) set_data(t1, t1_value);
-			if (dirty & /*quant*/ 1 && t3_value !== (t3_value = /*quant*/ ctx[0].title + "")) set_data(t3, t3_value);
-
-			if (/*quant*/ ctx[0].subline) {
-				if (if_block1) {
-					if_block1.p(ctx, dirty);
-				} else {
-					if_block1 = create_if_block_1(ctx);
-					if_block1.c();
-					if_block1.m(div0, t5);
-				}
-			} else if (if_block1) {
-				if_block1.d(1);
-				if_block1 = null;
-			}
-
-			if (/*quant*/ ctx[0].text) {
-				if (if_block2) {
-					if_block2.p(ctx, dirty);
-				} else {
-					if_block2 = create_if_block(ctx);
-					if_block2.c();
-					if_block2.m(div0, null);
-				}
-			} else if (if_block2) {
-				if_block2.d(1);
-				if_block2 = null;
-			}
-		},
-		i: noop,
-		o: noop,
-		d(detaching) {
-			if (detaching) detach(div1);
-			if (if_block0) if_block0.d();
-			if (if_block1) if_block1.d();
-			if (if_block2) if_block2.d();
-		}
-	};
-}
-
-function OmoHero_svelte_instance($$self, $$props, $$invalidate) {
-	let { quant = {
-		uptitle: "uptitle",
-		title: "title",
-		subline: "subline",
-		illustration: "/images/the_world_is_mine.svg",
-		text: ""
-	} } = $$props;
-
-	$$self.$set = $$props => {
-		if ("quant" in $$props) $$invalidate(0, quant = $$props.quant);
-	};
-
-	return [quant];
-}
-
-class OmoHero_svelte_OmoHero extends SvelteComponent {
-	constructor(options) {
-		super();
-		init(this, options, OmoHero_svelte_instance, OmoHero_svelte_create_fragment, safe_not_equal, { quant: 0 });
-	}
-}
-
-/* harmony default export */ var OmoHero_svelte = (OmoHero_svelte_OmoHero);
-// CONCATENATED MODULE: ./quanta/2-molecules/OmoCard.svelte
-/* src/quanta/2-molecules/OmoCard.svelte generated by Svelte v3.21.0 */
-
-
-function OmoCard_svelte_create_if_block(ctx) {
-	let p;
-	let t_value = /*quant*/ ctx[0].passion + "";
-	let t;
-
-	return {
-		c() {
-			p = internal_element("p");
-			t = internal_text(t_value);
-			attr(p, "class", "text-gray-600 text-sm mt-1");
-		},
-		m(target, anchor) {
-			insert(target, p, anchor);
-			append(p, t);
-		},
-		p(ctx, dirty) {
-			if (dirty & /*quant*/ 1 && t_value !== (t_value = /*quant*/ ctx[0].passion + "")) set_data(t, t_value);
-		},
-		d(detaching) {
-			if (detaching) detach(p);
-		}
-	};
-}
-
-function OmoCard_svelte_create_fragment(ctx) {
-	let div1;
-	let a;
-	let img;
-	let img_src_value;
-	let t0;
-	let div0;
-	let h1;
-	let t1_value = /*quant*/ ctx[0].name + "";
-	let t1;
-	let t2;
-	let a_href_value;
-	let if_block = /*quant*/ ctx[0].passion && OmoCard_svelte_create_if_block(ctx);
-
-	return {
-		c() {
-			div1 = internal_element("div");
-			a = internal_element("a");
-			img = internal_element("img");
-			t0 = space();
-			div0 = internal_element("div");
-			h1 = internal_element("h1");
-			t1 = internal_text(t1_value);
-			t2 = space();
-			if (if_block) if_block.c();
-			attr(img, "class", "h-auto w-full object-cover");
-			if (img.src !== (img_src_value = /*quant*/ ctx[0].image)) attr(img, "src", img_src_value);
-			attr(img, "alt", "image");
-			attr(h1, "class", "text-center text-blue-900 text-sm font-bold uppercase");
-			attr(div0, "class", "px-4 py-2");
-			attr(a, "href", a_href_value = /*quant*/ ctx[0].link);
-			attr(a, "class", "bg-gray-100 rounded hover:bg-green-10");
-			attr(div1, "class", "flex flex-col max-w-sm mx-auto rounded shadow");
-		},
-		m(target, anchor) {
-			insert(target, div1, anchor);
-			append(div1, a);
-			append(a, img);
-			append(a, t0);
-			append(a, div0);
-			append(div0, h1);
-			append(h1, t1);
-			append(div0, t2);
-			if (if_block) if_block.m(div0, null);
-		},
-		p(ctx, [dirty]) {
-			if (dirty & /*quant*/ 1 && img.src !== (img_src_value = /*quant*/ ctx[0].image)) {
-				attr(img, "src", img_src_value);
-			}
-
-			if (dirty & /*quant*/ 1 && t1_value !== (t1_value = /*quant*/ ctx[0].name + "")) set_data(t1, t1_value);
-
-			if (/*quant*/ ctx[0].passion) {
-				if (if_block) {
-					if_block.p(ctx, dirty);
-				} else {
-					if_block = OmoCard_svelte_create_if_block(ctx);
-					if_block.c();
-					if_block.m(div0, null);
-				}
-			} else if (if_block) {
-				if_block.d(1);
-				if_block = null;
-			}
-
-			if (dirty & /*quant*/ 1 && a_href_value !== (a_href_value = /*quant*/ ctx[0].link)) {
-				attr(a, "href", a_href_value);
-			}
-		},
-		i: noop,
-		o: noop,
-		d(detaching) {
-			if (detaching) detach(div1);
-			if (if_block) if_block.d();
-		}
-	};
-}
-
-function OmoCard_svelte_instance($$self, $$props, $$invalidate) {
-	let { quant = {
-		id: "",
-		name: "name",
-		image: "image",
-		passion: "",
-		link: "link"
-	} } = $$props;
-
-	$$self.$set = $$props => {
-		if ("quant" in $$props) $$invalidate(0, quant = $$props.quant);
-	};
-
-	return [quant];
-}
-
-class OmoCard_svelte_OmoCard extends SvelteComponent {
-	constructor(options) {
-		super();
-		init(this, options, OmoCard_svelte_instance, OmoCard_svelte_create_fragment, safe_not_equal, { quant: 0 });
-	}
-}
-
-/* harmony default export */ var OmoCard_svelte = (OmoCard_svelte_OmoCard);
-// CONCATENATED MODULE: ./quanta/2-molecules/OmoContributors.svelte
-/* src/quanta/2-molecules/OmoContributors.svelte generated by Svelte v3.21.0 */
-
-
-
-
-function OmoContributors_svelte_get_each_context(ctx, list, i) {
-	const child_ctx = ctx.slice();
-	child_ctx[1] = list[i];
-	child_ctx[3] = i;
-	return child_ctx;
-}
-
-// (21:4) {#each contributors as quant, i (quant.id)}
-function OmoContributors_svelte_create_each_block(key_1, ctx) {
-	let first;
-	let current;
-	const omocard = new OmoCard_svelte({ props: { quant: /*quant*/ ctx[1] } });
-
-	return {
-		key: key_1,
-		first: null,
-		c() {
-			first = empty();
-			create_component(omocard.$$.fragment);
-			this.first = first;
-		},
-		m(target, anchor) {
-			insert(target, first, anchor);
-			mount_component(omocard, target, anchor);
-			current = true;
-		},
-		p: noop,
-		i(local) {
-			if (current) return;
-			transition_in(omocard.$$.fragment, local);
-			current = true;
-		},
-		o(local) {
-			transition_out(omocard.$$.fragment, local);
-			current = false;
-		},
-		d(detaching) {
-			if (detaching) detach(first);
-			destroy_component(omocard, detaching);
-		}
-	};
-}
-
-function OmoContributors_svelte_create_fragment(ctx) {
-	let a;
-	let div;
-	let each_blocks = [];
-	let each_1_lookup = new Map();
-	let a_href_value;
-	let current;
-	let each_value = /*contributors*/ ctx[0];
-	const get_key = ctx => /*quant*/ ctx[1].id;
-
-	for (let i = 0; i < each_value.length; i += 1) {
-		let child_ctx = OmoContributors_svelte_get_each_context(ctx, each_value, i);
-		let key = get_key(child_ctx);
-		each_1_lookup.set(key, each_blocks[i] = OmoContributors_svelte_create_each_block(key, child_ctx));
-	}
-
-	return {
-		c() {
-			a = internal_element("a");
-			div = internal_element("div");
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].c();
-			}
-
-			attr(div, "class", "py-4 grid grid-cols-3 gap-3 lg:grid-cols-6 lg:gap-6");
-			attr(a, "href", a_href_value = /*contributors*/ ctx[0].link);
-		},
-		m(target, anchor) {
-			insert(target, a, anchor);
-			append(a, div);
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].m(div, null);
-			}
-
-			current = true;
-		},
-		p(ctx, [dirty]) {
-			if (dirty & /*contributors*/ 1) {
-				const each_value = /*contributors*/ ctx[0];
-				group_outros();
-				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, div, outro_and_destroy_block, OmoContributors_svelte_create_each_block, null, OmoContributors_svelte_get_each_context);
-				check_outros();
-			}
-		},
-		i(local) {
-			if (current) return;
-
-			for (let i = 0; i < each_value.length; i += 1) {
-				transition_in(each_blocks[i]);
-			}
-
-			current = true;
-		},
-		o(local) {
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				transition_out(each_blocks[i]);
-			}
-
-			current = false;
-		},
-		d(detaching) {
-			if (detaching) detach(a);
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].d();
-			}
-		}
-	};
-}
-
-function OmoContributors_svelte_instance($$self) {
-	const contributors = [
-		{
-			id: "1",
-			name: "Philipp Bartels",
-			image: "/images/philipp.jpg",
-			link: "https://github.com/phibar"
-		},
-		{
-			id: "2",
-			name: "Samuel Andert",
-			image: "/images/samuel.jpg",
-			link: "https://github.com/samuelandert"
-		}
-	];
-
-	return [contributors];
-}
-
-class OmoContributors_svelte_OmoContributors extends SvelteComponent {
-	constructor(options) {
-		super();
-		init(this, options, OmoContributors_svelte_instance, OmoContributors_svelte_create_fragment, safe_not_equal, {});
-	}
-}
-
-/* harmony default export */ var OmoContributors_svelte = (OmoContributors_svelte_OmoContributors);
-// CONCATENATED MODULE: ./quanta/2-molecules/OmoTechnologies.svelte
-/* src/quanta/2-molecules/OmoTechnologies.svelte generated by Svelte v3.21.0 */
-
-
-
-
-function OmoTechnologies_svelte_get_each_context(ctx, list, i) {
-	const child_ctx = ctx.slice();
-	child_ctx[1] = list[i];
-	child_ctx[3] = i;
-	return child_ctx;
-}
-
-// (44:2) {#each partners as quant, i (quant.id)}
-function OmoTechnologies_svelte_create_each_block(key_1, ctx) {
-	let first;
-	let current;
-	const omocard = new OmoCard_svelte({ props: { quant: /*quant*/ ctx[1] } });
-
-	return {
-		key: key_1,
-		first: null,
-		c() {
-			first = empty();
-			create_component(omocard.$$.fragment);
-			this.first = first;
-		},
-		m(target, anchor) {
-			insert(target, first, anchor);
-			mount_component(omocard, target, anchor);
-			current = true;
-		},
-		p: noop,
-		i(local) {
-			if (current) return;
-			transition_in(omocard.$$.fragment, local);
-			current = true;
-		},
-		o(local) {
-			transition_out(omocard.$$.fragment, local);
-			current = false;
-		},
-		d(detaching) {
-			if (detaching) detach(first);
-			destroy_component(omocard, detaching);
-		}
-	};
-}
-
-function OmoTechnologies_svelte_create_fragment(ctx) {
-	let div;
-	let each_blocks = [];
-	let each_1_lookup = new Map();
-	let current;
-	let each_value = /*partners*/ ctx[0];
-	const get_key = ctx => /*quant*/ ctx[1].id;
-
-	for (let i = 0; i < each_value.length; i += 1) {
-		let child_ctx = OmoTechnologies_svelte_get_each_context(ctx, each_value, i);
-		let key = get_key(child_ctx);
-		each_1_lookup.set(key, each_blocks[i] = OmoTechnologies_svelte_create_each_block(key, child_ctx));
-	}
-
-	return {
-		c() {
-			div = internal_element("div");
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].c();
-			}
-
-			attr(div, "class", "py-4 grid grid-cols-3 gap-3 lg:grid-cols-6 lg:gap-6");
-		},
-		m(target, anchor) {
-			insert(target, div, anchor);
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].m(div, null);
-			}
-
-			current = true;
-		},
-		p(ctx, [dirty]) {
-			if (dirty & /*partners*/ 1) {
-				const each_value = /*partners*/ ctx[0];
-				group_outros();
-				each_blocks = update_keyed_each(each_blocks, dirty, get_key, 1, ctx, each_value, each_1_lookup, div, outro_and_destroy_block, OmoTechnologies_svelte_create_each_block, null, OmoTechnologies_svelte_get_each_context);
-				check_outros();
-			}
-		},
-		i(local) {
-			if (current) return;
-
-			for (let i = 0; i < each_value.length; i += 1) {
-				transition_in(each_blocks[i]);
-			}
-
-			current = true;
-		},
-		o(local) {
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				transition_out(each_blocks[i]);
-			}
-
-			current = false;
-		},
-		d(detaching) {
-			if (detaching) detach(div);
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].d();
-			}
-		}
-	};
-}
-
-function OmoTechnologies_svelte_instance($$self) {
-	const partners = [
-		{
-			id: "1",
-			name: "tailwind",
-			image: "/logos/tailwind.png",
-			link: "https://tailwindcss.com"
-		},
-		{
-			id: "2",
-			name: "svelte",
-			image: "/logos/svelte.png",
-			link: "https://svelte.dev"
-		},
-		{
-			id: "3",
-			name: "graphql",
-			image: "/logos/graphql.png",
-			link: "https://graphql.org"
-		},
-		{
-			id: "4",
-			name: "textile",
-			image: "/logos/textile.png",
-			link: "https://textile.io"
-		},
-		{
-			id: "5",
-			name: "ipfs",
-			image: "/logos/ipfs.png",
-			link: "https://ipfs.io"
-		},
-		{
-			id: "6",
-			name: "circles ubi",
-			image: "/logos/circles.png",
-			link: "https://www.joincircles.net"
-		}
-	];
-
-	return [partners];
-}
-
-class OmoTechnologies_svelte_OmoTechnologies extends SvelteComponent {
-	constructor(options) {
-		super();
-		init(this, options, OmoTechnologies_svelte_instance, OmoTechnologies_svelte_create_fragment, safe_not_equal, {});
-	}
-}
-
-/* harmony default export */ var OmoTechnologies_svelte = (OmoTechnologies_svelte_OmoTechnologies);
-// EXTERNAL MODULE: ./quanta/2-molecules/OmoBanner.svelte.css
-var OmoBanner_svelte = __webpack_require__(465);
-
-// CONCATENATED MODULE: ./quanta/2-molecules/OmoBanner.svelte
-/* src/quanta/2-molecules/OmoBanner.svelte generated by Svelte v3.21.0 */
-
-
-
-
-function OmoBanner_svelte_create_if_block(ctx) {
-	let a;
-	let t_value = /*quant*/ ctx[0].button + "";
-	let t;
-	let a_href_value;
-
-	return {
-		c() {
-			a = internal_element("a");
-			t = internal_text(t_value);
-			attr(a, "href", a_href_value = /*quant*/ ctx[0].button.link);
-			attr(a, "class", "mt-10 bg-green-400 py-3 px-6 text-white font-bold text-xs rounded\n        hover:bg-blue-800 hover:text-white");
-		},
-		m(target, anchor) {
-			insert(target, a, anchor);
-			append(a, t);
-		},
-		p(ctx, dirty) {
-			if (dirty & /*quant*/ 1 && t_value !== (t_value = /*quant*/ ctx[0].button + "")) set_data(t, t_value);
-
-			if (dirty & /*quant*/ 1 && a_href_value !== (a_href_value = /*quant*/ ctx[0].button.link)) {
-				attr(a, "href", a_href_value);
-			}
-		},
-		d(detaching) {
-			if (detaching) detach(a);
-		}
-	};
-}
-
-function OmoBanner_svelte_create_fragment(ctx) {
-	let div1;
-	let div0;
-	let p0;
-	let t0_value = /*quant*/ ctx[0].title + "";
-	let t0;
-	let t1;
-	let p1;
-	let t2_value = /*quant*/ ctx[0].subline + "";
-	let t2;
-	let t3;
-	let if_block = /*quant*/ ctx[0].button && OmoBanner_svelte_create_if_block(ctx);
-
-	return {
-		c() {
-			div1 = internal_element("div");
-			div0 = internal_element("div");
-			p0 = internal_element("p");
-			t0 = internal_text(t0_value);
-			t1 = space();
-			p1 = internal_element("p");
-			t2 = internal_text(t2_value);
-			t3 = space();
-			if (if_block) if_block.c();
-			attr(p0, "class", "omo-font-title omo-text-xl font-bold text-green-500 uppercase svelte-14trs6v");
-			attr(p1, "class", "-mt-8 font-light font-sans tracking-wide text-4xl text-gray-400");
-			attr(div0, "class", "md:w-2/3 m-auto text-center px-16 py-8 rounded");
-			set_style(div0, "background-color", "rgba(11, 42, 77, 0.5)");
-			attr(div1, "class", "bg-cover bg-center rounded h-auto text-white py-48 px-16 object-fill");
-			set_style(div1, "background-image", "url(" + /*quant*/ ctx[0].image + ")");
-		},
-		m(target, anchor) {
-			insert(target, div1, anchor);
-			append(div1, div0);
-			append(div0, p0);
-			append(p0, t0);
-			append(div0, t1);
-			append(div0, p1);
-			append(p1, t2);
-			append(div0, t3);
-			if (if_block) if_block.m(div0, null);
-		},
-		p(ctx, [dirty]) {
-			if (dirty & /*quant*/ 1 && t0_value !== (t0_value = /*quant*/ ctx[0].title + "")) set_data(t0, t0_value);
-			if (dirty & /*quant*/ 1 && t2_value !== (t2_value = /*quant*/ ctx[0].subline + "")) set_data(t2, t2_value);
-
-			if (/*quant*/ ctx[0].button) {
-				if (if_block) {
-					if_block.p(ctx, dirty);
-				} else {
-					if_block = OmoBanner_svelte_create_if_block(ctx);
-					if_block.c();
-					if_block.m(div0, null);
-				}
-			} else if (if_block) {
-				if_block.d(1);
-				if_block = null;
-			}
-
-			if (dirty & /*quant*/ 1) {
-				set_style(div1, "background-image", "url(" + /*quant*/ ctx[0].image + ")");
-			}
-		},
-		i: noop,
-		o: noop,
-		d(detaching) {
-			if (detaching) detach(div1);
-			if (if_block) if_block.d();
-		}
-	};
-}
-
-function OmoBanner_svelte_instance($$self, $$props, $$invalidate) {
-	let { quant = {
-		title: "one quantum leap a time",
-		subline: "subline",
-		image: "https://source.unsplash.com/random",
-		button: "call to action",
-		buttonlink: "/"
-	} } = $$props;
-
-	$$self.$set = $$props => {
-		if ("quant" in $$props) $$invalidate(0, quant = $$props.quant);
-	};
-
-	return [quant];
-}
-
-class OmoBanner_svelte_OmoBanner extends SvelteComponent {
-	constructor(options) {
-		super();
-		init(this, options, OmoBanner_svelte_instance, OmoBanner_svelte_create_fragment, safe_not_equal, { quant: 0 });
-	}
-}
-
-/* harmony default export */ var _2_molecules_OmoBanner_svelte = (OmoBanner_svelte_OmoBanner);
-
-
-// CONCATENATED MODULE: ./quanta/2-molecules/OmoSteps.svelte
-/* src/quanta/2-molecules/OmoSteps.svelte generated by Svelte v3.21.0 */
-
-
-
-
-function OmoSteps_svelte_get_each_context(ctx, list, i) {
-	const child_ctx = ctx.slice();
-	child_ctx[1] = list[i];
-	child_ctx[3] = i;
-	return child_ctx;
-}
-
-// (28:4) {#each quant.data.steps as step, i}
-function OmoSteps_svelte_create_each_block(ctx) {
+function OmoHome_svelte_create_fragment(ctx) {
 	let div2;
-	let img;
-	let img_src_value;
-	let t0;
-	let div0;
-	let t1_value = /*step*/ ctx[1].title + "";
-	let t1;
-	let t2;
-	let div1;
-	let t3_value = /*step*/ ctx[1].description + "";
-	let t3;
-	let t4;
 
 	return {
 		c() {
 			div2 = internal_element("div");
-			img = internal_element("img");
-			t0 = space();
-			div0 = internal_element("div");
-			t1 = internal_text(t1_value);
-			t2 = space();
-			div1 = internal_element("div");
-			t3 = internal_text(t3_value);
-			t4 = space();
-			if (img.src !== (img_src_value = /*step*/ ctx[1].image)) attr(img, "src", img_src_value);
-			attr(img, "class", "object-center m-auto px-10");
-			set_style(img, "height", "20rem");
-			attr(img, "alt", "image");
-			attr(div0, "class", "text-2xl text-center text-blue-800 my-2 flex flex-wrap\n          justify-center content-center font-title uppercase font-bold");
-			set_style(div0, "font-family", "'Montserrat', sans-serif", 1);
-			attr(div1, "class", "text-gray-600");
-			attr(div2, "class", "lg:w-1/3 p-6 m-auto content-center text-center");
+
+			div2.innerHTML = `<div class="text-primary uppercase text-4xl"><img class="mx-auto" src="/logos/logo.png" height="100px" width="100px"> 
+		<div class="text-center mt-4">Coming Soon</div></div>`;
+
+			attr(div2, "class", "flex items-center justify-center h-screen w-screen");
 		},
 		m(target, anchor) {
 			insert(target, div2, anchor);
-			append(div2, img);
-			append(div2, t0);
-			append(div2, div0);
-			append(div0, t1);
-			append(div2, t2);
-			append(div2, div1);
-			append(div1, t3);
-			append(div2, t4);
 		},
-		p(ctx, dirty) {
-			if (dirty & /*quant*/ 1 && img.src !== (img_src_value = /*step*/ ctx[1].image)) {
-				attr(img, "src", img_src_value);
-			}
-
-			if (dirty & /*quant*/ 1 && t1_value !== (t1_value = /*step*/ ctx[1].title + "")) set_data(t1, t1_value);
-			if (dirty & /*quant*/ 1 && t3_value !== (t3_value = /*step*/ ctx[1].description + "")) set_data(t3, t3_value);
-		},
+		p: noop,
+		i: noop,
+		o: noop,
 		d(detaching) {
 			if (detaching) detach(div2);
 		}
 	};
 }
 
-function OmoSteps_svelte_create_fragment(ctx) {
-	let div1;
-	let div0;
-	let each_value = /*quant*/ ctx[0].data.steps;
-	let each_blocks = [];
-
-	for (let i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = OmoSteps_svelte_create_each_block(OmoSteps_svelte_get_each_context(ctx, each_value, i));
-	}
-
-	return {
-		c() {
-			div1 = internal_element("div");
-			div0 = internal_element("div");
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].c();
-			}
-
-			attr(div0, "class", "flex content-start flex-wrap");
-			attr(div1, "class", "bg-white flex justify-center");
-		},
-		m(target, anchor) {
-			insert(target, div1, anchor);
-			append(div1, div0);
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].m(div0, null);
-			}
-		},
-		p(ctx, [dirty]) {
-			if (dirty & /*quant*/ 1) {
-				each_value = /*quant*/ ctx[0].data.steps;
-				let i;
-
-				for (i = 0; i < each_value.length; i += 1) {
-					const child_ctx = OmoSteps_svelte_get_each_context(ctx, each_value, i);
-
-					if (each_blocks[i]) {
-						each_blocks[i].p(child_ctx, dirty);
-					} else {
-						each_blocks[i] = OmoSteps_svelte_create_each_block(child_ctx);
-						each_blocks[i].c();
-						each_blocks[i].m(div0, null);
-					}
-				}
-
-				for (; i < each_blocks.length; i += 1) {
-					each_blocks[i].d(1);
-				}
-
-				each_blocks.length = each_value.length;
-			}
-		},
-		i: noop,
-		o: noop,
-		d(detaching) {
-			if (detaching) detach(div1);
-			destroy_each(each_blocks, detaching);
-		}
-	};
-}
-
-function OmoSteps_svelte_instance($$self, $$props, $$invalidate) {
-	let { quant = {
-		data: {
-			steps: [
-				{
-					image: "/images/city_girl.svg",
-					title: "Step 1",
-					description: "description step 1"
-				},
-				{
-					image: "/images/order_a_car.svg",
-					title: "Step 2",
-					description: "description step 2"
-				},
-				{
-					image: "/images/city_driver.svg",
-					title: "Step 3",
-					description: "description step 2"
-				}
-			]
-		}
-	} } = $$props;
-
-	$$self.$set = $$props => {
-		if ("quant" in $$props) $$invalidate(0, quant = $$props.quant);
-	};
-
-	return [quant];
-}
-
-class OmoSteps_svelte_OmoSteps extends SvelteComponent {
-	constructor(options) {
-		super();
-		init(this, options, OmoSteps_svelte_instance, OmoSteps_svelte_create_fragment, safe_not_equal, { quant: 0 });
-	}
-}
-
-/* harmony default export */ var OmoSteps_svelte = (OmoSteps_svelte_OmoSteps);
-// CONCATENATED MODULE: ./quanta/2-molecules/OmoRoadmap.svelte
-/* src/quanta/2-molecules/OmoRoadmap.svelte generated by Svelte v3.21.0 */
-
-
-function OmoRoadmap_svelte_get_each_context(ctx, list, i) {
-	const child_ctx = ctx.slice();
-	child_ctx[1] = list[i];
-	child_ctx[3] = i;
-	return child_ctx;
-}
-
-// (99:10) {#if step.done}
-function create_if_block_3(ctx) {
-	let div;
-
-	return {
-		c() {
-			div = internal_element("div");
-			attr(div, "class", "rounded-full h-12 w-12 bg-green-400");
-		},
-		m(target, anchor) {
-			insert(target, div, anchor);
-		},
-		d(detaching) {
-			if (detaching) detach(div);
-		}
-	};
-}
-
-// (102:10) {#if !step.done}
-function OmoRoadmap_svelte_create_if_block_2(ctx) {
-	let div;
-
-	return {
-		c() {
-			div = internal_element("div");
-			attr(div, "class", "rounded-full h-12 w-12 bg-gray-500");
-		},
-		m(target, anchor) {
-			insert(target, div, anchor);
-		},
-		d(detaching) {
-			if (detaching) detach(div);
-		}
-	};
-}
-
-// (106:12) {#if step.done}
-function OmoRoadmap_svelte_create_if_block_1(ctx) {
-	let span;
-	let t_value = /*step*/ ctx[1].title + "";
-	let t;
-
-	return {
-		c() {
-			span = internal_element("span");
-			t = internal_text(t_value);
-			attr(span, "class", "text-gray-500 ml-4 text-xl");
-			set_style(span, "font-family", "'Montserrat', sans-serif", 1);
-		},
-		m(target, anchor) {
-			insert(target, span, anchor);
-			append(span, t);
-		},
-		p(ctx, dirty) {
-			if (dirty & /*quant*/ 1 && t_value !== (t_value = /*step*/ ctx[1].title + "")) set_data(t, t_value);
-		},
-		d(detaching) {
-			if (detaching) detach(span);
-		}
-	};
-}
-
-// (113:12) {#if !step.done}
-function OmoRoadmap_svelte_create_if_block(ctx) {
-	let span;
-	let t_value = /*step*/ ctx[1].title + "";
-	let t;
-
-	return {
-		c() {
-			span = internal_element("span");
-			t = internal_text(t_value);
-			attr(span, "class", "text-blue-800 ml-4 text-xl");
-			set_style(span, "font-family", "'Montserrat', sans-serif", 1);
-		},
-		m(target, anchor) {
-			insert(target, span, anchor);
-			append(span, t);
-		},
-		p(ctx, dirty) {
-			if (dirty & /*quant*/ 1 && t_value !== (t_value = /*step*/ ctx[1].title + "")) set_data(t, t_value);
-		},
-		d(detaching) {
-			if (detaching) detach(span);
-		}
-	};
-}
-
-// (96:4) {#each quant.data.steps as step, i}
-function OmoRoadmap_svelte_create_each_block(ctx) {
-	let li;
-	let div1;
-	let t0;
-	let t1;
-	let div0;
-	let t2;
-	let t3;
-	let div2;
-	let t4_value = /*step*/ ctx[1].version + "";
-	let t4;
-	let t5;
-	let t6_value = /*step*/ ctx[1].date + "";
-	let t6;
-	let t7;
-	let div3;
-	let t8_value = /*step*/ ctx[1].description + "";
-	let t8;
-	let t9;
-	let if_block0 = /*step*/ ctx[1].done && create_if_block_3(ctx);
-	let if_block1 = !/*step*/ ctx[1].done && OmoRoadmap_svelte_create_if_block_2(ctx);
-	let if_block2 = /*step*/ ctx[1].done && OmoRoadmap_svelte_create_if_block_1(ctx);
-	let if_block3 = !/*step*/ ctx[1].done && OmoRoadmap_svelte_create_if_block(ctx);
-
-	return {
-		c() {
-			li = internal_element("li");
-			div1 = internal_element("div");
-			if (if_block0) if_block0.c();
-			t0 = space();
-			if (if_block1) if_block1.c();
-			t1 = space();
-			div0 = internal_element("div");
-			if (if_block2) if_block2.c();
-			t2 = space();
-			if (if_block3) if_block3.c();
-			t3 = space();
-			div2 = internal_element("div");
-			t4 = internal_text(t4_value);
-			t5 = internal_text(" - ");
-			t6 = internal_text(t6_value);
-			t7 = space();
-			div3 = internal_element("div");
-			t8 = internal_text(t8_value);
-			t9 = space();
-			attr(div0, "class", "flex-1");
-			attr(div1, "class", "flex items-center mb-1");
-			attr(div2, "class", "ml-16 font-bold italic");
-			attr(div3, "class", "ml-16");
-			attr(li, "class", "mb-2");
-		},
-		m(target, anchor) {
-			insert(target, li, anchor);
-			append(li, div1);
-			if (if_block0) if_block0.m(div1, null);
-			append(div1, t0);
-			if (if_block1) if_block1.m(div1, null);
-			append(div1, t1);
-			append(div1, div0);
-			if (if_block2) if_block2.m(div0, null);
-			append(div0, t2);
-			if (if_block3) if_block3.m(div0, null);
-			append(li, t3);
-			append(li, div2);
-			append(div2, t4);
-			append(div2, t5);
-			append(div2, t6);
-			append(li, t7);
-			append(li, div3);
-			append(div3, t8);
-			append(li, t9);
-		},
-		p(ctx, dirty) {
-			if (/*step*/ ctx[1].done) {
-				if (if_block0) {
-					
-				} else {
-					if_block0 = create_if_block_3(ctx);
-					if_block0.c();
-					if_block0.m(div1, t0);
-				}
-			} else if (if_block0) {
-				if_block0.d(1);
-				if_block0 = null;
-			}
-
-			if (!/*step*/ ctx[1].done) {
-				if (if_block1) {
-					
-				} else {
-					if_block1 = OmoRoadmap_svelte_create_if_block_2(ctx);
-					if_block1.c();
-					if_block1.m(div1, t1);
-				}
-			} else if (if_block1) {
-				if_block1.d(1);
-				if_block1 = null;
-			}
-
-			if (/*step*/ ctx[1].done) {
-				if (if_block2) {
-					if_block2.p(ctx, dirty);
-				} else {
-					if_block2 = OmoRoadmap_svelte_create_if_block_1(ctx);
-					if_block2.c();
-					if_block2.m(div0, t2);
-				}
-			} else if (if_block2) {
-				if_block2.d(1);
-				if_block2 = null;
-			}
-
-			if (!/*step*/ ctx[1].done) {
-				if (if_block3) {
-					if_block3.p(ctx, dirty);
-				} else {
-					if_block3 = OmoRoadmap_svelte_create_if_block(ctx);
-					if_block3.c();
-					if_block3.m(div0, null);
-				}
-			} else if (if_block3) {
-				if_block3.d(1);
-				if_block3 = null;
-			}
-
-			if (dirty & /*quant*/ 1 && t4_value !== (t4_value = /*step*/ ctx[1].version + "")) set_data(t4, t4_value);
-			if (dirty & /*quant*/ 1 && t6_value !== (t6_value = /*step*/ ctx[1].date + "")) set_data(t6, t6_value);
-			if (dirty & /*quant*/ 1 && t8_value !== (t8_value = /*step*/ ctx[1].description + "")) set_data(t8, t8_value);
-		},
-		d(detaching) {
-			if (detaching) detach(li);
-			if (if_block0) if_block0.d();
-			if (if_block1) if_block1.d();
-			if (if_block2) if_block2.d();
-			if (if_block3) if_block3.d();
-		}
-	};
-}
-
-function OmoRoadmap_svelte_create_fragment(ctx) {
-	let div;
-	let ul;
-	let each_value = /*quant*/ ctx[0].data.steps;
-	let each_blocks = [];
-
-	for (let i = 0; i < each_value.length; i += 1) {
-		each_blocks[i] = OmoRoadmap_svelte_create_each_block(OmoRoadmap_svelte_get_each_context(ctx, each_value, i));
-	}
-
-	return {
-		c() {
-			div = internal_element("div");
-			ul = internal_element("ul");
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].c();
-			}
-
-			attr(ul, "class", "list-none m-0 p-0");
-			attr(div, "class", "relative w-1/2 m-auto");
-		},
-		m(target, anchor) {
-			insert(target, div, anchor);
-			append(div, ul);
-
-			for (let i = 0; i < each_blocks.length; i += 1) {
-				each_blocks[i].m(ul, null);
-			}
-		},
-		p(ctx, [dirty]) {
-			if (dirty & /*quant*/ 1) {
-				each_value = /*quant*/ ctx[0].data.steps;
-				let i;
-
-				for (i = 0; i < each_value.length; i += 1) {
-					const child_ctx = OmoRoadmap_svelte_get_each_context(ctx, each_value, i);
-
-					if (each_blocks[i]) {
-						each_blocks[i].p(child_ctx, dirty);
-					} else {
-						each_blocks[i] = OmoRoadmap_svelte_create_each_block(child_ctx);
-						each_blocks[i].c();
-						each_blocks[i].m(ul, null);
-					}
-				}
-
-				for (; i < each_blocks.length; i += 1) {
-					each_blocks[i].d(1);
-				}
-
-				each_blocks.length = each_value.length;
-			}
-		},
-		i: noop,
-		o: noop,
-		d(detaching) {
-			if (detaching) detach(div);
-			destroy_each(each_blocks, detaching);
-		}
-	};
-}
-
-function OmoRoadmap_svelte_instance($$self, $$props, $$invalidate) {
-	let { quant = {
-		data: {
-			steps: [
-				{
-					version: "v0.1.0 alpha",
-					date: "2020 JAN",
-					title: "PROTOTYPE: Store web-components on IPFS",
-					description: "",
-					done: true
-				},
-				{
-					version: "v0.2.0 alpha",
-					date: "2020 FEB",
-					title: "PROTOTYPE: Svelte Mini-Platform",
-					description: "",
-					done: true
-				},
-				{
-					version: "v0.3.0 alpha",
-					date: "2020 MAR",
-					title: "PROTOTYPE: CRUD on textileio threads",
-					description: "",
-					done: true
-				},
-				{
-					version: "v0.4.0 alpha",
-					date: "2020 MAI",
-					title: "PROTOTYPE: GraphQL Editor",
-					description: "Basic CODA like Schema- and Data-Editor with Graphql subscriptions on-top of textileio threads",
-					done: true
-				},
-				{
-					version: "v0.5.0 alpha",
-					date: "2020 JULI",
-					title: "LAUNCH: First dream profiles",
-					description: "We make interviews with you about your greatest dreams in life and build websites, apps and tools with you to grow your passion",
-					done: false
-				},
-				{
-					version: "v0.6.0 alpha",
-					date: "2020 AUG",
-					title: "PROTOTYPE: Crowdsourcing Dreams",
-					description: "Omo.earth is build on top of the Circles universal basic income currency protocol, which enables us to crowdsource your dreams",
-					done: false
-				},
-				{
-					version: "v0.7.0 alpha",
-					date: "2020 SEP",
-					title: "IMPLEMENT: Integrate UBI-Blockchain",
-					description: "Integrate and switch to the real Circles-UBI Blockchain Token on xDAI",
-					done: false
-				},
-				{
-					version: "v0.8.0 alpha",
-					date: "2020 OKT",
-					title: "POC: Quanta-Code Editor",
-					description: "Create, edit and compile quanta as web-components with a SVELTE REPL like editor to ipfs and the textile threads DB",
-					done: false
-				},
-				{
-					version: "v0.9.0 alpha",
-					date: "2020 NOV",
-					title: "POC: Basic UI-Designer",
-					description: "Simple Designer-Editor to create different views, with the help of a basic design system based on svelte components, inspired by 'styled system' and the tailwind syntax",
-					done: false
-				},
-				{
-					version: "v1.0.0 private beta",
-					date: "2020 DEZ",
-					title: "TEST: Test run beta funding",
-					description: "",
-					done: false
-				},
-				{
-					version: "v1.1.0 public",
-					date: "2021 JAN",
-					title: "LAUNCH: The first dream crowdfunds",
-					description: "which will be runnning completely on top of the circles-ubi protocol",
-					done: false
-				}
-			]
-		}
-	} } = $$props;
-
-	$$self.$set = $$props => {
-		if ("quant" in $$props) $$invalidate(0, quant = $$props.quant);
-	};
-
-	return [quant];
-}
-
-class OmoRoadmap_svelte_OmoRoadmap extends SvelteComponent {
-	constructor(options) {
-		super();
-		init(this, options, OmoRoadmap_svelte_instance, OmoRoadmap_svelte_create_fragment, safe_not_equal, { quant: 0 });
-	}
-}
-
-/* harmony default export */ var OmoRoadmap_svelte = (OmoRoadmap_svelte_OmoRoadmap);
-// CONCATENATED MODULE: ./quanta/2-molecules/OmoSubscribe.svelte
-/* src/quanta/2-molecules/OmoSubscribe.svelte generated by Svelte v3.21.0 */
-
-
-function OmoSubscribe_svelte_create_fragment(ctx) {
-	let div4;
-	let div3;
-	let div0;
-	let t0_value = /*quant*/ ctx[0].data.title + "";
-	let t0;
-	let t1;
-	let div1;
-	let t2_value = /*quant*/ ctx[0].data.subline + "";
-	let t2;
-	let t3;
-	let div2;
-	let input;
-	let input_placeholder_value;
-	let t4;
-	let button;
-	let t5_value = /*quant*/ ctx[0].data.button + "";
-	let t5;
-
-	return {
-		c() {
-			div4 = internal_element("div");
-			div3 = internal_element("div");
-			div0 = internal_element("div");
-			t0 = internal_text(t0_value);
-			t1 = space();
-			div1 = internal_element("div");
-			t2 = internal_text(t2_value);
-			t3 = space();
-			div2 = internal_element("div");
-			input = internal_element("input");
-			t4 = space();
-			button = internal_element("button");
-			t5 = internal_text(t5_value);
-			attr(div0, "class", "m-0 p-0 text-5xl font-title font-bold uppercase text-white\n      antialiased text-center");
-			attr(div1, "class", " m-0 p-0 text-2xl text-white italic font-light font-sans\n      antialiased text-center");
-			attr(input, "type", "text");
-			attr(input, "class", "text-lg text-gray-600 w-2/3 px-6 rounded");
-			attr(input, "placeholder", input_placeholder_value = /*quant*/ ctx[0].data.email);
-			attr(button, "class", "py-3 px-4 w-1/3 bg-green-400 font-bold text-lg rounded text-white\n        hover:bg-blue-800");
-			attr(button, "type", "button");
-			attr(div2, "class", " mt-3 flex flex-row flex-wrap");
-			attr(div3, "class", "p-10 py-20 flex flex-col flex-wrap justify-center content-center");
-			attr(div4, "class", "bg-cover bg-center h-auto text-white py-24 px-16 object-fill");
-			set_style(div4, "background-image", "url(" + /*quant*/ ctx[0].data.image + ")");
-		},
-		m(target, anchor) {
-			insert(target, div4, anchor);
-			append(div4, div3);
-			append(div3, div0);
-			append(div0, t0);
-			append(div3, t1);
-			append(div3, div1);
-			append(div1, t2);
-			append(div3, t3);
-			append(div3, div2);
-			append(div2, input);
-			append(div2, t4);
-			append(div2, button);
-			append(button, t5);
-		},
-		p(ctx, [dirty]) {
-			if (dirty & /*quant*/ 1 && t0_value !== (t0_value = /*quant*/ ctx[0].data.title + "")) set_data(t0, t0_value);
-			if (dirty & /*quant*/ 1 && t2_value !== (t2_value = /*quant*/ ctx[0].data.subline + "")) set_data(t2, t2_value);
-
-			if (dirty & /*quant*/ 1 && input_placeholder_value !== (input_placeholder_value = /*quant*/ ctx[0].data.email)) {
-				attr(input, "placeholder", input_placeholder_value);
-			}
-
-			if (dirty & /*quant*/ 1 && t5_value !== (t5_value = /*quant*/ ctx[0].data.button + "")) set_data(t5, t5_value);
-
-			if (dirty & /*quant*/ 1) {
-				set_style(div4, "background-image", "url(" + /*quant*/ ctx[0].data.image + ")");
-			}
-		},
-		i: noop,
-		o: noop,
-		d(detaching) {
-			if (detaching) detach(div4);
-		}
-	};
-}
-
-function OmoSubscribe_svelte_instance($$self, $$props, $$invalidate) {
-	let { quant = {
-		data: {
-			title: "Follow us on Github",
-			subline: "Find out about events and other news",
-			email: "team@omo.earth",
-			image: "https://source.unsplash.com/random",
-			button: "Github"
-		}
-	} } = $$props;
-
-	$$self.$set = $$props => {
-		if ("quant" in $$props) $$invalidate(0, quant = $$props.quant);
-	};
-
-	return [quant];
-}
-
-class OmoSubscribe_svelte_OmoSubscribe extends SvelteComponent {
-	constructor(options) {
-		super();
-		init(this, options, OmoSubscribe_svelte_instance, OmoSubscribe_svelte_create_fragment, safe_not_equal, { quant: 0 });
-	}
-}
-
-/* harmony default export */ var OmoSubscribe_svelte = (OmoSubscribe_svelte_OmoSubscribe);
-// CONCATENATED MODULE: ./quanta/2-molecules/OmoSquares.svelte
-/* src/quanta/2-molecules/OmoSquares.svelte generated by Svelte v3.21.0 */
-
-
-
-
-function OmoSquares_svelte_create_fragment(ctx) {
-	let div5;
-	let div0;
-	let img;
-	let img_src_value;
-	let t0;
-	let div4;
-	let div3;
-	let div1;
-	let t1_value = /*quant*/ ctx[0].title + "";
-	let t1;
-	let t2;
-	let div2;
-	let t3_value = /*quant*/ ctx[0].text + "";
-	let t3;
-
-	return {
-		c() {
-			div5 = internal_element("div");
-			div0 = internal_element("div");
-			img = internal_element("img");
-			t0 = space();
-			div4 = internal_element("div");
-			div3 = internal_element("div");
-			div1 = internal_element("div");
-			t1 = internal_text(t1_value);
-			t2 = space();
-			div2 = internal_element("div");
-			t3 = internal_text(t3_value);
-			attr(img, "class", "h-64");
-			if (img.src !== (img_src_value = /*quant*/ ctx[0].illustration)) attr(img, "src", img_src_value);
-			attr(img, "alt", "plant the seed");
-			attr(div0, "class", "flex justify-center mb-8");
-			attr(div1, "class", "uppercase text-5xl text-green-400 mb-1");
-			set_style(div1, "font-family", "'Montserrat', sans-serif", 1);
-			attr(div2, "class", "text-lg text-gray-600 italic font-light tracking-wide pt-6");
-			attr(div3, "class", "text-center w-full");
-			attr(div4, "class", "flex content-center justify-center w-full");
-			attr(div5, "class", "my-8 py-12");
-			set_style(div5, "background-color", "#fafafa");
-		},
-		m(target, anchor) {
-			insert(target, div5, anchor);
-			append(div5, div0);
-			append(div0, img);
-			append(div5, t0);
-			append(div5, div4);
-			append(div4, div3);
-			append(div3, div1);
-			append(div1, t1);
-			append(div3, t2);
-			append(div3, div2);
-			append(div2, t3);
-		},
-		p(ctx, [dirty]) {
-			if (dirty & /*quant*/ 1 && img.src !== (img_src_value = /*quant*/ ctx[0].illustration)) {
-				attr(img, "src", img_src_value);
-			}
-
-			if (dirty & /*quant*/ 1 && t1_value !== (t1_value = /*quant*/ ctx[0].title + "")) set_data(t1, t1_value);
-			if (dirty & /*quant*/ 1 && t3_value !== (t3_value = /*quant*/ ctx[0].text + "")) set_data(t3, t3_value);
-		},
-		i: noop,
-		o: noop,
-		d(detaching) {
-			if (detaching) detach(div5);
-		}
-	};
-}
-
-function OmoSquares_svelte_instance($$self, $$props, $$invalidate) {
-	let { quant = {
-		title: "title",
-		text: "test",
-		illustration: "/illustrations/plant_the_seed.svg"
-	} } = $$props;
-
-	$$self.$set = $$props => {
-		if ("quant" in $$props) $$invalidate(0, quant = $$props.quant);
-	};
-
-	return [quant];
-}
-
-class OmoSquares_svelte_OmoSquares extends SvelteComponent {
-	constructor(options) {
-		super();
-		init(this, options, OmoSquares_svelte_instance, OmoSquares_svelte_create_fragment, safe_not_equal, { quant: 0 });
-	}
-}
-
-/* harmony default export */ var OmoSquares_svelte = (OmoSquares_svelte_OmoSquares);
-// CONCATENATED MODULE: ./quanta/5-pages/OmoHome.svelte
-/* src/quanta/5-pages/OmoHome.svelte generated by Svelte v3.21.0 */
-
-
-
-
-
-
-
-
-
-
-
-function OmoHome_svelte_create_fragment(ctx) {
-	let div;
-	let current;
-	const omobanner = new _2_molecules_OmoBanner_svelte({ props: { quant: /*vision*/ ctx[0] } });
-
-	return {
-		c() {
-			div = internal_element("div");
-			create_component(omobanner.$$.fragment);
-			attr(div, "class", "overflow-hidden overflow-y-auto");
-		},
-		m(target, anchor) {
-			insert(target, div, anchor);
-			mount_component(omobanner, div, null);
-			current = true;
-		},
-		p: noop,
-		i(local) {
-			if (current) return;
-			transition_in(omobanner.$$.fragment, local);
-			current = true;
-		},
-		o(local) {
-			transition_out(omobanner.$$.fragment, local);
-			current = false;
-		},
-		d(detaching) {
-			if (detaching) detach(div);
-			destroy_component(omobanner);
-		}
-	};
-}
-
-function OmoHome_svelte_instance($$self) {
-	const vision = {
-		title: "one dream shared",
-		subline: "is one quantum leap more powerful than the million obstacles and failures ahead",
-		image: "/images/thought-catalog-23KdVfc395A-unsplash.jpg"
-	};
-
-	const mission = {
-		uptitle: "our dream is to",
-		title: "grow your passions week by week",
-		subline: "experience the growth of playful and joyful passion when opensourcing your dreams to the crowd",
-		text: "publicly challenge your dreams to turn your small seeds of inspiration into large trees of fruitful abundance. Intrinsicly, Omos begin to share your dreams and commit their time to co-create with you the social-, technological-, organizational- and financial opensource systems, tools and protocols to transform the shared dreams into empowering and joyful passions."
-	};
-
-	const steps = {
-		data: {
-			steps: [
-				{
-					image: "/images/ideas.svg",
-					title: "1. CHALLENGE YOUR DREAMS",
-					description: "Increase the velocity of collaborative innovation by open sourcing your dreams and visions through our omo design thinking process "
-				},
-				{
-					image: "/images/app.svg",
-					title: "2. PLAY WITH YOUR ASSUMPTIONS",
-					description: "Omo's co-create and iterate ideas and interactive prototypes to evaluate your assumptions in a matter of days and weeks rather than lost months or years"
-				},
-				{
-					image: "/images/happy.svg",
-					title: "3. CROWDFUND YOUR GOALS",
-					description: "Once evaluated successfully traction picks up magically and embraces the work of your co-creators with crowdfunded early adopter benefits and privileges."
-				}
-			]
-		}
-	};
-
-	const process = {
-		uptitle: "Our 5 step evolution circle",
-		title: "a lifelong journey towards abundance",
-		subline: "enjoy and build your dreams with us on top of circles the most important and innovative human-centered universal basic income currency of our time"
-	};
-
-	const quote = {
-		text: "OMO EARTHS crowdsourcing and crowdfunding tools are build on top of the CIRCLES universal basic income currency protocol. Circles introduces a radical new breed of money and a value system based on human centered trust, with the mission to empower sustainable human innovation growth for a greater common good"
-	};
-
-	const documentation = {
-		uptitle: "OUR HANDBOOK",
-		title: "How to play with omo code blocks",
-		subline: "WIP: A quick introduction of our core tech concepts and how you can interact with it (EARLY ALPHA) "
-	};
-
-	const roadmap = {
-		uptitle: "Our roadmap",
-		title: "One quantum leap dream at a time",
-		subline: "our roadmap is fluid and an ever evolving set of technological-, social- and economic- tools, we ideate, iterate and implement over time"
-	};
-
-	const contributors = {
-		uptitle: "omo co-creators",
-		title: "contributing tools to the commons",
-		subline: "Omo co-creators love to empower other dreamers, makers, developers and entrepreneuers, by playing with and adapting opensource, decentralized and modern technologies for a greater common good"
-	};
-
-	const square1 = {
-		title: "1. Plant 10 Seeds",
-		text: "inspire 10 dream patrons, who commit every week min 1 hour to your dream",
-		illustration: "/illustrations/plant_the_seed.svg"
-	};
-
-	const square2 = {
-		title: "2. Gather 50+ Votes",
-		text: "to dance and filter out the most promising idea which you will test",
-		illustration: "/illustrations/gather_the _votes.svg"
-	};
-
-	const square3 = {
-		title: "3. Test 100+ Makers",
-		text: "to evaluate your prototype by crowdfunding 5.000+ Circles (~5k€)",
-		illustration: "/illustrations/evaluate.svg"
-	};
-
-	const square4 = {
-		title: "4. Inspire 500+ Omos",
-		text: "to pre-order your future services and products for 50.000+ Circles (~50k €)",
-		illustration: "/illustrations/inspire.svg"
-	};
-
-	const square5 = {
-		title: "5. Trust 1000+ investors",
-		text: "who guarantee you an exchange rate of 1 Circle = 0,50 € (up to 500.000€)",
-		illustration: "/illustrations/trust.svg"
-	};
-
-	const square6 = {
-		title: "REPEAT THE CIRCLE",
-		text: "inspire 10 dream patrons, who commit every week min 1 hour to your dream",
-		illustration: "/illustrations/plant_the_seed.svg"
-	};
-
-	return [vision];
-}
-
 class OmoHome_svelte_OmoHome extends SvelteComponent {
 	constructor(options) {
 		super();
-		init(this, options, OmoHome_svelte_instance, OmoHome_svelte_create_fragment, safe_not_equal, {});
+		init(this, options, null, OmoHome_svelte_create_fragment, safe_not_equal, {});
 	}
 }
 
 /* harmony default export */ var OmoHome_svelte = (OmoHome_svelte_OmoHome);
 // EXTERNAL MODULE: ../node_modules/svelte-select/src/Item.svelte.css
-var Item_svelte = __webpack_require__(466);
+var Item_svelte = __webpack_require__(465);
 
 // CONCATENATED MODULE: ../node_modules/svelte-select/src/Item.svelte
 /* node_modules/svelte-select/src/Item.svelte generated by Svelte v3.21.0 */
@@ -112273,7 +110523,7 @@ class Item_svelte_Item extends SvelteComponent {
 
 
 // EXTERNAL MODULE: ../node_modules/svelte-select/src/VirtualList.svelte.css
-var VirtualList_svelte = __webpack_require__(467);
+var VirtualList_svelte = __webpack_require__(466);
 
 // CONCATENATED MODULE: ../node_modules/svelte-select/src/VirtualList.svelte
 /* node_modules/svelte-select/src/VirtualList.svelte generated by Svelte v3.21.0 */
@@ -112666,7 +110916,7 @@ class VirtualList_svelte_VirtualList extends SvelteComponent {
 
 
 // EXTERNAL MODULE: ../node_modules/svelte-select/src/List.svelte.css
-var List_svelte = __webpack_require__(468);
+var List_svelte = __webpack_require__(467);
 
 // CONCATENATED MODULE: ../node_modules/svelte-select/src/List.svelte
 /* node_modules/svelte-select/src/List.svelte generated by Svelte v3.21.0 */
@@ -112685,7 +110935,7 @@ function List_svelte_get_each_context(ctx, list, i) {
 }
 
 // (210:0) {#if isVirtualList}
-function List_svelte_create_if_block_3(ctx) {
+function create_if_block_3(ctx) {
 	let div;
 	let current;
 
@@ -112849,7 +111099,7 @@ function create_default_slot(ctx) {
 }
 
 // (232:0) {#if !isVirtualList}
-function List_svelte_create_if_block(ctx) {
+function create_if_block(ctx) {
 	let div;
 	let current;
 	let each_value = /*items*/ ctx[4];
@@ -112966,7 +111216,7 @@ function List_svelte_create_if_block(ctx) {
 // (254:2) {:else}
 function create_else_block_1(ctx) {
 	let if_block_anchor;
-	let if_block = !/*hideEmptyState*/ ctx[10] && List_svelte_create_if_block_2(ctx);
+	let if_block = !/*hideEmptyState*/ ctx[10] && create_if_block_2(ctx);
 
 	return {
 		c() {
@@ -112982,7 +111232,7 @@ function create_else_block_1(ctx) {
 				if (if_block) {
 					if_block.p(ctx, dirty);
 				} else {
-					if_block = List_svelte_create_if_block_2(ctx);
+					if_block = create_if_block_2(ctx);
 					if_block.c();
 					if_block.m(if_block_anchor.parentNode, if_block_anchor);
 				}
@@ -112999,7 +111249,7 @@ function create_else_block_1(ctx) {
 }
 
 // (255:4) {#if !hideEmptyState}
-function List_svelte_create_if_block_2(ctx) {
+function create_if_block_2(ctx) {
 	let div;
 	let t;
 
@@ -113129,7 +111379,7 @@ function create_else_block(ctx) {
 }
 
 // (235:4) {#if item.isGroupHeader && !item.isSelectable}
-function List_svelte_create_if_block_1(ctx) {
+function create_if_block_1(ctx) {
 	let div;
 	let t_value = /*getGroupHeaderLabel*/ ctx[6](/*item*/ ctx[34]) + "";
 	let t;
@@ -113161,7 +111411,7 @@ function List_svelte_create_each_block(ctx) {
 	let if_block;
 	let if_block_anchor;
 	let current;
-	const if_block_creators = [List_svelte_create_if_block_1, create_else_block];
+	const if_block_creators = [create_if_block_1, create_else_block];
 	const if_blocks = [];
 
 	function select_block_type(ctx, dirty) {
@@ -113228,8 +111478,8 @@ function List_svelte_create_fragment(ctx) {
 	let if_block1_anchor;
 	let current;
 	let dispose;
-	let if_block0 = /*isVirtualList*/ ctx[3] && List_svelte_create_if_block_3(ctx);
-	let if_block1 = !/*isVirtualList*/ ctx[3] && List_svelte_create_if_block(ctx);
+	let if_block0 = /*isVirtualList*/ ctx[3] && create_if_block_3(ctx);
+	let if_block1 = !/*isVirtualList*/ ctx[3] && create_if_block(ctx);
 
 	return {
 		c() {
@@ -113256,7 +111506,7 @@ function List_svelte_create_fragment(ctx) {
 						transition_in(if_block0, 1);
 					}
 				} else {
-					if_block0 = List_svelte_create_if_block_3(ctx);
+					if_block0 = create_if_block_3(ctx);
 					if_block0.c();
 					transition_in(if_block0, 1);
 					if_block0.m(t.parentNode, t);
@@ -113279,7 +111529,7 @@ function List_svelte_create_fragment(ctx) {
 						transition_in(if_block1, 1);
 					}
 				} else {
-					if_block1 = List_svelte_create_if_block(ctx);
+					if_block1 = create_if_block(ctx);
 					if_block1.c();
 					transition_in(if_block1, 1);
 					if_block1.m(if_block1_anchor.parentNode, if_block1_anchor);
@@ -113629,7 +111879,7 @@ class List_svelte_List extends SvelteComponent {
 
 
 // EXTERNAL MODULE: ../node_modules/svelte-select/src/Selection.svelte.css
-var Selection_svelte = __webpack_require__(469);
+var Selection_svelte = __webpack_require__(468);
 
 // CONCATENATED MODULE: ../node_modules/svelte-select/src/Selection.svelte
 /* node_modules/svelte-select/src/Selection.svelte generated by Svelte v3.21.0 */
@@ -113682,7 +111932,7 @@ class Selection_svelte_Selection extends SvelteComponent {
 
 
 // EXTERNAL MODULE: ../node_modules/svelte-select/src/MultiSelection.svelte.css
-var MultiSelection_svelte = __webpack_require__(470);
+var MultiSelection_svelte = __webpack_require__(469);
 
 // CONCATENATED MODULE: ../node_modules/svelte-select/src/MultiSelection.svelte
 /* node_modules/svelte-select/src/MultiSelection.svelte generated by Svelte v3.21.0 */
@@ -113931,7 +112181,7 @@ function debounce(func, wait, immediate) {
 };
 
 // EXTERNAL MODULE: ../node_modules/svelte-select/src/Select.svelte.css
-var Select_svelte = __webpack_require__(471);
+var Select_svelte = __webpack_require__(470);
 
 // CONCATENATED MODULE: ../node_modules/svelte-select/src/Select.svelte
 /* node_modules/svelte-select/src/Select.svelte generated by Svelte v3.21.0 */
@@ -116617,7 +114867,7 @@ class OmoQuantTable_svelte_OmoQuantTable extends SvelteComponent {
 
 /* harmony default export */ var OmoQuantTable_svelte = (OmoQuantTable_svelte_OmoQuantTable);
 // EXTERNAL MODULE: ./quanta/2-molecules/OmoQuantGrid.svelte.css
-var OmoQuantGrid_svelte = __webpack_require__(472);
+var OmoQuantGrid_svelte = __webpack_require__(471);
 
 // CONCATENATED MODULE: ./quanta/2-molecules/OmoQuantGrid.svelte
 /* src/quanta/2-molecules/OmoQuantGrid.svelte generated by Svelte v3.21.0 */
@@ -117458,7 +115708,7 @@ class Imprint_svelte_Imprint extends SvelteComponent {
 
 /* harmony default export */ var Imprint_svelte = (Imprint_svelte_Imprint);
 // EXTERNAL MODULE: ./App.svelte.css
-var App_svelte = __webpack_require__(473);
+var App_svelte = __webpack_require__(472);
 
 // CONCATENATED MODULE: ./App.svelte
 /* src/App.svelte generated by Svelte v3.21.0 */
@@ -117479,7 +115729,9 @@ const { window: window_1 } = globals;
 function App_svelte_create_fragment(ctx) {
 	let div;
 	let main;
-	let t;
+	let t0;
+	let footer;
+	let t1;
 	let a;
 	let current;
 	let dispose;
@@ -117493,12 +115745,17 @@ function App_svelte_create_fragment(ctx) {
 		var switch_instance = new switch_value(switch_props(ctx));
 	}
 
+	const omonavbar = new OmoNavbar_svelte({});
+
 	return {
 		c() {
 			div = internal_element("div");
 			main = internal_element("main");
 			if (switch_instance) create_component(switch_instance.$$.fragment);
-			t = space();
+			t0 = space();
+			footer = internal_element("footer");
+			create_component(omonavbar.$$.fragment);
+			t1 = space();
 			a = internal_element("a");
 
 			a.innerHTML = `<svg width="80" height="80" viewBox="0 0 250 250" style="fill:#102137; color:2AD78B; position: absolute; top: 0; border: 0;
@@ -117516,7 +115773,7 @@ function App_svelte_create_fragment(ctx) {
 			attr(main, "class", "h-full flex-1 flex overflow-hidden w-full");
 			attr(div, "class", "flex flex-col h-full w-full text-blue-900");
 			set_style(div, "font-family", "'Muli', sans-serif", 1);
-			attr(a, "href", "https://github.com/omoearth/omo-quantum");
+			attr(a, "href", "https://github.com/omoearth/omo");
 			attr(a, "class", "github-corner svelte-1ejivyp");
 			attr(a, "aria-label", "Follow us on GitHub");
 		},
@@ -117528,7 +115785,10 @@ function App_svelte_create_fragment(ctx) {
 				mount_component(switch_instance, main, null);
 			}
 
-			insert(target, t, anchor);
+			append(div, t0);
+			append(div, footer);
+			mount_component(omonavbar, footer, null);
+			insert(target, t1, anchor);
 			insert(target, a, anchor);
 			current = true;
 			if (remount) dispose();
@@ -117562,16 +115822,19 @@ function App_svelte_create_fragment(ctx) {
 		i(local) {
 			if (current) return;
 			if (switch_instance) transition_in(switch_instance.$$.fragment, local);
+			transition_in(omonavbar.$$.fragment, local);
 			current = true;
 		},
 		o(local) {
 			if (switch_instance) transition_out(switch_instance.$$.fragment, local);
+			transition_out(omonavbar.$$.fragment, local);
 			current = false;
 		},
 		d(detaching) {
 			if (detaching) detach(div);
 			if (switch_instance) destroy_component(switch_instance);
-			if (detaching) detach(t);
+			destroy_component(omonavbar);
+			if (detaching) detach(t1);
 			if (detaching) detach(a);
 			dispose();
 		}
@@ -117663,7 +115926,7 @@ class App_svelte_App extends SvelteComponent {
 // CONCATENATED MODULE: ./index.ts
 
 
-const escapeStringRegexp = __webpack_require__(474);
+const escapeStringRegexp = __webpack_require__(473);
 let index_pluralize = __webpack_require__(94);
 let app;
 // var textileThread = TextileThread.getInstance(null);
