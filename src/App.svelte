@@ -112,14 +112,13 @@
       this={router.find(x => x.route == $curRoute).quant}
       {router} />
   </main>
-    <!--
   <footer>
     <OmoNavbar />
-  </footer>-->
+  </footer>
 </div>
 
 <a
-  href="https://github.com/omoearth/omo-quantum"
+  href="https://github.com/omoearth/omo"
   class="github-corner"
   aria-label="Follow us on GitHub">
   <svg
